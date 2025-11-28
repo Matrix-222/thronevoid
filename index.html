@@ -1,92 +1,41 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>عرش الفراغ</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #000; color: #FFD700; font-family: 'Arial', sans-serif; overflow: hidden; height: 100vh; }
-        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(2px 2px at 20px 30px, #eee, transparent), radial-gradient(2px 2px at 40px 70px, #fff, transparent); background-size: 50px 50px; animation: twinkle 5s infinite; }
-        @keyframes twinkle { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-        .welcome { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 1; }
-        h1 { font-size: 4rem; text-shadow: 0 0 30px #FFD700; margin-bottom: 20px; animation: glow 2s infinite alternate; }
-        @keyframes glow { from { text-shadow: 0 0 20px #FFD700; } to { text-shadow: 0 0 40px #FFD700, 0 0 60px #FF4500; } }
-        .start-btn { background: #FFD700; color: #000; padding: 20px 50px; font-size: 1.5rem; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 0 40px #FFD700; transition: all 0.3s; animation: pulse 2s infinite; }
-        .start-btn:hover { transform: scale(1.1); box-shadow: 0 0 60px #FFD700; }
-        @keyframes pulse { 0%, 100% { box-shadow: 0 0 40px #FFD700; } 50% { box-shadow: 0 0 80px #FFD700; } }
-        .dashboard { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); padding: 20px; text-align: center; z-index: 2; }
-        .panel { background: rgba(255,215,0,0.1); border: 2px solid #FFD700; border-radius: 20px; padding: 20px; margin: 20px auto; max-width: 300px; display: inline-block; }
-        .stat { font-size: 2rem; margin: 10px 0; }
-        .action-btn { background: #111; color: #FFD700; border: 2px solid #FFD700; padding: 15px 30px; font-size: 1.2rem; border-radius: 15px; cursor: pointer; margin: 10px; transition: 0.3s; }
-        .action-btn:hover { background: #FFD700; color: #000; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>عرش الفراغ</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#FFD700;font-family:Arial;overflow:hidden;height:100vh}
+.stars{position:fixed;inset:0;background:transparent url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='4' height='4'><circle cx='2' cy='2' r='1' fill='%23fff'/></svg>") repeat;animation:s 8s infinite}
+@keyframes s{0%,100%{opacity:.3}50%{opacity:1}}
+.center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+h1{font-size:4.5rem;text-shadow:0 0 40px #FFD700;animation:g 3s infinite alternate}
+@keyframes g{from{text-shadow:0 0 20px #FFD700}to{text-shadow:0 0 60px #FFD700,0 0 100px #B8860B}}
+.btn{background:#FFD700;color:#000;padding:20px 60px;font-size:2rem;border:none;border-radius:50px;cursor:pointer;box-shadow:0 0 50px #FFD700;animation:p 2s infinite}
+.btn:hover{transform:scale(1.15)}
+@keyframes p{0%,100%{box-shadow:0 0 50px #FFD700}50%{box-shadow:0 0 100px #FFD700}}
+#game{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.97);padding:30px;text-align:center}
+.stat{display:inline-block;background:rgba(255,215,0,0.15);border:3px solid #FFD700;border-radius:20px;padding:20px 40px;margin:20px;font-size:2.5rem}
+</style>
 </head>
 <body>
-    <div class="stars"></div>
-    <div class="welcome" id="welcome">
-        <h1>عرش الفراغ</h1>
-        <p style="font-size: 1.5rem; margin-bottom: 30px;">هل أنت جاهز لتتويجك إمبراطور المجرة؟</p>
-        <button class="start-btn" onclick="showDashboard()">ابدأ إمبراطوريتك</button>
-    </div>
-    <div class="dashboard" id="dashboard">
-        <h2 style="margin-bottom: 30px;">لوحة تحكم الإمبراطور علي آل عابد</h2>
-        <div class="panel">
-            <div class="stat" id="planets">0</div>
-            <p>كواكب محتلة</p>
-        </div>
-        <div class="panel">
-            <div class="stat" id="fleets">0</div>
-            <p>أساطيل جاهزة</p>
-        </div>
-        <div class="panel">
-            <div class="stat" id="energy">0</div>
-            <p>طاقة إجمالية</p>
-        </div>
-        <div style="margin-top: 30px;">
-            <button class="action-btn" onclick="addFleet()">إنشاء أسطول</button>
-            <button class="action-btn" onclick="conquerPlanet()">غزو كوكب</button>
-            <button class="action-btn" onclick="showReport()">عرض التقرير</button>
-        </div>
-        <button class="action-btn" onclick="showWelcome()" style="margin-top: 30px;">العودة للشاشة الرئيسية</button>
-    </div>
-    <script>
-        let gameState = { fleets: 0, planets: 0, energy: 0 };
-        function showDashboard() {
-            document.getElementById('welcome').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
-        }
-        function showWelcome() {
-            document.getElementById('dashboard').style.display = 'none';
-            document.getElementById('welcome').style.display = 'block';
-        }
-        function addFleet() {
-            gameState.fleets += 1;
-            gameState.energy += 100;
-            document.getElementById('fleets').textContent = gameState.fleets;
-            document.getElementById('energy').textContent = gameState.energy;
-            alert('تم إنشاء أسطول جديد! قوتك زادت 🚀');
-        }
-        function conquerPlanet() {
-            if (gameState.fleets >= 1) {
-                gameState.planets += 1;
-                gameState.energy += 500;
-                gameState.fleets -= 1;
-                document.getElementById('planets').textContent = gameState.planets;
-                document.getElementById('fleets').textContent = gameState.fleets;
-                document.getElementById('energy').textContent = gameState.energy;
-                alert('تم غزو كوكب جديد! إمبراطوريتك تكبر 🌍');
-            } else {
-                alert('أنشئ أسطول أولاً للغزو!');
-            }
-        }
-        function showReport() {
-            alert(`تقرير الإمبراطور علي آل عابد:
-كواكب: ${gameState.planets}
-أساطيل: ${gameState.fleets}
-طاقة: ${gameState.energy}
-قوتك: ${gameState.planets * 1000 + gameState.energy}`);
-        }
-    </script>
-</body>
-</html>
+
+<div class="stars"></div>
+
+<div class="center" id="welcome">
+  <h1>عرش الفراغ</h1>
+  <p style="font-size:2rem;margin:40px 0">هل أنت جاهز لتتويجك إمبراطور المجرة؟</p>
+  <button class="btn" id="start">ابدأ إمبراطوريتك</button>
+</div>
+
+<div id="game">
+  <h1 style="margin:30px 0">لوحة تحكم الإمبراطور علي آل عابد</h1>
+  <div class="stat" id="p">0</div> <span style="font-size:2rem">كواكب</span><br>
+  <div class="stat" id="f">0</div> <span style="font-size:2rem">أساطيل</span><br>
+  <div class="stat" id="e">500</div> <span style="font-size:2rem">طاقة</span>
+  <br><br>
+  <button class="btn" onclick="addF()">إنشاء أسطول</button>
+  <button class="btn" onclick="conq()">غزو كوكب</button>
+  <button class="btn" onclick="rep()">تقرير</button>
+  <br><br>
