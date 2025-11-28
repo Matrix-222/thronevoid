@@ -109,7 +109,7 @@
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // 2. إعدادات Firebase (هذا هو كود مشروعك الحقيقي)
+        // 2. إعدادات Firebase (تم دمج كود مشروعك الفعلي)
         const firebaseConfig = {
             apiKey: "AIzaSyB-bfHRJW3E8KW3-o-PkNW6xi5ytrTKMJE", 
             authDomain: "thronevoid.firebaseapp.com",
@@ -163,30 +163,30 @@
             });
         });
 
-        // --- دالة إنشاء حساب جديد ---
+        // --- دالة إنشاء حساب جديد (مع انتقال لـ Dashboard) ---
         document.getElementById('registerBtn').addEventListener('click', () => {
             const email = document.getElementById('regEmail').value;
             const pass = document.getElementById('regPassword').value;
 
             createUserWithEmailAndPassword(auth, email, pass)
                 .then((userCredential) => {
-                    alert("تم إنشاء الحساب بنجاح! جاري تسجيل الدخول...");
-                    hideForms();
+                    // الانتقال إلى لوحة التحكم
+                    window.location.href = "dashboard.html";
                 })
                 .catch((error) => {
                     alert("خطأ في التسجيل: " + error.message);
                 });
         });
 
-        // --- دالة تسجيل الدخول ---
+        // --- دالة تسجيل الدخول (مع انتقال لـ Dashboard) ---
         document.getElementById('loginBtn').addEventListener('click', () => {
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPassword').value;
 
             signInWithEmailAndPassword(auth, email, pass)
                 .then((userCredential) => {
-                    alert("تم تسجيل الدخول بنجاح!");
-                    hideForms();
+                    // الانتقال إلى لوحة التحكم
+                    window.location.href = "dashboard.html";
                 })
                 .catch((error) => {
                     alert("خطأ في تسجيل الدخول: " + error.message);
