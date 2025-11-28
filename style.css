@@ -1,157 +1,138 @@
-/* ---------- عام ---------- */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Arial', sans-serif;
-}
-body {
-    background: radial-gradient(#000011, #000);
-    color: white;
-    transition: 0.3s;
-}
-body.light {
-    background: radial-gradient(#e0e0e0, #fafafa);
-    color: #111;
-}
-body[dir="rtl"] {
-    direction: rtl;
+/* ================================================= */
+/* 1. الإعدادات الأساسية والخلفية (Cinematic Dark Theme) */
+/* ================================================= */
+:root {
+    --primary-dark: #000000; /* أسود عميق */
+    --secondary-dark: #1a1a1a; /* أسود فاتح للخلفيات */
+    --text-light: #f0f0f0; /* نص أبيض ساطع */
+    --accent-red: #E31B23; /* أحمر داكن (مثل Sith) */
+    --accent-yellow: #FFC700; /* أصفر (مثل شعار Star Wars) */
+    --spacing: 20px;
 }
 
-/* ---------- الهيدر ---------- */
+body {
+    background-color: var(--primary-dark);
+    color: var(--text-light);
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* ================================================= */
+/* 2. شريط التنقل والرأس (Header) */
+/* ================================================= */
 header {
-    padding: 20px 50px;
+    background-color: var(--secondary-dark);
+    color: var(--text-light);
+    padding: var(--spacing) 5%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: relative;
-    z-index: 10;
+    border-bottom: 2px solid var(--accent-red); /* خط أحمر فاصل */
 }
+
 header h1 {
-    font-size: 32px;
+    font-family: Impact, "Arial Black", sans-serif;
+    color: var(--accent-yellow);
+    text-transform: uppercase;
+    font-size: 2.5em;
     letter-spacing: 2px;
-    color: #0ff;
-    text-shadow: 0 0 10px #0ff;
+    text-shadow: 0 0 5px rgba(255, 199, 0, 0.5); /* تأثير توهج خفيف */
 }
-nav a {
-    color: #0ff;
-    text-decoration: none;
-    margin: 0 15px;
-    font-weight: bold;
-    transition: 0.2s;
-}
-nav a:hover {
-    color: #fff;
-    text-shadow: 0 0 8px #0ff;
-}
+
+/* ================================================= */
+/* 3. الأزرار (Buttons) */
+/* ================================================= */
 button {
-    padding: 10px 16px;
-    cursor: pointer;
-    background: #222;
-    color: #0ff;
+    background-color: var(--accent-red);
+    color: var(--text-light);
     border: none;
-    border-radius: 8px;
-    transition: 0.3s;
-}
-body.light button {
-    background: #ddd;
-    color: #111;
-}
-
-/* ---------- Hero ---------- */
-.hero {
-    text-align: center;
-    padding: 100px 20px 50px 20px;
-    position: relative;
-    z-index: 5;
-}
-.hero h2 {
-    font-size: 48px;
-    margin-bottom: 20px;
-    text-shadow: 0 0 20px #0ff;
-}
-.hero p {
-    font-size: 20px;
-    color: #ccc;
-    max-width: 700px;
-    margin: auto;
-    line-height: 1.6;
-}
-.buttons {
-    margin-top: 30px;
-}
-.buttons a {
-    display: inline-block;
-    margin: 10px;
-    padding: 15px 30px;
-    background: #0ff;
-    color: #000;
-    font-weight: bold;
-    border-radius: 10px;
-    text-decoration: none;
-    transition: 0.3s;
-}
-.buttons a:hover {
-    background: #0aa;
-    color: #fff;
-}
-
-/* ---------- Canvas اللعبة ---------- */
-canvas#gameCanvas {
-    display: block;
-    margin: 50px auto;
-    background: rgba(0,0,0,0.6);
-    border-radius: 20px;
-    width: 90%;
-    height: 300px;
-}
-body.light canvas#gameCanvas {
-    background: rgba(230,230,230,0.8);
-}
-
-/* ---------- النموذج ---------- */
-form {
-    display: flex;
-    flex-direction: column;
-    background: rgba(0,0,0,0.6);
-    padding: 30px;
-    border-radius: 15px;
-    min-width: 300px;
-    margin-top: 30px;
-}
-form input {
-    margin: 10px 0;
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: none;
-}
-form button {
-    margin-top: 15px;
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 10px;
-    background: #0ff;
-    color: #000;
-    cursor: pointer;
-    border: none;
-}
-form button:hover {
-    background: #0aa;
-    color: white;
-}
-.social-login {
-    margin-top: 15px;
-    display: flex;
-    justify-content: space-around;
-}
-.social-login button {
     padding: 10px 20px;
-    border: none;
-    border-radius: 10px;
+    margin-left: 10px;
     cursor: pointer;
-    transition: 0.3s;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+    border-radius: 4px; /* زوايا مربعة */
+}
+
+button:hover {
+    background-color: #ff3838; /* أحمر أكثر لمعاناً عند التمرير */
+    box-shadow: 0 0 15px rgba(227, 27, 35, 0.8); /* توهج قوي */
+    transform: translateY(-2px);
+}
+
+/* الأزرار الاجتماعية */
+.social-login button {
+    background-color: var(--secondary-dark);
+    border: 1px solid var(--accent-yellow);
+    color: var(--accent-yellow);
+    margin-bottom: 10px;
 }
 .social-login button:hover {
-    opacity: 0.8;
+    background-color: var(--accent-yellow);
+    color: var(--secondary-dark);
+    box-shadow: none;
+}
+
+/* ================================================= */
+/* 4. قسم المحتوى الرئيسي والنماذج (Main & Form) */
+/* ================================================= */
+main {
+    padding: 40px var(--spacing);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+form {
+    background-color: var(--secondary-dark);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    border: 1px solid var(--accent-red);
+}
+
+form h2 {
+    color: var(--accent-yellow);
+    text-transform: uppercase;
+    margin-bottom: 25px;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #444;
+    background-color: #222;
+    color: var(--text-light);
+    border-radius: 4px;
+}
+input:focus {
+    border-color: var(--accent-yellow);
+    outline: none;
+}
+
+form button[type="submit"] {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 10px;
+}
+
+/* الروابط */
+a {
+    color: var(--accent-yellow);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+a:hover {
+    color: var(--accent-red);
 }
