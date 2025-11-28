@@ -3,33 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - Throne Void</title>
+<title>Login - Throne Void</title>
 <link rel="stylesheet" href="style.css">
-<style>
-body { margin:0; font-family:'Arial',sans-serif; background: radial-gradient(#000011,#000); color:white; transition:0.3s; }
-body.light { background: radial-gradient(#e0e0e0,#fafafa); color:#111; }
-header { padding:20px 50px; display:flex; justify-content:space-between; align-items:center; }
-header h1 { font-size:32px; color:#0ff; text-shadow:0 0 10px #0ff; }
-nav a { color:#0ff; text-decoration:none; margin:0 15px; font-weight:bold; transition:0.2s; }
-nav a:hover { color:#fff; text-shadow:0 0 8px #0ff; }
-main { padding:50px 20px; text-align:center; }
-canvas#gameCanvas { display:block; margin:50px auto; width:90%; height:300px; background: rgba(0,0,0,0.6); border-radius:20px; }
-body.light canvas#gameCanvas { background: rgba(230,230,230,0.8); }
-</style>
 </head>
 <body>
 <header>
-    <h1>Dashboard</h1>
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="login.html">Logout</a>
-    </nav>
+    <h1>Throne Void</h1>
+    <button onclick="window.location='index.html'">Home</button>
+    <button id="langToggle">العربية</button>
 </header>
 <main>
-    <h2>Welcome, Player!</h2>
-    <p>Here you can see your stats, rankings, and game progress.</p>
-    <canvas id="gameCanvas"></canvas>
+    <form>
+        <h2 data-key="login">Login</h2>
+        <input type="text" placeholder="Username or Email" required>
+        <input type="password" placeholder="Password" required>
+        <button type="submit" data-key="login">Login</button>
+        <div class="social-login">
+            <button>Google</button>
+            <button>Facebook</button>
+            <button>Twitter</button>
+        </div>
+    </form>
 </main>
-<script src="game.js"></script>
+<script src="lang.js"></script>
 </body>
 </html>
