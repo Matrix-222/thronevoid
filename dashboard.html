@@ -3,84 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaderboard - Throne Void</title>
+    <title>Dashboard - Throne Void</title>
     <link rel="stylesheet" href="style.css"> 
     <style>
-        /* تنسيقات خاصة بلوحة المتصدرين */
-        .leaderboard-container {
-            margin: 40px auto;
-            max-width: 600px;
-            background-color: var(--secondary-dark);
-            padding: 30px;
-            border-radius: 8px;
+        /* التنسيقات الإضافية للداشبورد */
+        .container { 
+            background: #1f2a36; 
+            padding: 40px; 
+            border-radius: 12px; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
             border: 1px solid var(--accent-yellow);
         }
-        .leaderboard-container h2 {
-            color: var(--accent-yellow);
-            text-align: center;
-            margin-bottom: 30px;
-            text-shadow: 0 0 5px rgba(255, 199, 0, 0.5);
+        #highScoreDisplay { color: var(--accent-yellow); margin-bottom: 15px; } 
+        #gameArea {
+            border: 2px solid #3498db;
+            background-color: #121212;
+            margin: 20px auto;
+            display: block;
+            cursor: pointer;
         }
-        #leaderboardTable {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-        #leaderboardTable th, #leaderboardTable td {
-            padding: 12px;
-            border-bottom: 1px solid #333;
-        }
-        #leaderboardTable th {
-            background-color: #2a2a2a;
-            color: var(--accent-red);
-            text-transform: uppercase;
-        }
-        #leaderboardTable tr:nth-child(even) {
-            background-color: #161616;
-        }
-        #leaderboardTable tr:hover {
-            background-color: #333;
-        }
-        /* تمييز المراكز الثلاثة الأولى */
-        .rank-1 { color: gold; font-weight: bold; }
-        .rank-2 { color: silver; font-weight: bold; }
-        .rank-3 { color: #cd7f32; font-weight: bold; } /* برونزي */
     </style>
 </head>
 <body>
     <header>
         <h1>THRONES OF THE VOID</h1>
         <div>
-            <button onclick="window.location='dashboard.html'" style="background-color: #2ecc71;">DASHBOARD</button>
-            <button onclick="window.location='index.html'">HOME</button>
+            <button onclick="window.location='leaderboard.html'" style="background-color: var(--accent-yellow); color: var(--primary-dark);">LEADERBOARD</button>
+            <button id="logoutBtn" style="background-color: var(--accent-red);">LOGOUT</button>
         </div>
     </header>
 
     <main>
-        <div class="leaderboard-container">
-            <h2>🥇 Global High Scores (لوحة المتصدرين) 🥇</h2>
+        <div class="container">
+            <h1>أهلاً بك في ساحة المجرة!</h1>
+            <p>تم تسجيل دخولك باسم المستخدم: <span id="userEmailDisplay" style="color: #2ecc71;">جاري التحميل...</span></p>
             
-            <table id="leaderboardTable">
-                <thead>
-                    <tr>
-                        <th>الترتيب</th>
-                        <th>اسم المستخدم (الإيميل)</th>
-                        <th>النتيجة</th>
-                    </tr>
-                </thead>
-                <tbody id="leaderboardBody">
-                    <tr><td colspan="3" style="text-align: center;">جاري تحميل النتائج...</td></tr>
-                </tbody>
-            </table>
+            <p id="highScoreDisplay">أعلى نتيجة لديك: 0</p>
+            
+            <p style="margin-top: 10px;">انقر في أي مكان داخل اللعبة للبدء!</p>
+
+            <canvas id="gameArea" width="600" height="400"></canvas>
+            
         </div>
     </main>
-    
-    <script type="module">
-        // 1. استيراد دوال Firebase الضرورية
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // 2. إعدادات Firebase (مفاتيح مشروعك)
+    <audio id="gameMusic" src="survival_music.mp3" loop></audio>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // *** مفاتيح مشروعك الفعلي (thronevoid) ***
         const firebaseConfig = {
             apiKey: "AIzaSyB-bfHRJW3E8KW3-o-PkNW6xi5ytrTKMJE", 
             authDomain: "thronevoid.firebaseapp.com",
@@ -91,67 +67,233 @@
             measurementId: "G-N34T3VRGX0"
         };
         
-        // تهيئة Firebase
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- دالة جلب وعرض لوحة المتصدرين ---
-        async function loadLeaderboard() {
-            const leaderboardBody = document.getElementById('leaderboardBody');
-            leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align: center;">جاري البحث عن العروش...</td></tr>';
-            
+        let currentUserEmail = null;
+        let currentHighScore = 0; 
+        
+        // دالة تحميل أعلى نتيجة للمستخدم
+        async function loadHighScore(email) {
+            const userDocRef = doc(db, "users", email);
             try {
-                // إنشاء استعلام: جلب الوثائق من مجلد 'users' وترتيبها حسب 'highScore' تنازلياً
-                const usersCollectionRef = collection(db, "users");
-                const q = query(usersCollectionRef, orderBy("highScore", "desc")); // ترتيب تنازلياً
-                
-                const querySnapshot = await getDocs(q);
-                
-                if (querySnapshot.empty) {
-                    leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align: center;">لا توجد نتائج حتى الآن.</td></tr>';
-                    return;
+                const docSnap = await getDoc(userDocRef);
+                if (docSnap.exists() && docSnap.data().highScore !== undefined) {
+                    currentHighScore = docSnap.data().highScore;
+                    document.getElementById('highScoreDisplay').innerText = `أعلى نتيجة لديك: ${currentHighScore}`;
+                } else {
+                    document.getElementById('highScoreDisplay').innerText = `أعلى نتيجة لديك: 0`;
                 }
-
-                let rank = 1;
-                leaderboardBody.innerHTML = ''; // تفريغ رسالة التحميل
-
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const email = doc.id; // الإيميل هو اسم الوثيقة (doc.id)
-                    const score = data.highScore || 0; // إذا لم يوجد حقل النتيجة، نعتبرها 0
-
-                    if (score > 0) { // عرض فقط اللاعبين الذين لديهم نقاط
-                        const row = leaderboardBody.insertRow();
-                        
-                        // تحديد الصنف للتمييز البصري
-                        let rankClass = '';
-                        if (rank === 1) rankClass = 'rank-1';
-                        else if (rank === 2) rankClass = 'rank-2';
-                        else if (rank === 3) rankClass = 'rank-3';
-
-                        // الترتيب
-                        row.insertCell(0).innerHTML = `<span class="${rankClass}">${rank}</span>`;
-                        
-                        // اسم المستخدم (نخفي جزء من الإيميل لحماية الخصوصية)
-                        const displayedEmail = email.substring(0, email.indexOf('@', 3)) + '***' + email.substring(email.lastIndexOf('.'));
-                        row.insertCell(1).textContent = displayedEmail;
-                        
-                        // النتيجة
-                        row.insertCell(2).textContent = score;
-                        
-                        rank++;
-                    }
-                });
-
             } catch (error) {
-                console.error("Error loading leaderboard:", error);
-                leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--accent-red);">خطأ في جلب البيانات: تأكد من تفعيل Firestore.</td></tr>';
+                console.error("Error loading high score:", error);
             }
         }
 
-        // بدء تحميل لوحة المتصدرين عند تحميل الصفحة
-        window.onload = loadLeaderboard;
+        // دالة حفظ أعلى نتيجة جديدة
+        async function saveHighScore(newScore) {
+            if (newScore > currentHighScore && currentUserEmail) {
+                const userDocRef = doc(db, "users", currentUserEmail);
+                try {
+                    await setDoc(userDocRef, { highScore: newScore }, { merge: true });
+                    currentHighScore = newScore;
+                    document.getElementById('highScoreDisplay').innerText = `أعلى نتيجة لديك: ${currentHighScore} (تم تحديثها!)`;
+                    console.log("High score saved successfully!");
+                } catch (error) {
+                    console.error("Error saving high score:", error);
+                }
+            }
+        }
 
+        // حماية الصفحة
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUserEmail = user.email;
+                document.getElementById('userEmailDisplay').innerText = currentUserEmail;
+                loadHighScore(currentUserEmail);
+                startGame();
+            } else {
+                alert("يجب عليك تسجيل الدخول أولاً للوصول إلى لوحة التحكم!");
+                window.location.href = "index.html"; 
+            }
+        });
+
+        // دالة تسجيل الخروج
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => {
+                window.location.href = "index.html";
+            }).catch((error) => {
+                console.error("Logout Error:", error);
+            });
+        });
+
+        // --- كود لعبة VOID FIGHTER القتالية ---
+
+        function startGame() {
+            const canvas = document.getElementById('gameArea');
+            const ctx = canvas.getContext('2d');
+            const music = document.getElementById('gameMusic');
+            
+            let player = { x: canvas.width / 2, y: canvas.height / 2, size: 20, speed: 5, color: '#2ecc71', health: 100 };
+            let enemies = [];
+            let bullets = []; 
+            let score = 0;
+            let gameOver = true; 
+            let lastShotTime = 0;
+            const shotCooldown = 300; 
+            let enemySpawnInterval; 
+
+            function playMusic() {
+                music.volume = 0.4;
+                music.play().catch(error => { console.log("Audio playback blocked."); });
+            }
+            
+            function resetGame() {
+                player.health = 100;
+                enemies = [];
+                bullets = [];
+                score = 0;
+                gameOver = false;
+                if (enemySpawnInterval) clearInterval(enemySpawnInterval);
+                enemySpawnInterval = setInterval(spawnEnemy, 1500);
+                update(); 
+                playMusic();
+            }
+
+            function spawnEnemy() {
+                if (gameOver) return;
+                let edge = Math.floor(Math.random() * 4);
+                let x, y;
+
+                if (edge === 0) { x = Math.random() * canvas.width; y = -10; }
+                else if (edge === 1) { x = Math.random() * canvas.width; y = canvas.height + 10; }
+                else if (edge === 2) { x = -10; y = Math.random() * canvas.height; }
+                else { x = canvas.width + 10; y = Math.random() * canvas.height; }
+
+                enemies.push({ x: x, y: y, size: 15, health: 30, color: '#e74c3c', speed: 1.5 + Math.random() * 1.5 });
+            }
+
+            function fireBullet() {
+                const currentTime = Date.now();
+                if (currentTime - lastShotTime < shotCooldown || gameOver) { return; }
+                lastShotTime = currentTime;
+                bullets.push({ x: player.x, y: player.y, size: 5, speed: 8, damage: 10, color: '#3498db' });
+            }
+
+            function draw() {
+                ctx.fillStyle = '#121212';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#3498db';
+                bullets.forEach(bullet => {
+                    ctx.beginPath();
+                    ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                ctx.fillStyle = player.color;
+                ctx.fillRect(player.x - player.size / 2, player.y - player.size / 2, player.size, player.size);
+                enemies.forEach(enemy => {
+                    ctx.fillStyle = enemy.color;
+                    ctx.fillRect(enemy.x - enemy.size / 2, enemy.y - enemy.size / 2, enemy.size, enemy.size);
+                    ctx.fillStyle = 'lime';
+                    ctx.fillRect(enemy.x - enemy.size / 2, enemy.y - enemy.size / 2 - 5, enemy.size * (enemy.health / 30), 3);
+                });
+                ctx.fillStyle = 'white';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText(`Kills: ${score}`, 10, 25);
+                ctx.fillText(`Health: ${player.health}`, 10, 45);
+
+                if (gameOver) {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = 'white';
+                    ctx.font = '40px Arial';
+                    ctx.textAlign = 'center';
+                    const message = score === 0 ? 'انقر للبدء' : 'انتهت اللعبة (GAME OVER)';
+                    ctx.fillText(message, canvas.width / 2, canvas.height / 2);
+                    if (score > 0) {
+                         ctx.font = '20px Arial';
+                         ctx.fillText(`النتيجة النهائية: ${score} عدو`, canvas.width / 2, canvas.height / 2 + 40);
+                         if (score > currentHighScore) {
+                             ctx.fillText(`تم تسجيل ${score} كأعلى نتيجة جديدة!`, canvas.width / 2, canvas.height / 2 + 70);
+                         } else {
+                             ctx.fillText(`أعلى نتيجة لديك: ${currentHighScore}`, canvas.width / 2, canvas.height / 2 + 70);
+                         }
+                         ctx.fillText(`انقر في أي مكان لإعادة التشغيل`, canvas.width / 2, canvas.height / 2 + 100);
+                    }
+                }
+            }
+
+            function update() {
+                if (gameOver) return;
+
+                bullets.forEach((bullet, bIndex) => {
+                    bullet.y -= bullet.speed;
+                    if (bullet.y < 0) { bullets.splice(bIndex, 1); }
+                });
+
+                enemies.forEach((enemy, eIndex) => {
+                    const dx = player.x - enemy.x;
+                    const dy = player.y - enemy.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    enemy.x += (dx / distance) * enemy.speed;
+                    enemy.y += (dy / distance) * enemy.speed;
+
+                    if (distance < (player.size / 2 + enemy.size / 2)) {
+                        player.health -= 10;
+                        enemies.splice(eIndex, 1);
+                    }
+                    
+                    bullets.forEach((bullet, bIndex) => {
+                        const bx = bullet.x - enemy.x;
+                        const by = bullet.y - enemy.y;
+                        const bDistance = Math.sqrt(bx * bx + by * by);
+
+                        if (bDistance < (bullet.size + enemy.size / 2)) {
+                            enemy.health -= bullet.damage;
+                            bullets.splice(bIndex, 1);
+
+                            if (enemy.health <= 0) {
+                                enemies.splice(eIndex, 1);
+                                score++;
+                            }
+                        }
+                    });
+                });
+
+                if (player.health <= 0) {
+                    gameOver = true;
+                    clearInterval(enemySpawnInterval);
+                    saveHighScore(score);
+                    music.pause();
+                    music.currentTime = 0;
+                }
+
+                draw();
+                requestAnimationFrame(update);
+            }
+            
+            document.addEventListener('keydown', (e) => {
+                if (gameOver) return;
+                if (e.key === 'ArrowUp' || e.key === 'w') { player.y -= player.speed; }
+                else if (e.key === 'ArrowDown' || e.key === 's') { player.y += player.speed; }
+                else if (e.key === 'ArrowLeft' || e.key === 'a') { player.x -= player.speed; }
+                else if (e.key === 'ArrowRight' || e.key === 'd') { player.x += player.speed; }
+                else if (e.key === ' ') { fireBullet(); } 
+                
+                player.x = Math.max(player.size / 2, Math.min(canvas.width - player.size / 2, player.x));
+                player.y = Math.max(player.size / 2, Math.min(canvas.height - player.size / 2, player.y));
+            });
+
+            canvas.addEventListener('click', () => {
+                if (gameOver) {
+                    resetGame();
+                }
+            });
+            
+            draw(); 
+        }
     </script>
 </body>
 </html>
