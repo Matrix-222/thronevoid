@@ -1,4 +1,143 @@
 /* ================================================= */
+/* 1. الإعدادات الأساسية والخلفية (Cinematic Dark Theme) */
+/* ================================================= */
+:root {
+    --primary-dark: #000000; /* أسود عميق */
+    --secondary-dark: #1a1a1a; /* أسود فاتح للخلفيات */
+    --text-light: #f0f0f0; /* نص أبيض ساطع */
+    --accent-red: #E31B23; /* أحمر داكن (مثل Sith) */
+    --accent-yellow: #FFC700; /* أصفر (مثل شعار Star Wars) */
+    --spacing: 20px;
+}
+
+body {
+    background-color: var(--primary-dark);
+    color: var(--text-light);
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* ================================================= */
+/* 2. شريط التنقل والرأس (Header) */
+/* ================================================= */
+header {
+    background-color: var(--secondary-dark);
+    color: var(--text-light);
+    padding: var(--spacing) 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--accent-red); /* خط أحمر فاصل */
+}
+
+header h1 {
+    font-family: Impact, "Arial Black", sans-serif;
+    color: var(--accent-yellow);
+    text-transform: uppercase;
+    font-size: 2.5em;
+    letter-spacing: 2px;
+    text-shadow: 0 0 5px rgba(255, 199, 0, 0.5); /* تأثير توهج خفيف */
+}
+
+/* ================================================= */
+/* 3. الأزرار (Buttons) */
+/* ================================================= */
+button {
+    background-color: var(--accent-red);
+    color: var(--text-light);
+    border: none;
+    padding: 10px 20px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+    border-radius: 4px; /* زوايا مربعة */
+}
+
+button:hover {
+    background-color: #ff3838; /* أحمر أكثر لمعاناً عند التمرير */
+    box-shadow: 0 0 15px rgba(227, 27, 35, 0.8); /* توهج قوي */
+    transform: translateY(-2px);
+}
+
+/* الأزرار الاجتماعية */
+.social-login button {
+    background-color: var(--secondary-dark);
+    border: 1px solid var(--accent-yellow);
+    color: var(--accent-yellow);
+    margin-bottom: 10px;
+}
+.social-login button:hover {
+    background-color: var(--accent-yellow);
+    color: var(--secondary-dark);
+    box-shadow: none;
+}
+
+/* ================================================= */
+/* 4. قسم المحتوى الرئيسي والنماذج (Main & Form) */
+/* ================================================= */
+main {
+    padding: 40px var(--spacing);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+form {
+    background-color: var(--secondary-dark);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    border: 1px solid var(--accent-red);
+}
+
+form h2 {
+    color: var(--accent-yellow);
+    text-transform: uppercase;
+    margin-bottom: 25px;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #444;
+    background-color: #222;
+    color: var(--text-light);
+    border-radius: 4px;
+}
+input:focus {
+    border-color: var(--accent-yellow);
+    outline: none;
+}
+
+form button[type="submit"] {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 10px;
+}
+
+/* الروابط */
+a {
+    color: var(--accent-yellow);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+a:hover {
+    color: var(--accent-red);
+}
+
+/* ================================================= */
 /* 5. قسم الترحيب الكبير (Hero Section) */
 /* ================================================= */
 
