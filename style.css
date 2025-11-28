@@ -1,48 +1,157 @@
-```css
-background: #fafafa;
-color: #111;
+/* ---------- عام ---------- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+}
+body {
+    background: radial-gradient(#000011, #000);
+    color: white;
+    transition: 0.3s;
+}
+body.light {
+    background: radial-gradient(#e0e0e0, #fafafa);
+    color: #111;
+}
+body[dir="rtl"] {
+    direction: rtl;
 }
 
-
+/* ---------- الهيدر ---------- */
 header {
-padding: 20px;
-display: flex;
-justify-content: space-between;
-align-items: center;
+    padding: 20px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 10;
+}
+header h1 {
+    font-size: 32px;
+    letter-spacing: 2px;
+    color: #0ff;
+    text-shadow: 0 0 10px #0ff;
+}
+nav a {
+    color: #0ff;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+nav a:hover {
+    color: #fff;
+    text-shadow: 0 0 8px #0ff;
+}
+button {
+    padding: 10px 16px;
+    cursor: pointer;
+    background: #222;
+    color: #0ff;
+    border: none;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+body.light button {
+    background: #ddd;
+    color: #111;
 }
 
-
-#themeToggle {
-padding: 10px 16px;
-cursor: pointer;
-background: #444;
-color: white;
-border: none;
-border-radius: 6px;
+/* ---------- Hero ---------- */
+.hero {
+    text-align: center;
+    padding: 100px 20px 50px 20px;
+    position: relative;
+    z-index: 5;
+}
+.hero h2 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px #0ff;
+}
+.hero p {
+    font-size: 20px;
+    color: #ccc;
+    max-width: 700px;
+    margin: auto;
+    line-height: 1.6;
+}
+.buttons {
+    margin-top: 30px;
+}
+.buttons a {
+    display: inline-block;
+    margin: 10px;
+    padding: 15px 30px;
+    background: #0ff;
+    color: #000;
+    font-weight: bold;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+.buttons a:hover {
+    background: #0aa;
+    color: #fff;
 }
 
-
-body.light #themeToggle {
-background: #ddd;
-color: black;
+/* ---------- Canvas اللعبة ---------- */
+canvas#gameCanvas {
+    display: block;
+    margin: 50px auto;
+    background: rgba(0,0,0,0.6);
+    border-radius: 20px;
+    width: 90%;
+    height: 300px;
+}
+body.light canvas#gameCanvas {
+    background: rgba(230,230,230,0.8);
 }
 
-
-#welcome {
-text-align: center;
-padding: 40px;
+/* ---------- النموذج ---------- */
+form {
+    display: flex;
+    flex-direction: column;
+    background: rgba(0,0,0,0.6);
+    padding: 30px;
+    border-radius: 15px;
+    min-width: 300px;
+    margin-top: 30px;
 }
-
-
-#gameCanvas {
-width: 100%;
-height: 400px;
-background: #111;
-display: block;
+form input {
+    margin: 10px 0;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
 }
-
-
-body.light #gameCanvas {
-background: #e0e0e0;
+form button {
+    margin-top: 15px;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 10px;
+    background: #0ff;
+    color: #000;
+    cursor: pointer;
+    border: none;
 }
-```
+form button:hover {
+    background: #0aa;
+    color: white;
+}
+.social-login {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-around;
+}
+.social-login button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.social-login button:hover {
+    opacity: 0.8;
+}
