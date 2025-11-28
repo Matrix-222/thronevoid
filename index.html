@@ -5,85 +5,49 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>عرش الفراغ</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+
+<!-- جوجل One Tap + تسجيل الدخول -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<!-- فيسبوك SDK -->
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/ar_AR/sdk.js#xfbml=1&version=v20.0&appId=YOUR_APP_ID&autoLogAppEvents=1"></script>
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Tajawal',sans-serif}
-body{
-  background:#000;
-  color:#d4af37;
-  min-height:100vh;
-  position:relative;
-  overflow-y:auto;
-}
-audio{visibility:hidden}
+body{background:#000;color:#d4af37;overflow-y:auto;min-height:100vh;position:relative}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle at center,#1a0000,#000);z-index:-1;opacity:0.9}
 
-/* خلفية سوداء نظيفة تمامًا */
-body::before{
-  content:"";
-  position:fixed;inset:0;
-  background:radial-gradient(circle at center,#1a0000,#000);
-  z-index:-1;
-}
+h1{font-size:clamp(3.5rem,12vw,9rem);text-align:center;margin:50px 0;text-shadow:0 0 60px #b8860b,0 0 120px #8b0000;letter-spacing:6px;font-weight:900}
 
-/* عنوان ملكي مركزي */
-h1{
-  font-size:clamp(4rem,14vw,10rem);
-  text-align:center;
-  margin:60px 0;
-  text-shadow:0 0 60px #b8860b,0 0 120px #8b0000;
-  letter-spacing:8px;
-  font-weight:900;
-}
-
-/* أزرار ذهبية فخمة */
+/* أزرار ذهبية ملكية */
 .royal-btn{
   background:linear-gradient(45deg,#8b0000,#b8860b,#d4af37,#b8860b,#8b0000);
-  color:#000;
-  border:5px ridge #d4af37;
-  padding:22px 50px;
-  font-size:2rem;
-  font-weight:900;
-  border-radius:25px;
-  cursor:pointer;
-  box-shadow:0 0 80px #b8860b,0 15px 40px #000;
-  transition:0.5s;
-  margin:25px auto;
-  display:block;
-  width:90%;
-  max-width:520px;
+  color:#000;border:5px ridge #d4af37;padding:20px 40px;font-size:1.8rem;font-weight:900;
+  border-radius:25px;cursor:pointer;box-shadow:0 0 80px #b8860b,0 15px 40px #000;transition:0.4s;
+  margin:20px auto;display:block;width:90%;max-width:500px
 }
-.royal-btn:hover{
-  transform:scale(1.08) translateY(-12px);
-  box-shadow:0 0 150px #d4af37,0 0 200px #8b0000,0 30px 60px #000;
-}
+.royal-btn:hover{transform:scale(1.06) translateY(-10px);box-shadow:0 0 140px #d4af37,0 0 200px #8b0000}
 
-/* البطاقات */
-.card{
-  background:rgba(15,0,0,0.94);
-  border:4px double #d4af37;
-  border-radius:30px;
-  padding:40px;
-  margin:30px 20px;
-  box-shadow:0 0 120px #b8860b40,inset 0 0 70px #8b000040;
-  backdrop-filter:blur(15px);
-}
-input{
-  width:100%;padding:20px;margin:15px 0;
-  background:#111;color:#d4af37;
-  border:3px double #b8860b;border-radius:18px;
-  font-size:1.6rem;text-align:center;
-}
+/* بطاقات ملكية */
+.card{background:rgba(20,0,0,0.96);border:4px double #d4af37;border-radius:30px;padding:35px;margin:20px auto;
+  max-width:520px;box-shadow:0 0 100px #b8860b40,inset 0 0 60px #8b000040;backdrop-filter:blur(15px)}
 
-/* التنقل */
-.hidden{display:none!important}
-.container{max-width:640px;margin:0 auto;padding:20px}
+/* أزرار التواصل الاجتماعي */
+.social-btn{margin:15px auto;display:block;width:90%;max-width:500px;padding:18px;font-size:1.7rem;border-radius:20px;cursor:pointer}
+#googleBtn{background:#fff;color:#000;border:2px solid #fff}
+#fbBtn{background:#1877f2;color:#fff}
 
-/* زر الصعود */
-#scrollUp{
-  position:fixed;bottom:30px;right:30px;
-  width:70px;height:70px;background:#d4af37;color:#000;
-  border-radius:50%;font-size:3rem;line-height:70px;text-align:center;
-  cursor:pointer;z-index:999;box-shadow:0 0 60px #b8860b;
-  display:none;
+/* زر الرجوع */
+.back-btn{
+  position:fixed;top:20px;left:20px;background:#d4af37;color:#000;padding:12px 20px;border-radius:50px;
+  font-size:1.5rem;cursor:pointer;z-index:9999;box-shadow:0 0 40px #b8860b;transition:0.3s
+}
+.back-btn:hover{transform:scale(1.1);box-shadow:0 0 70px #d4af37}
+
+/* تحسين الجوال */
+@media (max-width:768px){
+  .card{margin:15px 10px;padding:25px}
+  .royal-btn{font-size:1.6rem;padding:18px}
 }
 </style>
 </head>
@@ -93,70 +57,100 @@ input{
   <source src="https://files.catbox.moe/8p3v0j.mp3" type="audio/mpeg">
 </audio>
 
-<div class="container" id="welcome">
-  <h1>عرش الفراغ</h1>
-  <button class="royal-btn" onclick="show('auth')">ادخل الإمبراطورية</button>
-</div>
+<!-- زر الرجوع (يظهر في كل الصفحات ما عدا الرئيسية) -->
+<div class="back-btn hidden" id="backBtn" onclick="history.back()">←</div>
 
-<!-- تسجيل الدخول -->
-<div class="container hidden" id="auth">
+<div class="container" id="auth">
   <div class="card">
-    <h2 style="font-size:3rem;text-align:center;margin-bottom:30px">تسجيل الدخول</h2>
+    <h1>عرش الفراغ</h1>
+    <p style="text-align:center;font-size:2rem;color:#8b0000;margin:40px">باسم الدم والذهب</p>
+
+    <!-- تسجيل عادي -->
     <input type="text" id="username" placeholder="اسم الإمبراطور">
     <input type="password" placeholder="كلمة المرور">
-    <button class="royal-btn" onclick="login()">تسجيل الدخول</button>
-    <button class="royal-btn" onclick="show('register')">تسجيل مستخدم جديد</button>
-    <button class="royal-btn" style="background:#1877f2">فيسبوك</button>
-    <button class="royal-btn" style="background:#db4437">جوجل</button>
-    <button class="royal-btn" onclick="show('welcome')">رجوع</button>
+    <button class="royal-btn" onclick="manualLogin()">تسجيل الدخول</button>
+
+    <!-- جوجل One Tap (يظهر تلقائيًا) -->
+    <div id="g_id_onload"
+         data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+         data-login_uri="https://thronevoid.com"
+         data-auto_prompt="true">
+    </div>
+    <div class="g_id_signin" data-type="standard" data-size="large" data-theme="filled_black" data-text="signin_with" data-shape="rectangular" data-logo_alignment="left"></div>
+
+    <!-- فيسبوك -->
+    <div class="fb-login-button" data-width="100%" data-size="large" data-button-type="continue_with" data-auto_logout_link="false" data-use-continue-as="true" onlogin="checkLoginState();"></div>
+
+    <button class="royal-btn" onclick="showPage('register')">تسجيل مستخدم جديد</button>
+  </div>
+</div>
+
+<!-- صفحة التسجيل -->
+<div class="container hidden" id="register">
+  <div class="card">
+    <h2>إنشاء إمبراطورية جديدة</h2>
+    <input type="text" placeholder="اسم الإمبراطور">
+    <input type="email" placeholder="البريد الإلكتروني">
+    <input type="password" placeholder="كلمة المرور">
+    <button class="royal-btn" onclick="alert('تم التسجيل بنجاح!');showPage('auth')">تسجيل</button>
   </div>
 </div>
 
 <!-- لوحة التحكم -->
 <div class="container hidden" id="dashboard">
   <div class="card">
-    <h2 style="font-size:3rem;text-align:center">يا جلالة <span id="playerName">الإمبراطور</span></h2>
-    <p style="font-size:2.2rem;text-align:center;margin:40px 0">
-      كواكب محتلة: 15<br>
-      أساطيل: 12<br>
-      طاقة الظلام: 12500
+    <h1>يا جلالة <span id="playerName">الإمبراطور</span></h1>
+    <p style="font-size:2.2rem;text-align:center;margin:40px">
+      كواكب: <strong id="planets">0</strong><br>
+      أساطيل: <strong id="fleets">0</strong><br>
+      طاقة: <strong id="energy">1000</strong>
     </p>
-    <button class="royal-btn" onclick="alert('خريطة المجرة قيد التطوير')">خريطة المجرة</button>
-    <button class="royal-btn" onclick="alert('الرنك العالمي')">الرنك العالمي</button>
-    <button class="royal-btn" onclick="alert('الشات العام')">الشات العام</button>
-    <button class="royal-btn" onclick="alert('النجاة في الصقيع')">النجاة في الصقيع</button>
+    <button class="royal-btn" onclick="addFleet()">استدعاء أسطول</button>
+    <button class="royal-btn" onclick="conquer()">غزو كوكب</button>
     <button class="royal-btn" style="background:#600" onclick="logout()">تسجيل الخروج</button>
   </div>
 </div>
 
-<!-- تذييل الحقوق -->
-<footer style="text-align:center;padding:30px;color:#b8860b;font-size:1.3rem;border-top:4px double #d4af37;margin-top:50px">
-  كل الحقوق محفوظة © 2025 • 
-  <a href="https://x.com/ccs_0" target="_blank" style="color:#d4af37;font-weight:900">@ccs_0</a>
+<footer style="text-align:center;padding:30px;color:#b8860b;font-size:1.2rem;border-top:4px double #d4af37">
+  كل الحقوق محفوظة © 2025 • <a href="https://x.com/ccs_0" target="_blank" style="color:#d4af37;font-weight:900">@ccs_0</a>
 </footer>
-
-<div id="scrollUp" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
 
 <script>
 // تشغيل الموسيقى
 document.body.onclick = () => document.getElementById("imperialMarch").play();
 
-// تبديل الصفحات
-function show(page){
-  document.querySelectorAll(".container").forEach(c=>c.classList.add("hidden"));
-  document.getElementById(page).classList.remove("hidden");
+// نظام الصفحات مع زر رجوع حقيقي
+const pages = ['auth','register','dashboard'];
+let currentPage = 'auth';
+
+function showPage(page){
+  pages.forEach(p => document.getElementById(p).classList.add('hidden'));
+  document.getElementById(page).classList.remove('hidden');
+  currentPage = page;
+  document.getElementById('backBtn').classList.toggle('hidden', page === 'auth');
 }
-function login(){
+function manualLogin(){
   const name = document.getElementById("username").value || "الإمبراطور الأعظم";
   document.getElementById("playerName").textContent = name;
-  show("dashboard");
+  showPage('dashboard');
 }
-function logout(){ show("welcome"); }
+function logout(){
+  showPage('auth');
+}
 
-// زر الصعود
-window.onscroll = () => {
-  document.getElementById("scrollUp").style.display = (window.scrollY > 300) ? "block" : "none";
-};
+// اللعبة
+let player = {planets:0,fleets:0,energy:1000};
+function addFleet(){if(player.energy>=500){player.fleets++;player.energy-=500;update()}}
+function conquer(){if(player.fleets>0){player.planets++;player.energy+=1200;player.fleets--;update()}}
+function update(){
+  document.getElementById("planets").innerText = player.planets;
+  document.getElementById("fleets").innerText = player.fleets;
+  document.getElementById("energy").innerText = player.energy;
+}
+
+// فيسبوك تسجيل الدخول
+function checkLoginState(){FB.getLoginStatus(response => {if(response.status==='connected')manualLogin();})}
+window.fbAsyncInit = function(){FB.init({appId:'YOUR_FB_APP_ID',cookie:true,xfbml:true,version:'v20.0'});};
 </script>
 </body>
 </html>
