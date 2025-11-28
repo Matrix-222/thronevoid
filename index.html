@@ -1,41 +1,91 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>عرش الفراغ</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;color:#FFD700;font-family:Arial;overflow:hidden;height:100vh}
-.stars{position:fixed;inset:0;background:transparent url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='4' height='4'><circle cx='2' cy='2' r='1' fill='%23fff'/></svg>") repeat;animation:s 8s infinite}
-@keyframes s{0%,100%{opacity:.3}50%{opacity:1}}
-.center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
-h1{font-size:4.5rem;text-shadow:0 0 40px #FFD700;animation:g 3s infinite alternate}
-@keyframes g{from{text-shadow:0 0 20px #FFD700}to{text-shadow:0 0 60px #FFD700,0 0 100px #B8860B}}
-.btn{background:#FFD700;color:#000;padding:20px 60px;font-size:2rem;border:none;border-radius:50px;cursor:pointer;box-shadow:0 0 50px #FFD700;animation:p 2s infinite}
-.btn:hover{transform:scale(1.15)}
-@keyframes p{0%,100%{box-shadow:0 0 50px #FFD700}50%{box-shadow:0 0 100px #FFD700}}
-#game{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.97);padding:30px;text-align:center}
-.stat{display:inline-block;background:rgba(255,215,0,0.15);border:3px solid #FFD700;border-radius:20px;padding:20px 40px;margin:20px;font-size:2.5rem}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرش الفراغ</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #121212; color: #E0E0E0; font-family: 'Arial', sans-serif; overflow-x: hidden; height: 100vh; }
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(1px 1px at 20px 30px, #BDBDBD, transparent), radial-gradient(1px 1px at 40px 70px, #9E9E9E, transparent); background-size: 50px 50px; opacity: 0.6; }
+        .welcome { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        h1 { font-size: 3.5rem; color: #FFC107; margin-bottom: 20px; text-shadow: 0 0 10px #FFC107; }
+        .subtitle { font-size: 1.2rem; margin-bottom: 30px; color: #BDBDBD; }
+        .start-btn { background: #FFC107; color: #000; padding: 15px 40px; font-size: 1.5rem; border: none; border-radius: 30px; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255,193,7,0.3); }
+        .start-btn:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(255,193,7,0.5); }
+        #game { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #1E1E1E; padding: 40px; text-align: center; }
+        .dashboard-title { font-size: 2rem; color: #FFC107; margin-bottom: 30px; }
+        .stat-panel { display: inline-block; background: #2C2C2C; border: 1px solid #FFC107; border-radius: 10px; padding: 20px; margin: 10px; min-width: 120px; }
+        .stat-value { font-size: 2rem; color: #FFC107; }
+        .stat-label { font-size: 0.9rem; color: #BDBDBD; }
+        .action-btn { background: #2C2C2C; color: #E0E0E0; border: 1px solid #FFC107; padding: 12px 25px; font-size: 1rem; border-radius: 8px; cursor: pointer; margin: 10px; transition: all 0.3s; }
+        .action-btn:hover { background: #FFC107; color: #000; }
+    </style>
 </head>
 <body>
-
-<div class="stars"></div>
-
-<div class="center" id="welcome">
-  <h1>عرش الفراغ</h1>
-  <p style="font-size:2rem;margin:40px 0">هل أنت جاهز لتتويجك إمبراطور المجرة؟</p>
-  <button class="btn" id="start">ابدأ إمبراطوريتك</button>
-</div>
-
-<div id="game">
-  <h1 style="margin:30px 0">لوحة تحكم الإمبراطور علي آل عابد</h1>
-  <div class="stat" id="p">0</div> <span style="font-size:2rem">كواكب</span><br>
-  <div class="stat" id="f">0</div> <span style="font-size:2rem">أساطيل</span><br>
-  <div class="stat" id="e">500</div> <span style="font-size:2rem">طاقة</span>
-  <br><br>
-  <button class="btn" onclick="addF()">إنشاء أسطول</button>
-  <button class="btn" onclick="conq()">غزو كوكب</button>
-  <button class="btn" onclick="rep()">تقرير</button>
-  <br><br>
+    <div class="stars"></div>
+    <div class="welcome" id="welcome">
+        <h1>عرش الفراغ</h1>
+        <p class="subtitle">هل أنت جاهز لتتويجك إمبراطور المجرة؟</p>
+        <button class="start-btn" onclick="showDashboard()">ابدأ إمبراطوريتك</button>
+    </div>
+    <div id="game">
+        <h2 class="dashboard-title">لوحة التحكم الإمبراطورية</h2>
+        <div class="stat-panel">
+            <div class="stat-value" id="planets">0</div>
+            <div class="stat-label">كواكب محتلة</div>
+        </div>
+        <div class="stat-panel">
+            <div class="stat-value" id="fleets">0</div>
+            <div class="stat-label">أساطيل جاهزة</div>
+        </div>
+        <div class="stat-panel">
+            <div class="stat-value" id="energy">1000</div>
+            <div class="stat-label">طاقة إجمالية</div>
+        </div>
+        <div style="margin-top: 30px;">
+            <button class="action-btn" onclick="addFleet()">إنشاء أسطول</button>
+            <button class="action-btn" onclick="conquerPlanet()">غزو كوكب</button>
+            <button class="action-btn" onclick="showReport()">عرض التقرير</button>
+        </div>
+        <button class="action-btn" onclick="showWelcome()" style="margin-top: 20px;">العودة للشاشة الرئيسية</button>
+    </div>
+    <script>
+        let gameState = { fleets: 0, planets: 0, energy: 1000 };
+        function showDashboard() {
+            document.getElementById('welcome').style.display = 'none';
+            document.getElementById('game').style.display = 'block';
+        }
+        function showWelcome() {
+            document.getElementById('game').style.display = 'none';
+            document.getElementById('welcome').style.display = 'block';
+        }
+        function addFleet() {
+            gameState.fleets += 1;
+            gameState.energy -= 200;
+            updateStats();
+        }
+        function conquerPlanet() {
+            if (gameState.fleets > 0 && gameState.energy > 300) {
+                gameState.planets += 1;
+                gameState.energy += 500;
+                gameState.fleets -= 1;
+                updateStats();
+            } else {
+                alert('تحتاج أسطول وطاقة كافية!');
+            }
+        }
+        function showReport() {
+            alert(`تقرير الإمبراطورية:
+كواكب: ${gameState.planets}
+أساطيل: ${gameState.fleets}
+طاقة: ${gameState.energy}`);
+        }
+        function updateStats() {
+            document.getElementById('planets').textContent = gameState.planets;
+            document.getElementById('fleets').textContent = gameState.fleets;
+            document.getElementById('energy').textContent = gameState.energy;
+        }
+    </script>
+</body>
+</html>
