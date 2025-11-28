@@ -101,13 +101,24 @@
         });
 
         // -----------------------------------------------------------------
-        // --- كود لعبة البقاء البسيط (Survival Game) ---
+        // --- كود لعبة VOID FIGHTER القتالية ---
         // -----------------------------------------------------------------
-        
+
         function startGame() {
             const canvas = document.getElementById('gameArea');
             const ctx = canvas.getContext('2d');
 
+            // *** إضافة وسم الصوت إلى HTML إذا لم يكن موجوداً ***
+            let music = document.getElementById('gameMusic');
+            if (!music) {
+                music = document.createElement('audio');
+                music.id = 'gameMusic';
+                // يجب وضع ملف survival_music.mp3 في نفس مجلد الملفات
+                music.src = 'survival_music.mp3'; 
+                music.loop = true;
+                document.body.appendChild(music);
+            }
+            
             // إعدادات اللاعب
             let player = {
                 x: canvas.width / 2,
@@ -118,10 +129,32 @@
                 health: 100
             };
 
-            // إعدادات الأعداء
             let enemies = [];
+            let bullets = []; // المقذوفات الجديدة
             let score = 0;
-            let gameOver = false;
+            let gameOver = true; // تبدأ اللعبة متوقفة
+            let lastShotTime = 0;
+            const shotCooldown = 300; // 300 مللي ثانية بين الطلقة والأخرى
+
+            // تشغيل الموسيقى عند بدء اللعب
+            function playMusic() {
+                music.volume = 0.4;
+                music.play().catch(error => {
+                    console.log("Audio playback blocked.");
+                });
+            }
+            
+            // إعادة تعيين اللعبة
+            function resetGame() {
+                player.health = 100;
+                enemies = [];
+                bullets = [];
+                score = 0;
+                gameOver = false;
+                update(); // بدء حلقة التحديث
+                setInterval(spawnEnemy, 1500); // زيادة سرعة ظهور الأعداء
+                playMusic();
+            }
 
             // دالة إنشاء الأعداء
             function spawnEnemy() {
@@ -130,52 +163,88 @@
                 let edge = Math.floor(Math.random() * 4);
                 let x, y;
 
-                if (edge === 0) { x = Math.random() * canvas.width; y = -10; } // الأعلى
-                else if (edge === 1) { x = Math.random() * canvas.width; y = canvas.height + 10; } // الأسفل
-                else if (edge === 2) { x = -10; y = Math.random() * canvas.height; } // اليسار
-                else { x = canvas.width + 10; y = Math.random() * canvas.height; } // اليمين
+                if (edge === 0) { x = Math.random() * canvas.width; y = -10; }
+                else if (edge === 1) { x = Math.random() * canvas.width; y = canvas.height + 10; }
+                else if (edge === 2) { x = -10; y = Math.random() * canvas.height; }
+                else { x = canvas.width + 10; y = Math.random() * canvas.height; }
 
                 enemies.push({
                     x: x,
                     y: y,
                     size: 15,
+                    health: 30, // الأعداء يحتاجون لعدة طلقات
                     color: '#e74c3c', 
-                    speed: 1 + Math.random() * 2 
+                    speed: 1.5 + Math.random() * 1.5 // سرعة أعداء معقولة
+                });
+            }
+
+            // دالة إطلاق النار
+            function fireBullet() {
+                const currentTime = Date.now();
+                if (currentTime - lastShotTime < shotCooldown || gameOver) {
+                    return;
+                }
+                lastShotTime = currentTime;
+
+                // إنشاء مقذوفة تنطلق للأعلى (يمكن تطويرها لاحقاً ليكون لها اتجاه محدد)
+                bullets.push({
+                    x: player.x,
+                    y: player.y,
+                    size: 5,
+                    speed: 8,
+                    damage: 10,
+                    color: '#3498db', // لون المقذوفة (أزرق)
                 });
             }
 
             // دالة الرسم
             function draw() {
-                // تنظيف الشاشة
                 ctx.fillStyle = '#121212';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // رسم المقذوفات
+                ctx.fillStyle = '#3498db';
+                bullets.forEach(bullet => {
+                    ctx.beginPath();
+                    ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
 
                 // رسم اللاعب
                 ctx.fillStyle = player.color;
                 ctx.fillRect(player.x - player.size / 2, player.y - player.size / 2, player.size, player.size);
 
                 // رسم الأعداء
-                ctx.fillStyle = '#e74c3c';
                 enemies.forEach(enemy => {
+                    // رسم مستطيل العدو
+                    ctx.fillStyle = enemy.color;
                     ctx.fillRect(enemy.x - enemy.size / 2, enemy.y - enemy.size / 2, enemy.size, enemy.size);
+                    // رسم شريط الصحة فوق العدو
+                    ctx.fillStyle = 'lime';
+                    ctx.fillRect(enemy.x - enemy.size / 2, enemy.y - enemy.size / 2 - 5, enemy.size * (enemy.health / 30), 3);
                 });
 
                 // عرض النقاط والصحة
                 ctx.fillStyle = 'white';
                 ctx.font = '16px Arial';
-                ctx.fillText(`Score: ${Math.floor(score/60)}`, 10, 25); // يتم قسمة score على 60 لتحويل الإطارات إلى ثواني تقريباً
+                ctx.textAlign = 'left';
+                ctx.fillText(`Kills: ${score}`, 10, 25);
                 ctx.fillText(`Health: ${player.health}`, 10, 45);
 
-                // عرض رسالة نهاية اللعبة
+                // عرض رسالة البداية أو النهاية
                 if (gameOver) {
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                     ctx.fillStyle = 'white';
                     ctx.font = '40px Arial';
                     ctx.textAlign = 'center';
-                    ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2);
-                    ctx.font = '20px Arial';
-                    ctx.fillText(`Final Score: ${Math.floor(score/60)} seconds`, canvas.width / 2, canvas.height / 2 + 40);
+                    const message = score === 0 ? 'انقر للبدء' : 'انتهت اللعبة (GAME OVER)';
+                    ctx.fillText(message, canvas.width / 2, canvas.height / 2);
+                    if (score > 0) {
+                         ctx.font = '20px Arial';
+                         ctx.fillText(`النتيجة النهائية: ${score} عدو`, canvas.width / 2, canvas.height / 2 + 40);
+                         ctx.fillText(`انقر في أي مكان لإعادة التشغيل`, canvas.width / 2, canvas.height / 2 + 70);
+                    }
                 }
             }
 
@@ -183,59 +252,84 @@
             function update() {
                 if (gameOver) return;
 
-                // تحديث الأعداء (حركتهم نحو اللاعب)
-                enemies.forEach((enemy, index) => {
+                // 1. تحديث حركة المقذوفات
+                bullets.forEach((bullet, bIndex) => {
+                    bullet.y -= bullet.speed;
+                    // إزالة المقذوفات التي خرجت من الشاشة
+                    if (bullet.y < 0) {
+                        bullets.splice(bIndex, 1);
+                    }
+                });
+
+                // 2. تحديث حركة الأعداء وكشف اصطدام الأعداء باللاعب
+                enemies.forEach((enemy, eIndex) => {
                     const dx = player.x - enemy.x;
                     const dy = player.y - enemy.y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
 
+                    // حركة العدو نحو اللاعب
                     enemy.x += (dx / distance) * enemy.speed;
                     enemy.y += (dy / distance) * enemy.speed;
 
-                    // كشف الاصطدام
+                    // اصطدام العدو باللاعب
                     if (distance < (player.size / 2 + enemy.size / 2)) {
-                        player.health -= 5;
-                        enemies.splice(index, 1);
+                        player.health -= 10; // فقدان صحة أكبر
+                        enemies.splice(eIndex, 1); // حذف العدو بعد الاصطدام
                     }
+                    
+                    // 3. كشف اصطدام المقذوفات بالأعداء
+                    bullets.forEach((bullet, bIndex) => {
+                        const bx = bullet.x - enemy.x;
+                        const by = bullet.y - enemy.y;
+                        const bDistance = Math.sqrt(bx * bx + by * by);
+
+                        if (bDistance < (bullet.size + enemy.size / 2)) {
+                            enemy.health -= bullet.damage; // إنقاص صحة العدو
+                            bullets.splice(bIndex, 1); // حذف المقذوفة
+
+                            if (enemy.health <= 0) {
+                                enemies.splice(eIndex, 1); // حذف العدو
+                                score++; // زيادة النقاط
+                            }
+                        }
+                    });
                 });
 
-                score++;
-
-                // التحقق من نهاية اللعبة
+                // 4. التحقق من نهاية اللعبة
                 if (player.health <= 0) {
                     gameOver = true;
+                    music.pause();
+                    music.currentTime = 0; // إيقاف الموسيقى وإعادتها للبداية
                 }
 
                 draw();
                 requestAnimationFrame(update);
             }
-
+            
             // دالة تحريك اللاعب عبر الأسهم
             document.addEventListener('keydown', (e) => {
                 if (gameOver) return;
 
-                if (e.key === 'ArrowUp' || e.key === 'w') {
-                    player.y -= player.speed;
-                } else if (e.key === 'ArrowDown' || e.key === 's') {
-                    player.y += player.speed;
-                } else if (e.key === 'ArrowLeft' || e.key === 'a') {
-                    player.x -= player.speed;
-                } else if (e.key === 'ArrowRight' || e.key === 'd') {
-                    player.x += player.speed;
-                }
+                if (e.key === 'ArrowUp' || e.key === 'w') { player.y -= player.speed; }
+                else if (e.key === 'ArrowDown' || e.key === 's') { player.y += player.speed; }
+                else if (e.key === 'ArrowLeft' || e.key === 'a') { player.x -= player.speed; }
+                else if (e.key === 'ArrowRight' || e.key === 'd') { player.x += player.speed; }
+                else if (e.key === ' ') { fireBullet(); } // إطلاق النار عند الضغط على المسافة (Space)
                 
                 // تحديد حدود الحركة داخل اللوحة
                 player.x = Math.max(player.size / 2, Math.min(canvas.width - player.size / 2, player.x));
                 player.y = Math.max(player.size / 2, Math.min(canvas.height - player.size / 2, player.y));
             });
 
-            // بدء إنشاء الأعداء
-            setInterval(spawnEnemy, 1000); 
-            // بدء حلقة التحديث
-            update(); 
+            // دالة البدء عند النقر
+            canvas.addEventListener('click', () => {
+                if (gameOver) {
+                    resetGame();
+                }
+            });
+            
+            draw(); // نرسم الشاشة الأولية مع رسالة "انقر للبدء"
         }
-
-        // ملاحظة: دالة startGame() يتم استدعاؤها داخل onAuthStateChanged بعد التحقق من تسجيل دخول المستخدم.
     </script>
 </body>
 </html>
