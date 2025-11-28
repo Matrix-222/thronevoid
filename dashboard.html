@@ -38,17 +38,25 @@
         button:hover { 
             background-color: #c0392b; 
         }
+        /* تنسيق اللعبة المضاف */
+        #gameArea {
+            border: 2px solid #3498db;
+            background-color: #121212; /* خلفية داكنة */
+            margin: 20px auto;
+            display: block;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>أهلاً بك في لوحة التحكم (Dashboard)!</h1>
-        <p>هذه هي البيانات الخاصة بحسابك:</p>
         <p>تم تسجيل دخولك باسم المستخدم:</p>
         <span id="userEmailDisplay">جاري التحميل...</span>
         
-        <p style="margin-top: 30px;">هنا يمكنك عرض الألعاب والبيانات الخاصة بالمستخدمين.</p>
+        <p style="margin-top: 30px;">ابدأ لعبتك لتحدي البقاء الآن!</p>
 
+        <canvas id="gameArea" width="600" height="400"></canvas>
+        
         <button id="logoutBtn">تسجيل الخروج</button>
     </div>
 
@@ -73,8 +81,9 @@
         // حماية الصفحة والتأكد من تسجيل الدخول
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // المستخدم مسجل دخوله، نعرض بريده
+                // المستخدم مسجل دخوله، نعرض بريده ونبدأ اللعبة
                 document.getElementById('userEmailDisplay').innerText = user.email;
+                startGame(); // تبدأ اللعبة بعد تأكيد المستخدم
             } else {
                 // المستخدم غير مسجل، يتم توجيهه إلى صفحة الدخول
                 alert("يجب عليك تسجيل الدخول أولاً للوصول إلى لوحة التحكم!");
@@ -85,12 +94,148 @@
         // دالة تسجيل الخروج
         document.getElementById('logoutBtn').addEventListener('click', () => {
             signOut(auth).then(() => {
-                // بعد تسجيل الخروج بنجاح، نعود للصفحة الرئيسية
                 window.location.href = "index.html";
             }).catch((error) => {
                 console.error("Logout Error:", error);
             });
         });
+
+        // -----------------------------------------------------------------
+        // --- كود لعبة البقاء البسيط (Survival Game) ---
+        // -----------------------------------------------------------------
+        
+        function startGame() {
+            const canvas = document.getElementById('gameArea');
+            const ctx = canvas.getContext('2d');
+
+            // إعدادات اللاعب
+            let player = {
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                size: 20,
+                speed: 5,
+                color: '#2ecc71',
+                health: 100
+            };
+
+            // إعدادات الأعداء
+            let enemies = [];
+            let score = 0;
+            let gameOver = false;
+
+            // دالة إنشاء الأعداء
+            function spawnEnemy() {
+                if (gameOver) return;
+                
+                let edge = Math.floor(Math.random() * 4);
+                let x, y;
+
+                if (edge === 0) { x = Math.random() * canvas.width; y = -10; } // الأعلى
+                else if (edge === 1) { x = Math.random() * canvas.width; y = canvas.height + 10; } // الأسفل
+                else if (edge === 2) { x = -10; y = Math.random() * canvas.height; } // اليسار
+                else { x = canvas.width + 10; y = Math.random() * canvas.height; } // اليمين
+
+                enemies.push({
+                    x: x,
+                    y: y,
+                    size: 15,
+                    color: '#e74c3c', 
+                    speed: 1 + Math.random() * 2 
+                });
+            }
+
+            // دالة الرسم
+            function draw() {
+                // تنظيف الشاشة
+                ctx.fillStyle = '#121212';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // رسم اللاعب
+                ctx.fillStyle = player.color;
+                ctx.fillRect(player.x - player.size / 2, player.y - player.size / 2, player.size, player.size);
+
+                // رسم الأعداء
+                ctx.fillStyle = '#e74c3c';
+                enemies.forEach(enemy => {
+                    ctx.fillRect(enemy.x - enemy.size / 2, enemy.y - enemy.size / 2, enemy.size, enemy.size);
+                });
+
+                // عرض النقاط والصحة
+                ctx.fillStyle = 'white';
+                ctx.font = '16px Arial';
+                ctx.fillText(`Score: ${Math.floor(score/60)}`, 10, 25); // يتم قسمة score على 60 لتحويل الإطارات إلى ثواني تقريباً
+                ctx.fillText(`Health: ${player.health}`, 10, 45);
+
+                // عرض رسالة نهاية اللعبة
+                if (gameOver) {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = 'white';
+                    ctx.font = '40px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2);
+                    ctx.font = '20px Arial';
+                    ctx.fillText(`Final Score: ${Math.floor(score/60)} seconds`, canvas.width / 2, canvas.height / 2 + 40);
+                }
+            }
+
+            // دالة التحديث والمنطق
+            function update() {
+                if (gameOver) return;
+
+                // تحديث الأعداء (حركتهم نحو اللاعب)
+                enemies.forEach((enemy, index) => {
+                    const dx = player.x - enemy.x;
+                    const dy = player.y - enemy.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    enemy.x += (dx / distance) * enemy.speed;
+                    enemy.y += (dy / distance) * enemy.speed;
+
+                    // كشف الاصطدام
+                    if (distance < (player.size / 2 + enemy.size / 2)) {
+                        player.health -= 5;
+                        enemies.splice(index, 1);
+                    }
+                });
+
+                score++;
+
+                // التحقق من نهاية اللعبة
+                if (player.health <= 0) {
+                    gameOver = true;
+                }
+
+                draw();
+                requestAnimationFrame(update);
+            }
+
+            // دالة تحريك اللاعب عبر الأسهم
+            document.addEventListener('keydown', (e) => {
+                if (gameOver) return;
+
+                if (e.key === 'ArrowUp' || e.key === 'w') {
+                    player.y -= player.speed;
+                } else if (e.key === 'ArrowDown' || e.key === 's') {
+                    player.y += player.speed;
+                } else if (e.key === 'ArrowLeft' || e.key === 'a') {
+                    player.x -= player.speed;
+                } else if (e.key === 'ArrowRight' || e.key === 'd') {
+                    player.x += player.speed;
+                }
+                
+                // تحديد حدود الحركة داخل اللوحة
+                player.x = Math.max(player.size / 2, Math.min(canvas.width - player.size / 2, player.x));
+                player.y = Math.max(player.size / 2, Math.min(canvas.height - player.size / 2, player.y));
+            });
+
+            // بدء إنشاء الأعداء
+            setInterval(spawnEnemy, 1000); 
+            // بدء حلقة التحديث
+            update(); 
+        }
+
+        // ملاحظة: دالة startGame() يتم استدعاؤها داخل onAuthStateChanged بعد التحقق من تسجيل دخول المستخدم.
     </script>
 </body>
 </html>
