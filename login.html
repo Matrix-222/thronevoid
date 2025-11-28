@@ -5,41 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login - Throne Void</title>
 <link rel="stylesheet" href="style.css">
-<style>
-body {
-    margin:0;
-    font-family: 'Arial', sans-serif;
-    background: radial-gradient(#000011, #000);
-    color: white;
-    overflow-x: hidden;
-    transition: 0.3s;
-}
-body.light { background: radial-gradient(#e0e0e0, #fafafa); color:#111; }
-header { padding:20px 50px; display:flex; justify-content:space-between; align-items:center; }
-header h1 { font-size:32px; color:#0ff; text-shadow:0 0 10px #0ff; }
-header button { padding:10px 18px; background:#222; color:#0ff; border:none; border-radius:8px; cursor:pointer; }
-body.light header button { background:#ddd; color:#111; }
-main { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:80vh; }
-form { display:flex; flex-direction:column; background: rgba(0,0,0,0.6); padding:30px; border-radius:15px; min-width:300px; }
-form input { margin:10px 0; padding:12px; font-size:16px; border-radius:8px; border:none; }
-form button { margin-top:15px; padding:12px; font-size:16px; border-radius:10px; background:#0ff; color:#000; cursor:pointer; border:none; }
-form button:hover { background:#0aa; color:white; }
-.social-login { margin-top:15px; display:flex; justify-content:space-around; }
-.social-login button { padding:10px 20px; border:none; border-radius:10px; cursor:pointer; transition:0.3s; }
-.social-login button:hover { opacity:0.8; }
-</style>
 </head>
 <body>
 <header>
     <h1>Throne Void</h1>
     <button onclick="window.location='index.html'">Home</button>
+    <button id="langToggle">العربية</button>
 </header>
 <main>
     <form>
-        <h2 style="text-align:center; margin-bottom:15px;">Login</h2>
+        <h2 data-key="login">Login</h2>
         <input type="text" placeholder="Username or Email" required>
         <input type="password" placeholder="Password" required>
-        <button type="submit">Login</button>
+        <button type="submit" data-key="login">Login</button>
         <div class="social-login">
             <button>Google</button>
             <button>Facebook</button>
@@ -47,9 +25,6 @@ form button:hover { background:#0aa; color:white; }
         </div>
     </form>
 </main>
-<script>
-const toggleBtn = document.getElementById('themeToggle');
-if(toggleBtn) toggleBtn.addEventListener('click',()=>{ document.body.classList.toggle('light'); });
-</script>
+<script src="lang.js"></script>
 </body>
 </html>
