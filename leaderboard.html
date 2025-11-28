@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard - Throne Void</title>
+    <link rel="stylesheet" href="style.css"> 
+    <style>
+        /* تنسيقات خاصة بلوحة المتصدرين */
+        .leaderboard-container {
+            margin: 40px auto;
+            max-width: 600px;
+            background-color: var(--secondary-dark);
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid var(--accent-yellow);
+        }
+        .leaderboard-container h2 {
+            color: var(--accent-yellow);
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 0 5px rgba(255, 199, 0, 0.5);
+        }
+        #leaderboardTable {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        #leaderboardTable th, #leaderboardTable td {
+            padding: 12px;
+            border-bottom: 1px solid #333;
+        }
+        #leaderboardTable th {
+            background-color: #2a2a2a;
+            color: var(--accent-red);
+            text-transform: uppercase;
+        }
+        #leaderboardTable tr:nth-child(even) {
+            background-color: #161616;
+        }
+        #leaderboardTable tr:hover {
+            background-color: #333;
+        }
+        /* تمييز المراكز الثلاثة الأولى */
+        .rank-1 { color: gold; font-weight: bold; }
+        .rank-2 { color: silver; font-weight: bold; }
+        .rank-3 { color: #cd7f32; font-weight: bold; } /* برونزي */
+    </style>
+</head>
+<body>
+    <header>
+        <h1>THRONES OF THE VOID</h1>
+        <div>
+            <button onclick="window.location='dashboard.html'" style="background-color: #2ecc71;">DASHBOARD</button>
+            <button onclick="window.location='index.html'">HOME</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="leaderboard-container">
+            <h2>🥇 Global High Scores (لوحة المتصدرين) 🥇</h2>
+            
+            <table id="leaderboardTable">
+                <thead>
+                    <tr>
+                        <th>الترتيب</th>
+                        <th>اسم المستخدم (الإيميل)</th>
+                        <th>النتيجة</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardBody">
+                    <tr><td colspan="3" style="text-align: center;">جاري تحميل النتائج...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+    
+    <script type="module">
+        // 1. استيراد دوال Firebase الضرورية
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // 2. إعدادات Firebase (مفاتيح مشروعك)
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-bfHRJW3E8KW3-o-PkNW6xi5ytrTKMJE", 
+            authDomain: "thronevoid.firebaseapp.com",
+            projectId: "thronevoid",
+            storageBucket: "thronevoid.firebasestorage.app",
+            messagingSenderId: "958587822012",
+            appId: "1:958587822012:web:312cf3d9e7c87e1c6415b9",
+            measurementId: "G-N34T3VRGX0"
+        };
+        
+        // تهيئة Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- دالة جلب وعرض لوحة المتصدرين ---
+        async function loadLeaderboard() {
+            const leaderboardBody = document.getElementById('leaderboardBody');
+            leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align: center;">جاري البحث عن العروش...</td></tr>';
+            
+            try {
+                // إنشاء استعلام: جلب الوثائق من مجلد 'users' وترتيبها حسب 'highScore' تنازلياً
+                const usersCollectionRef = collection(db, "users");
+                const q = query(usersCollectionRef, orderBy("highScore", "desc")); // ترتيب تنازلياً
+                
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align: center;">لا توجد نتائج حتى الآن.</td></tr>';
+                    return;
+                }
+
+                let rank = 1;
+                leaderboardBody.innerHTML = ''; // تفريغ رسالة التحميل
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const email = doc.id; // الإيميل هو اسم الوثيقة (doc.id)
+                    const score = data.highScore || 0; // إذا لم يوجد حقل النتيجة، نعتبرها 0
+
+                    if (score > 0) { // عرض فقط اللاعبين الذين لديهم نقاط
+                        const row = leaderboardBody.insertRow();
+                        
+                        // تحديد الصنف للتمييز البصري
+                        let rankClass = '';
+                        if (rank === 1) rankClass = 'rank-1';
+                        else if (rank === 2) rankClass = 'rank-2';
+                        else if (rank === 3) rankClass = 'rank-3';
+
+                        // الترتيب
+                        row.insertCell(0).innerHTML = `<span class="${rankClass}">${rank}</span>`;
+                        
+                        // اسم المستخدم (نخفي جزء من الإيميل لحماية الخصوصية)
+                        const displayedEmail = email.substring(0, email.indexOf('@', 3)) + '***' + email.substring(email.lastIndexOf('.'));
+                        row.insertCell(1).textContent = displayedEmail;
+                        
+                        // النتيجة
+                        row.insertCell(2).textContent = score;
+                        
+                        rank++;
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error loading leaderboard:", error);
+                leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--accent-red);">خطأ في جلب البيانات: تأكد من تفعيل Firestore.</td></tr>';
+            }
+        }
+
+        // بدء تحميل لوحة المتصدرين عند تحميل الصفحة
+        window.onload = loadLeaderboard;
+
+    </script>
+</body>
+</html>
