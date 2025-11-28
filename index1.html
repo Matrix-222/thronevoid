@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرش الفراغ - ThroneVoid</title>
+    <style>
+        body{margin:0;background:#000;color:#FFD700;font-family:Arial;overflow:hidden}
+        .stars{position:fixed;top:0;left:0;width:100%;height:100%;background:transparent url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><circle cx="10" cy="10" r="1" fill="white"/><circle cx="80" cy="20" r="0.5" fill="white"/><circle cx="50" cy="90" r="1" fill="white"/></svg>') repeat;animation:twinkle 6s infinite}
+        @keyframes twinkle{0%,100%{opacity:.3}50%{opacity:1}}
+        .header{text-align:center;padding:100px 20px}
+        h1{font-size:4em;text-shadow:0 0 30px #FFD700}
+        .btn{background:#FFD700;color:#000;padding:18px 40px;font-size:1.5em;border:none;border-radius:50px;cursor:pointer;box-shadow:0 0 40px #FFD700;transition:.3s}
+        .btn:hover{transform:scale(1.1)}
+        #game{display:none;padding:20px;max-width:600px;margin:auto;text-align:center}
+        canvas{border:2px solid #FFD700;background:#111;margin:20px auto;display:block}
+        #report{background:rgba(0,0,0,0.8);padding:20px;border-radius:15px;margin:20px 0}
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="header">
+        <h1>عرش الفراغ</h1>
+        <p style="font-size:1.8em">هل أنت جاهز لتتويجك إمبراطور المجرة؟</p>
+        <button class="btn" onclick="startGame()">ابدأ إمبراطوريتك</button>
+    </div>
+
+    <div id="game">
+        <h2>لوحة تحكم الإمبراطور علي آل عابد</h2>
+        <canvas id="galaxy" width="400" height="300"></canvas>
+        <div id="report"></div>
+        <button class="btn" onclick="addFleet()">أضف أسطول</button>
+        <button class="btn" onclick="conquerPlanet()">غزو كوكب</button>
+        <button class="btn" onclick="showReport()">تقرير الإمبراطورية</button>
+    </div>
+
+    <script>
+        let empire = {fleets:[],planets:[],resources:{energy:0,minerals:0},emperor:'علي آل عابد'};
+        const canvas=document.getElementById('galaxy');const ctx=canvas.getContext('2d');
+        function startGame(){document.querySelector('.header').style.display='none';document.getElementById('game').style.display='block';drawGalaxy();}
+        function addFleet(){let n=prompt('اسم الأسطول:');let s=prompt('عدد السفن:');let p=prompt('قوة السفينة:');empire.fleets.push({name:n,ships:+s,power:+p});alert('أسطول '+n+' أُضيف!');drawGalaxy();}
+        function conquerPlanet(){let n=prompt('اسم الكوكب:');let e=+prompt('طاقة الكوكب:');let m=+prompt('معادن الكوكب:');let d=+prompt('دفاع الكوكب:');let total=empire.fleets.reduce((a,f)=>a+f.ships*f.power,0);if(total>=d*1.5){ empire.planets.push({name:n});empire.resources.energy+=e;empire.resources.minerals+=m;alert('كوكب '+n+' تم غزوه!');}else alert('فشل الغزو! قوّي أساطيلك');drawGalaxy();}
+        function showReport(){document.getElementById('report').innerHTML=`<h3>تقرير الإمبراطور ${empire.emperor}</h3>أساطيل: ${empire.fleets.length} | كواكب: ${empire.planets.length}<br>طاقة: ${empire.resources.energy} | معادن: ${empire.resources.minerals}`;}
+        function drawGalaxy(){ctx.clearRect(0,0,400,300);ctx.fillStyle='#FFD700';empire.planets.forEach((p,i)=>{ctx.beginPath();ctx.arc(50+i*70,150,25,0,Math.PI*2);ctx.fill();ctx.fillStyle='#000';ctx.fillText(p.name,40+i*70,155);ctx.fillStyle='#FFD700';});}
+    </script>
+</body>
+</html>
