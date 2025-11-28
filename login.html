@@ -1,30 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - Throne Void</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Throne Void</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header>
-    <h1>Throne Void</h1>
-    <button onclick="window.location='index.html'">Home</button>
-    <button id="langToggle">العربية</button>
-</header>
-<main>
-    <form>
-        <h2 data-key="login">Login</h2>
-        <input type="text" placeholder="Username or Email" required>
-        <input type="password" placeholder="Password" required>
-        <button type="submit" data-key="login">Login</button>
-        <div class="social-login">
-            <button>Google</button>
-            <button>Facebook</button>
-            <button>Twitter</button>
-        </div>
-    </form>
-</main>
-<script src="lang.js"></script>
+    <header>
+        <h1>Throne Void</h1>
+        <button onclick="window.location='index.html'">Home</button>
+        <button id="langToggle">العربية</button>
+    </header>
+    <main>
+        <form id="loginForm">
+            <h2 data-key="login">Login</h2>
+            <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" required>
+            <input type="password" id="loginPassword" placeholder="كلمة المرور" required>
+            
+            <button type="submit" id="loginSubmitBtn" data-key="login">Login</button>
+            
+            <div class="social-login">
+                <button disabled>Google</button>
+                <button disabled>Facebook</button>
+                <button disabled>Twitter</button>
+            </div>
+            
+            <p style="margin-top: 20px;">
+                <a href="register.html">لا يوجد لديك حساب؟ سجل الآن!</a>
+            </p>
+        </form>
+    </main>
+    
+    <script src="lang.js"></script>
+
+    <script type="module">
+        // 1. استيراد دوال Firebase الضرورية
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // 2. إعدادات Firebase (كود مشروعك الفعلي)
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-bfHRJW3E8KW3-o-PkNW6xi5ytrTKMJE", 
+            authDomain: "thronevoid.firebaseapp.com",
+            projectId: "thronevoid",
+            storageBucket: "thronevoid.firebasestorage.app",
+            messagingSenderId: "958587822012",
+            appId: "1:958587822012:web:312cf3d9e7c87e1c6415b9",
+            measurementId: "G-N34T3VRGX0"
+        };
+        
+        // تهيئة Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // --- دالة تسجيل الدخول ---
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault(); // منع إرسال النموذج الافتراضي
+            
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPassword').value;
+
+            signInWithEmailAndPassword(auth, email, pass)
+                .then((userCredential) => {
+                    // تسجيل دخول ناجح، يتم التوجيه إلى لوحة التحكم
+                    alert("تم تسجيل الدخول بنجاح! جاري التوجيه...");
+                    window.location.href = "dashboard.html";
+                })
+                .catch((error) => {
+                    // خطأ في تسجيل الدخول (مثل بريد إلكتروني غير موجود أو كلمة مرور خاطئة)
+                    alert("خطأ في تسجيل الدخول: " + error.message);
+                });
+        });
+        
+    </script>
 </body>
 </html>
