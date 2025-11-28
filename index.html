@@ -4,101 +4,159 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>عرش الفراغ</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Tajawal',sans-serif}
 body{
   background:#000;
   color:#d4af37;
-  font-family:Tajawal,Arial,sans-serif;
-  overflow:hidden;
-  height:100vh;
+  min-height:100vh;
   position:relative;
+  overflow-y:auto;
 }
 audio{visibility:hidden}
 
-/* اللوحة الذهبية الضخمة */
-#gold-plate{
-  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:90%;max-width:800px;z-index:2;
-}
-#gold-plate img{width:100%;filter:drop-shadow(0 0 60px #b8860b);}
-
-/* العرش الذهبي أسفل */
-#throne{
-  position:fixed;bottom:-10%;left:50%;transform:translateX(-50%);
-  width:100%;max-width:1000px;opacity:0.85;z-index:1;
+/* خلفية سوداء نظيفة تمامًا */
+body::before{
+  content:"";
+  position:fixed;inset:0;
+  background:radial-gradient(circle at center,#1a0000,#000);
+  z-index:-1;
 }
 
-/* دخان ملكي */
-.smoke{
-  position:fixed;bottom:0;width:100%;height:300px;
-  background:linear-gradient(transparent,#000);
-  background-image:url('https://i.ibb.co.com/5kqY8nK/smoke.png');
-  background-size:cover;opacity:0.4;animation:smoke 20s infinite linear;
-}
-@keyframes smoke{0%{background-position:0 100%}100%{background-position:0 0}}
-
-/* عنوان إضافي */
+/* عنوان ملكي مركزي */
 h1{
-  position:fixed;top:20%;left:50%;transform:translateX(-50%);
-  font-size:clamp(3rem,12vw,8rem);color:#d4af37;
+  font-size:clamp(4rem,14vw,10rem);
+  text-align:center;
+  margin:60px 0;
   text-shadow:0 0 60px #b8860b,0 0 120px #8b0000;
-  letter-spacing:8px;z-index:10;
+  letter-spacing:8px;
+  font-weight:900;
 }
 
 /* أزرار ذهبية فخمة */
-.gold-btn{
-  position:relative;background:linear-gradient(45deg,#8b0000,#b8860b,#d4af37,#b8860b,#8b0000);
-  color:#000;border:5px ridge #d4af37;padding:20px 50px;
-  font-size:2rem;font-weight:900;border-radius:25px;cursor:pointer;
+.royal-btn{
+  background:linear-gradient(45deg,#8b0000,#b8860b,#d4af37,#b8860b,#8b0000);
+  color:#000;
+  border:5px ridge #d4af37;
+  padding:22px 50px;
+  font-size:2rem;
+  font-weight:900;
+  border-radius:25px;
+  cursor:pointer;
   box-shadow:0 0 80px #b8860b,0 15px 40px #000;
-  transition:0.4s;margin:20px auto;display:block;width:80%;max-width:500px;z-index:10;
+  transition:0.5s;
+  margin:25px auto;
+  display:block;
+  width:90%;
+  max-width:520px;
 }
-.gold-btn:hover{
-  transform:scale(1.08) translateY(-10px);
+.royal-btn:hover{
+  transform:scale(1.08) translateY(-12px);
   box-shadow:0 0 150px #d4af37,0 0 200px #8b0000,0 30px 60px #000;
 }
 
-/* باقي العناصر */
-.container{position:relative;z-index:10;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center}
+/* البطاقات */
+.card{
+  background:rgba(15,0,0,0.94);
+  border:4px double #d4af37;
+  border-radius:30px;
+  padding:40px;
+  margin:30px 20px;
+  box-shadow:0 0 120px #b8860b40,inset 0 0 70px #8b000040;
+  backdrop-filter:blur(15px);
+}
+input{
+  width:100%;padding:20px;margin:15px 0;
+  background:#111;color:#d4af37;
+  border:3px double #b8860b;border-radius:18px;
+  font-size:1.6rem;text-align:center;
+}
+
+/* التنقل */
+.hidden{display:none!important}
+.container{max-width:640px;margin:0 auto;padding:20px}
+
+/* زر الصعود */
+#scrollUp{
+  position:fixed;bottom:30px;right:30px;
+  width:70px;height:70px;background:#d4af37;color:#000;
+  border-radius:50%;font-size:3rem;line-height:70px;text-align:center;
+  cursor:pointer;z-index:999;box-shadow:0 0 60px #b8860b;
+  display:none;
+}
 </style>
 </head>
 <body>
 
-<audio id="imperialMarch" autoplay loop volume="0.3">
+<audio id="imperialMarch" autoplay loop>
   <source src="https://files.catbox.moe/8p3v0j.mp3" type="audio/mpeg">
 </audio>
 
-<div class="smoke"></div>
-
-<div id="throne">
-  <img src="https://i.ibb.co/9h5Y7tQ/darth-vader-throne-skulls-gold.png" alt="العرش الذهبي">
-</div>
-
-<div id="gold-plate">
-  <img src="https://i.ibb.co/0jD5q8K/thronevoid-gold-plate.png" alt="عرش الفراغ">
-</div>
-
-<div class="container">
+<div class="container" id="welcome">
   <h1>عرش الفراغ</h1>
-  
-  <button class="gold-btn" onclick="document.getElementById('auth').style.display='block';this.style.display='none'">
-    ادخل الإمبراطورية
-  </button>
+  <button class="royal-btn" onclick="show('auth')">ادخل الإمبراطورية</button>
 </div>
 
-<!-- صفحة تسجيل الدخول تظهر بعد الضغط -->
-<div id="auth" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:20;display:flex;align-items:center;justify-content:center">
-  <div style="background:#111;border:4px solid #d4af37;padding:40px;border-radius:30px;text-align:center;max-width:500px">
-    <h2 style="color:#d4af37;font-size:3rem;margin-bottom:30px">تسجيل الدخول</h2>
-    <input type="text" placeholder="اسم الملك" style="width:100%;padding:18px;margin:15px 0;background:#000;color:#d4af37;border:2px solid #d4af37;border-radius:15px;font-size:1.5rem"><br>
-    <input type="password" placeholder="كلمة السر الملكية" style="width:100%;padding:18px;margin:15px 0;background:#000;color:#d4af37;border:2px solid #d4af37;border-radius:15px;font-size:1.5rem"><br>
-    <button class="gold-btn" style="width:100%;font-size:2rem">ادخل عرشك</button>
+<!-- تسجيل الدخول -->
+<div class="container hidden" id="auth">
+  <div class="card">
+    <h2 style="font-size:3rem;text-align:center;margin-bottom:30px">تسجيل الدخول</h2>
+    <input type="text" id="username" placeholder="اسم الإمبراطور">
+    <input type="password" placeholder="كلمة المرور">
+    <button class="royal-btn" onclick="login()">تسجيل الدخول</button>
+    <button class="royal-btn" onclick="show('register')">تسجيل مستخدم جديد</button>
+    <button class="royal-btn" style="background:#1877f2">فيسبوك</button>
+    <button class="royal-btn" style="background:#db4437">جوجل</button>
+    <button class="royal-btn" onclick="show('welcome')">رجوع</button>
   </div>
 </div>
 
+<!-- لوحة التحكم -->
+<div class="container hidden" id="dashboard">
+  <div class="card">
+    <h2 style="font-size:3rem;text-align:center">يا جلالة <span id="playerName">الإمبراطور</span></h2>
+    <p style="font-size:2.2rem;text-align:center;margin:40px 0">
+      كواكب محتلة: 15<br>
+      أساطيل: 12<br>
+      طاقة الظلام: 12500
+    </p>
+    <button class="royal-btn" onclick="alert('خريطة المجرة قيد التطوير')">خريطة المجرة</button>
+    <button class="royal-btn" onclick="alert('الرنك العالمي')">الرنك العالمي</button>
+    <button class="royal-btn" onclick="alert('الشات العام')">الشات العام</button>
+    <button class="royal-btn" onclick="alert('النجاة في الصقيع')">النجاة في الصقيع</button>
+    <button class="royal-btn" style="background:#600" onclick="logout()">تسجيل الخروج</button>
+  </div>
+</div>
+
+<!-- تذييل الحقوق -->
+<footer style="text-align:center;padding:30px;color:#b8860b;font-size:1.3rem;border-top:4px double #d4af37;margin-top:50px">
+  كل الحقوق محفوظة © 2025 • 
+  <a href="https://x.com/ccs_0" target="_blank" style="color:#d4af37;font-weight:900">@ccs_0</a>
+</footer>
+
+<div id="scrollUp" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
 <script>
+// تشغيل الموسيقى
 document.body.onclick = () => document.getElementById("imperialMarch").play();
+
+// تبديل الصفحات
+function show(page){
+  document.querySelectorAll(".container").forEach(c=>c.classList.add("hidden"));
+  document.getElementById(page).classList.remove("hidden");
+}
+function login(){
+  const name = document.getElementById("username").value || "الإمبراطور الأعظم";
+  document.getElementById("playerName").textContent = name;
+  show("dashboard");
+}
+function logout(){ show("welcome"); }
+
+// زر الصعود
+window.onscroll = () => {
+  document.getElementById("scrollUp").style.display = (window.scrollY > 300) ? "block" : "none";
+};
 </script>
 </body>
 </html>
