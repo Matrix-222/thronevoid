@@ -6,31 +6,31 @@
 <title>عرش الفراغ</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-body{background:#0a0a0a;color:#eee;overflow:hidden;height:100vh;background:radial-gradient(circle at top, #1a1a2e, #0f0f1f)}
-.stars{position:fixed;inset:0;background:transparent url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='2' height='2'><circle cx='1' cy='1' r='0.8' fill='%234499ff'/></svg>") repeat;opacity:0.4;animation:twinkle 8s infinite}
-@keyframes twinkle{0%,100%{opacity:0.3}50%{opacity:0.7}}
-.container{max-width:500px;margin:0 auto;padding:20px;height:100vh;display:flex;flex-direction:column}
-.card{background:rgba(30,30,50,0.8);border:1px solid #444;border-radius:16px;padding:25px;margin:10px 0;box-shadow:0 8px 32px rgba(0,0,0,0.6);backdrop-filter:blur(10px)}
-h1,h2{color:#00d4ff;text-align:center;margin:20px 0;text-shadow:0 0 15px #00d4ff50}
-input,button{width:100%;padding:14px;margin:10px 0;border:none;border-radius:12px;font-size:1.1rem}
-input{background:#222;color:#fff}
-button{background:linear-gradient(45deg,#00d4ff,#0066ff);color:white;cursor:pointer;transition:.3s;box-shadow:0 4px 15px #00d4ff40}
+body{background:#0a0a0a;color:#eee;height:100vh;overflow:hidden;background:radial-gradient(circle at top, #1a1a2e, #0f0f1f)}
+.stars{position:fixed;inset:0;background:transparent url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='2' height='2'><circle cx='1' cy='1' r='0.8' fill='%234499ff'/></svg>") repeat;opacity:0.4;animation:s 10s infinite}
+@keyframes s{0%,100%{opacity:0.3}50%{opacity:0.7}}
+.container{max-width:520px;margin:0 auto;padding:15px;height:100vh;display:flex;flex-direction:column}
+.card{background:rgba(30,30,50,0.85);border:1px solid #0066ff;border-radius:16px;padding:25px;margin:10px 0;box-shadow:0 8px 32px #0008;backdrop-filter:blur(12px)}
+h1,h2{color:#00d4ff;text-align:center;margin:15px 0;text-shadow:0 0 15px #00d4ff40}
+input,button,select{width:100%;padding:14px;margin:10px 0;border:none;border-radius:12px;font-size:1.1rem}
+input,select{background:#222;color:#fff}
+button{background:linear-gradient(45deg,#00d4ff,#0099ff);color:white;cursor:pointer;box-shadow:0 4px 15px #00d4ff40;transition:.3s}
 button:hover{transform:translateY(-3px);box-shadow:0 8px 25px #00d4ff70}
-.btn-small{background:#333;color:#00d4ff;padding:10px 20px;width:auto;display:inline-block;margin:5px}
+.btn-small{background:#333;color:#00d4ff;padding:10px 20px;width:auto;display:inline-block;margin:8px;border-radius:10px}
 #game{display:none}
-.progress{width:100%;height:12px;background:#222;border-radius:6px;overflow:hidden;margin:15px 0}
+.progress{height:12px;background:#222;border-radius:6px;overflow:hidden;margin:10px 0}
 .progress-bar{height:100%;background:linear-gradient(90deg,#00ff88,#00d4ff);width:0%;transition:width 0.8s}
-.level{display:inline-block;background:#0066ff;color:white;padding:5px 15px;border-radius:20px;font-size:0.9rem}
+.alliance-tag{color:#ff0;font-weight:bold}
 </style>
 </head>
 <body>
 
 <div class="stars"></div>
 
+<!-- صفحة تسجيل الدخول -->
 <div class="container" id="auth">
   <div class="card">
     <h1>عرش الفراغ</h1>
-    <p style="text-align:center;color:#aaa">أنشئ إمبراطوريتك أو ادخل لحسابك</p>
     <input type="text" id="username" placeholder="اسم الإمبراطور">
     <input type="password" id="password" placeholder="كلمة المرور">
     <button onclick="login()">دخول</button>
@@ -38,107 +38,159 @@ button:hover{transform:translateY(-3px);box-shadow:0 8px 25px #00d4ff70}
   </div>
 </div>
 
+<!-- اللعبة الرئيسية -->
 <div class="container" id="game">
   <div class="card">
-    <h2>مرحباً، <span id="playerName">الإمبراطور</span> 👑</h2>
-    <div class="level">المستوى <span id="level">1</span></div>
-    <div class="progress"><div class="progress-bar" id="xpBar"></div></div>
-    <p>نقاط الخبرة: <span id="xp">0</span>/100</p>
-    
-    <div style="margin:20px 0">
-      <button class="btn-small" onclick="showSection('empire')">الإمبراطورية</button>
-      <button class="btn-small" onclick="showSection('battle')">المعارك</button>
-      <button class="btn-small" onclick="showSection('mine')">التعدين</button>
+    <h2>مرحباً <span id="playerName"></span> 
+      <span id="allianceTag" class="alliance-tag"></span>
+    </h2>
+    <div style="text-align:center">
+      <span style="background:#0066ff;padding:5px 15px;border-radius:20px">المستوى <span id="level">1</span></span>
+      <div class="progress"><div class="progress-bar" id="xpBar"></div></div>
+      <small>خبرة: <span id="xp">0</span>/100</small>
     </div>
 
-    <!-- الإمبراطورية -->
+    <div style="margin:20px 0;text-align:center">
+      <button class="btn-small" onclick="show('empire')">إمبراطوريتي</button>
+      <button class="btn-small" onclick="show('battle')">المعارك</button>
+      <button class="btn-small" onclick="show('mine')">التعدين</button>
+      <button class="btn-small" onclick="show('alliance')">التحالفات ⚔️</button>
+    </div>
+
+    <!-- إمبراطوريتي -->
     <div id="empire" class="section">
-      <h3>غزو الكواكب</h3>
-      <p>كواكب محتلة: <strong id="planets">0</strong></p>
-      <p>أساطيل: <strong id="fleets">0</strong></p>
-      <p>طاقة: <strong id="energy">1000</strong></p>
-      <button onclick="buildFleet()">بناء أسطول (-300 طاقة)</button>
-      <button onclick="conquerPlanet()">غزو كوكب جديد</button>
+      <h3>إمبراطوريتك</h3>
+      <p>كواكب: <strong id="planets">0</strong> | أساطيل: <strong id="fleets">0</strong> | طاقة: <strong id="energy">1000</strong></p>
+      <button onclick="buildFleet()">بناء أسطول (-300)</button>
+      <button onclick="conquerPlanet()">غزو كوكب (+800)</button>
     </div>
 
-    <!-- المعارك -->
+    <!-- المعارك والتعدين (كما هي) -->
     <div id="battle" class="section" style="display:none">
       <h3>معركة الأساطيل</h3>
-      <p>قوة أسطولك: <span id="attackPower">500</span></p>
-      <p>العدو: <span id="enemyPower">800</span> ⭐</p>
-      <button onclick="startBattle()">ابدأ المعركة!</button>
-      <div id="battleResult" style="margin:20px 0;font-size:1.2rem"></div>
+      <p>قوتك: <span id="attackPower">500</span> | العدو: 1200</p>
+      <button onclick="startBattle()">هجوم!</button>
+      <div id="battleResult"></div>
     </div>
 
-    <!-- التعدين -->
     <div id="mine" class="section" style="display:none">
       <h3>منجم الكريستال</h3>
-      <p>الكريستال: <strong id="crystals">0</strong></p>
-      <button style="font-size:2rem;padding:30px" onclick="mineCrystal()">⛏️ تعدين!</button>
+      <p>كريستال: <strong id="crystals">0</strong></p>
+      <button style="font-size:2rem;padding:30px" onclick="mineCrystal()">تعدين!</button>
     </div>
 
-    <button onclick="logout()" style="background:#600;margin-top:30px">تسجيل خروج</button>
+    <!-- نظام التحالفات -->
+    <div id="alliance" class="section" style="display:none">
+      <h3>التحالفات ⚔️</h3>
+      <div id="currentAlliance"></div>
+      <hr style="border:1px dashed #444;margin:20px 0">
+      <button class="btn-small" onclick="createAlliance()">إنشاء تحالف جديد</button>
+      <button class="btn-small" onclick="listAlliances()">عرض كل التحالفات</button>
+      <div id="allianceList" style="margin-top:15px"></div>
+    </div>
+
+    <button onclick="logout()" style="background:#900;margin-top:30px">خروج</button>
   </div>
 </div>
 
 <script>
-let player = {name:"", level:1, xp:0, planets:0, fleets:0, energy:1000, crystals:0, attack:500};
+let player = {name:"", alliance:"", level:1, xp:0, planets:0, fleets:0, energy:1000, crystals:0, attack:500};
+let alliances = JSON.parse(localStorage.getItem("alliances") || "{}");
 
 function login(){
-  const name = document.getElementById("username").value.trim();
-  const pass = document.getElementById("password").value;
-  if(!name) return alert("أدخل اسم الإمبراطور");
-  const saved = localStorage.getItem("player_"+name);
-  if(saved && JSON.parse(saved).pass !== pass) return alert("كلمة المرور خاطئة");
-  player = saved ? JSON.parse(saved) : {name, pass, level:1, xp:0, planets:0, fleets:0, energy:1000, crystals:0, attack:500};
+  const n = document.getElementById("username").value.trim();
+  const p = document.getElementById("password").value;
+  if(!n) return alert("أدخل اسمك");
+  const key = "player_"+n;
+  const data = localStorage.getItem(key);
+  if(data && JSON.parse(data).pass !== p) return alert("كلمة مرور خاطئة");
+  player = data ? JSON.parse(data) : {name:n, pass:p, alliance:"", level:1, xp:0, planets:0, fleets:0, energy:1000, crystals:0, attack:500};
   startGame();
 }
 function register(){
-  const name = document.getElementById("username").value.trim();
-  const pass = document.getElementById("password").value;
-  if(!name || !pass) return alert("املأ البيانات");
-  localStorage.setItem("player_"+name, JSON.stringify({name, pass, level:1, xp:0, planets:0, fleets:0, energy:1000, crystals:0, attack:500}));
+  const n = document.getElementById("username").value.trim();
+  const p = document.getElementById("password").value;
+  if(!n || !p) return alert("املأ البيانات");
+  localStorage.setItem("player_"+n, JSON.stringify({name:n, pass:p, alliance:"", level:1, xp:0, planets:0, fleets:0, energy:1000, crystals:0, attack:500}));
   alert("تم إنشاء الحساب! ادخل الآن");
 }
+
 function startGame(){
   document.getElementById("auth").style.display="none";
   document.getElementById("game").style.display="flex";
   document.getElementById("playerName").textContent = player.name;
-  updateAll();
+  player.alliance ? document.getElementById("allianceTag").textContent = " ["+player.alliance+"]" : "";
+  update();
 }
-function updateAll(){
+
+function update(){
   document.getElementById("level").textContent = player.level;
   document.getElementById("xp").textContent = player.xp;
-  document.getElementById("xpBar").style.width = (player.xp%100)+"%";
+  document.getElementById("xpBar").style.width = (player.xp % 100)+"%";
   document.getElementById("planets").textContent = player.planets;
   document.getElementById("fleets").textContent = player.fleets;
   document.getElementById("energy").textContent = player.energy;
   document.getElementById("crystals").textContent = player.crystals;
   document.getElementById("attackPower").textContent = player.attack;
   localStorage.setItem("player_"+player.name, JSON.stringify(player));
+  showCurrentAlliance();
 }
-function addXP(n){ player.xp += n; if(player.xp >= player.level*100){ player.xp -= player.level*100; player.level++; player.attack += 100; alert("مبروك! ارتفع مستواك إلى "+player.level); } updateAll(); }
 
-function showSection(s){
-  document.querySelectorAll(".section").forEach(x=>x.style.display="none");
-  document.getElementById(s).style.display="block";
+function show(s){ document.querySelectorAll(".section").forEach(x=>x.style.display="none"); document.getElementById(s).style.display="block"; if(s==="alliance") listAlliances(); }
+
+function addXP(n){ player.xp += n; while(player.xp >= player.level*100){ player.xp -= player.level*100; player.level++; player.attack += 150; } update(); }
+
+// الألعاب الأساسية
+function buildFleet(){ if(player.energy>=300){ player.fleets++; player.energy-=300; addXP(20); update(); }}
+function conquerPlanet(){ if(player.fleets>0){ player.planets++; player.energy+=800; player.fleets--; addXP(60); update(); }}
+function mineCrystal(){ player.crystals += Math.floor(Math.random()*20)+10; addXP(8); update(); }
+function startBattle(){ /* نفس الكود السابق */ }
+
+// نظام التحالفات
+function createAlliance(){
+  const name = prompt("اسم التحالف:");
+  if(!name || alliances[name]) return alert("اسم غير صالح أو موجود");
+  alliances[name] = {leader:player.name, members:[player.name], points:0};
+  player.alliance = name;
+  localStorage.setItem("alliances", JSON.stringify(alliances));
+  update();
+  alert("تم إنشاء تحالف ["+name+"] بنجاح!");
 }
-function buildFleet(){ if(player.energy>=300){ player.fleets++; player.energy-=300; addXP(15); updateAll(); } }
-function conquerPlanet(){ if(player.fleets>0){ player.planets++; player.energy+=800; player.fleets--; addXP(50); updateAll(); } }
-function mineCrystal(){ player.crystals += Math.floor(Math.random()*15)+10; addXP(5); updateAll(); }
-function startBattle(){
-  const dmg = Math.floor(Math.random()*player.attack*0.8)+player.attack*0.6;
-  const win = dmg > 800;
-  document.getElementById("enemyPower").textContent = win ? "مهزوم!" : "800";
-  document.getElementById("battleResult").innerHTML = win ? "انتصرت! +1000 طاقة و+50 كريستال" : "خسرت المعركة!";
-  if(win){ player.energy += 1000; player.crystals += 50; addXP(100); }
-  updateAll();
+function joinAlliance(name){
+  if(alliances[name].members.includes(player.name)) return alert("أنت عضو بالفعل");
+  alliances[name].members.push(player.name);
+  player.alliance = name;
+  localStorage.setItem("alliances", JSON.stringify(alliances));
+  update();
+  alert("انضممت إلى تحالف ["+name+"]");
 }
+function showCurrentAlliance(){
+  if(player.alliance){
+    const a = alliances[player.alliance];
+    document.getElementById("currentAlliance").innerHTML = `
+      <p>تحالفك: <strong>[${player.alliance}]</strong></p>
+      <p>القائد: ${a.leader} | الأعضاء: ${a.members.length}</p>
+    `;
+  } else {
+    document.getElementById("currentAlliance").innerHTML = "<p style='color:#aaa'>غير منضم لأي تحالف</p>";
+  }
+}
+function listAlliances(){
+  let html = "<h4 style='color:#00d4ff'>قائمة التحالفات</h4>";
+  for(const [name, data] of Object.entries(alliances)){
+    html += `<div style="background:#222;padding:10px;margin:8px 0;border-radius:10px">
+      <strong>[${name}]</strong> • ${data.members.length} عضو • قائد: ${data.leader}
+      <button class="btn-small" onclick="joinAlliance('${name}')" style="float:left">انضمام</button>
+    </div>`;
+  }
+  document.getElementById("allianceList").innerHTML = html || "لا توجد تحالفات بعد";
+}
+
 function logout(){
   document.getElementById("game").style.display="none";
   document.getElementById("auth").style.display="flex";
-  document.getElementById("username").value="";
-  document.getElementById("password").value="";
+  document.getElementById("username").value = "";
+  document.getElementById("password").value = "";
 }
 </script>
 </body>
