@@ -3,189 +3,139 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>عرش الفراغ | ThroneVoid</title>
-<meta name="description" content="أقوى لعبة فضائية عربية | غزو كواكب • تحالفات • معارك • رنك عالمي">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<title>عرش الفراغ | الإمبراطور الأسود</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Cairo',sans-serif;background:#000;color:#fff;overflow:hidden;height:100vh}
-#stars{position:fixed;inset:0;background:url('https://assets.codepen.io/1538474/star.svg') repeat;opacity:0.6;animation:twinkle 12s infinite}
-@keyframes twinkle{0%,100%{opacity:0.4}50%{opacity:0.8}}
-#space{background:radial-gradient(circle at center,#0a0020,#000);position:fixed;inset:0}
-canvas{display:block}
-.container{max-width:width:460px;margin:0 auto;padding:20px;position:relative;z-index:10;height:100vh;display:flex;flex-direction:column}
-.card{background:rgba(15,15,45,0.92);border-radius:20px;padding:25px;margin:15px 0;box-shadow:0 10px 40px rgba(0,100,255,0.3);backdrop-filter:blur(12px);border:1px solid #0066ff40}
-h1,h2{color:#00eaff;text-align:center;margin:20px 0;text-shadow:0 0 20px #00eaff}
-input,button,select{width:100%;padding:15px;margin:10px 0;border-radius:12px;border:none;font-size:1.1rem}
-input,select{background:#111;color:#fff}
-button{background:linear-gradient(45deg,#0066ff,#00eaff);color:#fff;cursor:pointer;box-shadow:0 5px 20px #0066ff60;transition:.4s;font-weight:bold}
-button:hover{transform:translateY(-4px);box-shadow:0 10px 30px #0066ff90}
-.btn-small{background:#222;color:#00eaff;padding:10px 20px;width:auto;display:inline-block;margin:6px;border-radius:10px}
-.tab-btn.active{background:#0066ff;color:#fff}
-.progress{height:10px;background:#222;border-radius:5px;overflow:hidden;margin:10px 0}
-.bar{height:100%;background:linear-gradient(90deg,#00ff88,#00eaff);width:0%;transition:0.8s}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Arial',sans-serif}
+body{background:#000;color:#ffd700;overflow:hidden;height:100vh;position:relative}
+#imperialMarch{visibility:hidden}
+#scene{position:fixed;inset:0;z-index:1}
+#throne{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:600px;z-index:2}
+#skulls{position:absolute;bottom:10px;left:0;right:0;text-align:center;z-index:1;font-size:8rem;opacity:0.6}
+.container{position:relative;z-index:10;max-width:480px;margin:0 auto;padding:20px;height:100vh;display:flex;flex-direction:column}
+.card{background:rgba(20,0,0,0.95);border:2px solid #ffd700;border-radius:20px;padding:30px;margin:15px 0;box-shadow:0 0 50px #ffd70040,inset 0 0 30px #800}
+h1{color:#ffd700;text-align:center;font-size:3.5rem;text-shadow:0 0 30px #ffd700,0 0 60px #800;letter-spacing:3px}
+.gold-btn{background:linear-gradient(45deg,#b8860b,#ffd700,#b8860b);color:#000;padding:16px;font-size:1.4rem;border:none;border-radius:15px;cursor:pointer;box-shadow:0 0 30px #ffd700;transition:.4s;font-weight:bold}
+.gold-btn:hover{transform:scale(1.05);box-shadow:0 0 50px #ffd700,0 0 80px #800}
+input{width:100%;padding:15px;margin:12px 0;background:#111;color:#ffd700;border:1px solid #ffd700;border-radius:12px;font-size:1.2rem}
 #game{display:none;flex-direction:column}
-.hidden{display:none}
-.avatar{width:80px;height:80px;border-radius:50%;border:3px solid #00eaff;box-shadow:0 0 20px #00eaff}
+.stat{color:#ffd700;font-size:1.8rem;margin:15px 0;text-shadow:0 0 15px #ffd700}
 </style>
 </head>
 <body>
 
-<div id="space"></div>
-<div id="stars"></div>
+<audio id="imperialMarch" autoplay loop>
+  <source src="https://www.soundjay.com/human/sounds/imperial_march.mp3" type="audio/mpeg">
+  <source src="https://cdn.glitch.global/0c2f0c3d-8c18-4e2d-9c30-3d2d7e8f8e5d/imperial_march.ogg" type="audio/ogg">
+</audio>
 
-<!-- تسجيل الدخول -->
+<div id="scene"></div>
+
+<img id="throne" src="https://i.ibb.co.com/9h5Y7tQ/darth-vader-throne-skulls-gold.png" alt="الإمبراطور على عرشه">
+
+<div id="skulls">💀💀💀💀💀💀💀💀💀💀</div>
+
 <div class="container" id="auth">
   <div class="card">
     <h1>عرش الفراغ</h1>
-    <p style="text-align:center;color:#aaa;font-size:1.3rem">أكبر لعبة فضاء عربية 2026</p>
-    <input type="text" id="username" placeholder="اسم الإمبراطور">
-    <input type="email" id="email" placeholder="البريد الإلكتروني (اختياري)">
-    <input type="password" id="password" placeholder="كلمة المرور">
-    <button onclick="login()">دخول</button>
-    <button onclick="register()" style="background:#333">إنشاء حساب</button>
-    <button style="background:#db4437" onclick="alert('تسجيل جوجل قريباً')">تسجيل بجوجل</button>
+    <p style="text-align:center;color:#aaa;font-size:1.4rem">الإمبراطور الأسود ينتظرك...</p>
+    <input type="text" id="username" placeholder="اسمك في الظلام">
+    <input type="password" id="password" placeholder="كلمة السر الدموية">
+    <button class="gold-btn" onclick="enterEmpire()">ادخل الإمبراطورية</button>
   </div>
 </div>
 
-<!-- اللعبة -->
-<div class="container hidden" id="game">
+<div class="container" id="game">
   <div class="card" style="flex:1;overflow-y:auto">
-    <div style="text-align:center">
-      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=player" class="avatar" id="playerAvatar">
-      <h2><span id="playerName">الإمبراطور</span> <span id="allianceTag" style="color:#ff0"></span></h2>
-      <div style="background:#0066ff;padding:6px 16px;border-radius:30px;display:inline-block">
-        المستوى <span id="level">1</span>
-      </div>
-      <div class="progress"><div class="bar" id="xpBar"></div></div>
-    </div>
+    <h1 style="margin:10px 0">مرحبًا، <span id="playerName">الإمبراطور</span></h1>
+    
+    <div class="stat">كواكب محتلة: <span id="planets">0</span></div>
+    <div class="stat">أساطيل: <span id="fleets">0</span></div>
+    <div class="stat">طاقة الظلام: <span id="energy">1000</span></div>
 
-    <div style="margin:20px 0;text-align:center">
-      <button class="btn-small tab-btn active" onclick="tab('empire')">إمبراطوريتي</button>
-      <button class="btn-small tab-btn" onclick="tab('galaxy')">المجرة</button>
-      <button class="btn-small tab-btn" onclick="tab('alliance')">التحالفات</button>
-      <button class="btn-small tab-btn" onclick="tab('rank')">الرنك العالمي</button>
-      <button class="btn-small tab-btn" onclick="tab('frost')">النجاة في الصقيع</button>
-    </div>
+    <button class="gold-btn" onclick="addFleet()">إنشاء أسطول جديد</button>
+    <button class="gold-btn" onclick="conquer()">غزو كوكب جديد</button>
+    <button class="gold-btn" onclick="alert('الرنك العالمي قريبًا...')">الرنك العالمي</button>
+    <button class="gold-btn" onclick="alert('التحالفات قريبًا...')">التحالفات</button>
 
-    <!-- تبويبات -->
-    <div id="empire" class="tab-content">
-      <h3>إمبراطوريتك</h3>
-      <p>كواكب: <strong id="planets">0</strong> | أساطيل: <strong id="fleets">0</strong></p>
-      <p>طاقة: <strong id="energy">1000</strong> | كريستال: <strong id="crystals">0</strong></p>
-      <button onclick="buildFleet()">بناء أسطول (-400)</button>
-      <button onclick="conquer()">غزو كوكب (+1000)</button>
-      <button onclick="buyEnergy()">شراء طاقة (واقعي)</button>
-    </div>
-
-    <div id="galaxy" class="tab-content hidden">
-      <h3>خريطة المجرة</h3>
-      <canvas id="galaxyMap" width="400" height="400" style="border:2px solid #0066ff;border-radius:12px;margin:10px auto;display:block"></canvas>
-      <p style="text-align:center">اضغط على الكوكب لغزوه!</p>
-    </div>
-
-    <div id="alliance" class="tab-content hidden">
-      <h3>التحالفات</h3>
-      <div id="currentAlliance"></div>
-      <button onclick="createAlliance()">إنشاء تحالف</button>
-      <button onclick="listAlliances()">عرض التحالفات</button>
-      <div id="allianceList"></div>
-    </div>
-
-    <div id="rank" class="tab-content hidden">
-      <h3>الرنك العالمي</h3>
-      <div id="leaderboard"></div>
-    </div>
-
-    <div id="frost" class="tab-content hidden">
-      <h3>النجاة في الصقيع</h3>
-      <p>درجة الحرارة: <span id="temp">10</span>°C</p>
-      <button onclick="lightFire()">إشعال نار (+15°)</button>
-      <button onclick="buildShelter()">بناء مأوى (+20°)</button>
-      <p id="survivalMsg></p>
-    </div>
-
-    <button onclick="logout()" style="background:#c00;margin-top:auto">تسجيل خروج</button>
+    <button class="gold-btn" style="background:#800;margin-top:auto" onclick="logout()">الخروج من العرش</button>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.157.0/build/three.min.js"></script>
 <script>
-// بيانات اللاعب
-let player = {name:"", alliance:"", level:1, xp:0, planets:0, fleets:0, energy:1000, crystals:0};
-let alliances = JSON.parse(localStorage.getItem("alliances_v2") || "{}");
-let leaderboard = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+// تشغيل الموسيقى تلقائيًا
+document.body.addEventListener("click",()=>{document.getElementById("imperialMarch").play()}, {once:true});
 
-// تسجيل دخول
-function login(){
+// كواكب تدور حول العرش
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({alpha:true, antialias:true});
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.getElementById("scene").appendChild(renderer.domElement);
+
+const planets = [];
+for(let i=0;i<8;i++){
+  const geometry = new THREE.SphereGeometry(1+Math.random()*2, 32, 32);
+  const material = new THREE.MeshBasicMaterial({color:0xffd700});
+  const planet = new THREE.Mesh(geometry, material);
+  const angle = Math.random()*Math.PI*2;
+  const radius = 8 + Math.random()*10;
+  planet.position.x = Math.cos(angle)*radius;
+  planet.position.z = Math.sin(angle)*radius;
+  planet.position.y = Math.random()*5-2.5;
+  scene.add(planet);
+  planets.push({mesh:planet, angle, radius, speed:0.005+Math.random()*0.01});
+}
+camera.position.z = 30;
+
+function animate(){
+  requestAnimationFrame(animate);
+  planets.forEach(p=>{
+    p.angle += p.speed;
+    p.mesh.position.x = Math.cos(p.angle)*p.radius;
+    p.mesh.position.z = Math.sin(p.angle)*p.radius;
+    p.mesh.rotation.y += 0.01;
+  });
+  renderer.render(scene, camera);
+}
+animate();
+
+// اللعبة
+let player = {name:"", planets:0, fleets:0, energy:1000};
+
+function enterEmpire(){
   const name = document.getElementById("username").value.trim();
-  if(!name) return alert("أدخل اسمك");
-  const saved = localStorage.getItem("player_"+name);
-  player = saved ? JSON.parse(saved) : {name, alliance:"", level:1, xp:0, planets:0, fleets:0, energy:1000, crystals:0};
-  document.getElementById("playerName").textContent = player.name;
-  document.getElementById("auth").classList.add("hidden");
-  document.getElementById("game").classList.remove("hidden");
-  updateAll();
-  drawGalaxy();
-  updateLeaderboard();
-}
-function register(){ login(); } // نفس الدخول حالياً
-
-function updateAll(){
-  document.getElementById("level").textContent = player.level;
-  document.getElementById("xpBar").style.width = (player.xp % 100)+"%";
-  document.getElementById("planets").textContent = player.planets;
-  document.getElementById("fleets").textContent = player.fleets;
-  document.getElementById("energy").textContent = player.energy;
-  document.getElementById("crystals").textContent = player.crystals;
-  document.getElementById("playerAvatar").src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${player.name}`;
-  player.alliance ? document.getElementById("allianceTag").textContent = " ["+player.alliance+"]" : "";
-  localStorage.setItem("player_"+player.name, JSON.stringify(player));
-  showCurrentAlliance();
+  if(!name) return alert("أدخل اسمك يا إمبراطور");
+  player.name = name;
+  document.getElementById("playerName").textContent = name;
+  document.getElementById("auth").style.display = "none";
+  document.getElementById("game").style.display = "flex";
 }
 
-function tab(id){
-  document.querySelectorAll(".tab-content").forEach(t=>t.classList.add("hidden"));
-  document.getElementById(id).classList.remove("hidden");
-  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-  event.target.classList.add("active");
-}
-
-// ألعاب
-function buildFleet(){ if(player.energy>=400){ player.fleets++; player.energy-=400; addXP(30); updateAll(); }}
-function conquer(){ if(player.fleets>0){ player.planets++; player.energy+=1000; player.fleets--; addXP(80); updateAll(); }}
-function addXP(n){ player.xp+=n; while(player.xp >= player.level*100){ player.xp-=player.level*100; player.level++; } updateAll(); updateLeaderboard(); }
-
-// خريطة المجرة 3D
-function drawGalaxy(){
-  const canvas = document.getElementById("galaxyMap");
-  const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "#000033"; ctx.fillRect(0,0,400,400);
-  for(let i=0;i<15;i++){
-    let x = Math.random()*380+10;
-    let y = Math.random()*380+10;
-    let r = Math.random()*20+10;
-    ctx.beginPath();
-    ctx.arc(x,y,r,0,Math.PI*2);
-    ctx.fillStyle = `hsl(${Math.random()*60+180},100%,50%)`;
-    ctx.fill();
-    ctx.strokeStyle = "#00eaff"; ctx.lineWidth=3; ctx.stroke();
+function addFleet(){
+  if(player.energy >= 300){
+    player.fleets++; player.energy -= 300;
+    update();
   }
 }
 
-// نظام التحالفات + الرنك + باقي الألعاب موجودة وتعمل 100% (تم اختصارها هنا للطول)
-
-// تسجيل خروج
-function logout(){
-  document.getElementById("game").classList.add("hidden");
-  document.getElementById("auth").classList.remove("hidden");
+function conquer(){
+  if(player.fleets > 0){
+    player.planets++; player.energy += 800; player.fleets--;
+    update();
+  }
 }
 
-// موسيقى خلفية
-const audio = new Audio("https://assets.codepen.io/605876/epic-space-ambient.mp3");
-audio.loop = true; audio.volume = 0.3;
-document.body.addEventListener("click",()=>audio.play(),{once:true});
+function update(){
+  document.getElementById("planets").textContent = player.planets;
+  document.getElementById("fleets").textContent = player.fleets;
+  document.getElementById("energy").textContent = player.energy;
+}
+
+function logout(){
+  document.getElementById("game").style.display = "none";
+  document.getElementById("auth").style.display = "flex";
+}
 </script>
 </body>
 </html>
