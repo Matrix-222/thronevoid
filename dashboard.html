@@ -1,30 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - Throne Void</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Throne Void</title>
+    <style>
+        body { 
+            text-align: center; 
+            padding: 50px; 
+            font-family: 'Arial', sans-serif; 
+            background: #121212; /* خلفية داكنة */
+            color: #ecf0f1; /* نص فاتح */
+        }
+        .container { 
+            background: #1f2a36; 
+            padding: 40px; 
+            border-radius: 12px; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        h1 { color: #3498db; margin-bottom: 20px; }
+        p { margin-bottom: 15px; }
+        #userEmailDisplay { font-weight: bold; color: #2ecc71; display: block; margin-top: 10px; }
+        
+        button { 
+            padding: 12px 25px; 
+            background-color: #e74c3c; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            margin-top: 20px; 
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover { 
+            background-color: #c0392b; 
+        }
+    </style>
 </head>
 <body>
-<header>
-    <h1>Throne Void</h1>
-    <button onclick="window.location='index.html'">Home</button>
-    <button id="langToggle">العربية</button>
-</header>
-<main>
-    <form>
-        <h2 data-key="login">Login</h2>
-        <input type="text" placeholder="Username or Email" required>
-        <input type="password" placeholder="Password" required>
-        <button type="submit" data-key="login">Login</button>
-        <div class="social-login">
-            <button>Google</button>
-            <button>Facebook</button>
-            <button>Twitter</button>
-        </div>
-    </form>
-</main>
-<script src="lang.js"></script>
+    <div class="container">
+        <h1>أهلاً بك في لوحة التحكم (Dashboard)!</h1>
+        <p>هذه هي البيانات الخاصة بحسابك:</p>
+        <p>تم تسجيل دخولك باسم المستخدم:</p>
+        <span id="userEmailDisplay">جاري التحميل...</span>
+        
+        <p style="margin-top: 30px;">هنا يمكنك عرض الألعاب والبيانات الخاصة بالمستخدمين.</p>
+
+        <button id="logoutBtn">تسجيل الخروج</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // *** مفاتيح مشروعك الفعلي (thronevoid) ***
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-bfHRJW3E8KW3-o-PkNW6xi5ytrTKMJE", 
+            authDomain: "thronevoid.firebaseapp.com",
+            projectId: "thronevoid",
+            storageBucket: "thronevoid.firebasestorage.app",
+            messagingSenderId: "958587822012",
+            appId: "1:958587822012:web:312cf3d9e7c87e1c6415b9",
+            measurementId: "G-N34T3VRGX0"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // حماية الصفحة والتأكد من تسجيل الدخول
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // المستخدم مسجل دخوله، نعرض بريده
+                document.getElementById('userEmailDisplay').innerText = user.email;
+            } else {
+                // المستخدم غير مسجل، يتم توجيهه إلى صفحة الدخول
+                alert("يجب عليك تسجيل الدخول أولاً للوصول إلى لوحة التحكم!");
+                window.location.href = "index.html"; 
+            }
+        });
+
+        // دالة تسجيل الخروج
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => {
+                // بعد تسجيل الخروج بنجاح، نعود للصفحة الرئيسية
+                window.location.href = "index.html";
+            }).catch((error) => {
+                console.error("Logout Error:", error);
+            });
+        });
+    </script>
 </body>
 </html>
