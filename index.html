@@ -6,109 +6,81 @@
 <title>عرش الفراغ</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0f0f0f;color:#e0e0e0;font-family:Arial;overflow:hidden;height:100vh}
-.stars{position:fixed;inset:0;background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='3' height='3'><circle cx='1.5' cy='1.5' r='1' fill='%23888'/></svg>") repeat;opacity:0.5}
+body{background:#121212;color:#E0E0E0;font-family:Arial;height:100vh;overflow:hidden}
+.stars{position:fixed;inset:0;background:transparent url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='2' height='2'><circle cx='1' cy='1' r='0.7' fill='%23555'/></svg>") repeat;opacity:0.5}
 .center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
-h1{font-size:3.5rem;color:#ff9800;text-shadow:0 0 15px #ff9800}
-.btn{background:#ff9800;color:#000;padding:15px 40px;font-size:1.4rem;border:none;border-radius:30px;cursor:pointer;margin:10px;transition:.3s;box-shadow:0 0 20px #ff980030}
-.btn:hover{transform:scale(1.1);box-shadow:0 0 30px #ff9800}
-#game{display:none;padding:20px;text-align:center}
-.tab-btn{background:#333;color:#ff9800;padding:10px 20px;margin:5px;border:1px solid #ff9800;border-radius:10px;cursor:pointer}
-.tab-btn.active{background:#ff9800;color:#000}
-.tab{display:none}
-.tab.active{display:block}
-.stat{font-size:2rem;margin:15px;color:#ff9800}
+h1{font-size:3.8rem;color:#FFC107;margin-bottom:20px;text-shadow:0 0 12px #FFC10750}
+p{font-size:1.4rem;margin:30px 0;color:#AAAAAA}
+.btn{background:#FFC107;color:#000;padding:16px 45px;font-size:1.5rem;border:none;border-radius:30px;cursor:pointer;box-shadow:0 4px 20px #FFC10740;transition:.3s}
+.btn:hover{transform:scale(1.07);box-shadow:0 6px 25px #FFC10760}
+#game{display:none;background:#1E1E1E;padding:30px;text-align:center;height:100vh}
+.stats{display:flex;justify-content:center;gap:30px;margin:30px 0;flex-wrap:wrap}
+.stat{background:#2C2C2C;border:1px solid #FFC107;border-radius:12px;padding:20px 30px;min-width:140px}
+.stat-value{font-size:2.5rem;color:#FFC107}
+.stat-label{font-size:1rem;color:#999}
+.actions{margin:40px 0}
+.actions button{margin:10px;padding:12px 30px;font-size:1.1rem;background:#2C2C2C;color:#E0E0E0;border:1px solid #FFC107;border-radius:10px;cursor:pointer;transition:.3s}
+.actions button:hover{background:#FFC107;color:#000}
 </style>
 </head>
 <body>
+
 <div class="stars"></div>
 
 <div class="center" id="welcome">
   <h1>عرش الفراغ</h1>
-  <p style="font-size:1.5rem;margin:30px">اختر لعبتك وابدأ الغزو!</p>
-  <button class="btn" onclick="start()">دخول الإمبراطورية</button>
+  <p>هل أنت جاهز لتتويجك إمبراطور المجرة؟</p>
+  <button class="btn" onclick="enter()">ابدأ إمبراطوريتك</button>
 </div>
 
 <div id="game">
-  <h2 style="color:#ff9800;margin:20px">مرحباً يا إمبراطور علي آل عابد</h2>
+  <h2 style="color:#FFC107;margin:20px 0">لوحة تحكم الإمبراطور علي آل عابد</h2>
   
-  <div style="margin:20px">
-    <button class="tab-btn active" onclick="openTab('main')">الغزو</button>
-    <button class="tab-btn" onclick="openTab('battle')">معركة الأساطيل</button>
-    <button class="tab-btn" onclick="openTab('mine')">تعدين</button>
-    <button class="tab-btn" onclick="openTab('puzzle')">لغز اليوم</button>
-    <button class="tab-btn" onclick="openTab('meme')">حلبة الميمات</button>
+  <div class="stats">
+    <div class="stat"><div class="stat-value" id="planets">0</div><div class="stat-label">كواكب محتلة</div></div>
+    <div class="stat"><div class="stat-value" id="fleets">0</div><div class="stat-label">أساطيل جاهزة</div></div>
+    <div class="stat"><div class="stat-value" id="energy">1000</div><div class="stat-label">طاقة إجمالية</div></div>
   </div>
 
-  <!-- تبويب الغزو -->
-  <div id="main" class="tab active">
-    <div class="stat">كواكب: <span id="p">0</span> | أساطيل: <span id="f">0</span> | طاقة: <span id="e">1000</span></div>
-    <button class="btn" onclick="addFleet()">إنشاء أسطول (-200 طاقة)</button>
-    <button class="btn" onclick="conquer()">غزو كوكب جديد</button>
+  <div class="actions">
+    <button onclick="addFleet()">إنشاء أسطول</button>
+    <button onclick="conquer()">غزو كوكب</button>
+    <button onclick="report()">عرض التقرير</button>
   </div>
 
-  <!-- معركة الأساطيل -->
-  <div id="battle" class="tab">
-    <h3>معركة الأساطيل</h3>
-    <p>قوتك: <span id="power">500</span> | عدو: <span id="enemy">800</span></p>
-    <button class="btn" onclick="attack()">هجوم!</button>
-    <div id="battleLog" style="margin:20px;height:100px;overflow-y:scroll;background:#000;padding:10px"></div>
-  </div>
-
-  <!-- التعدين -->
-  <div id="mine" class="tab">
-    <h3>تعدين المعادن</h3>
-    <p>معادن: <span id="minerals">0</span></p>
-    <button class="btn" style="font-size:3rem;padding:30px" onclick="mine()">⛏️ اضغط للتعدين!</button>
-  </div>
-
-  <!-- لغز اليوم -->
-  <div id="puzzle" class="tab">
-    <h3>لغز الإمبراطور</h3>
-    <p>ما هو الكوكب الذي يحرسه تنين ذهبي؟</p>
-    <input id="answer" placeholder="جوابك هنا" style="padding:10px;font-size:1.2rem">
-    <button class="btn" onclick="checkAnswer()">إرسال</button>
-  </div>
-
-  <!-- مولد الميمات -->
-  <div id="meme" class="tab">
-    <h3>حلبة الميمات</h3>
-    <button class="btn" onclick="generateMeme()">ولّد ميم باسمك!</button>
-    <div style="margin:30px;font-size:2rem" id="memeText"></div>
-  </div>
-
-  <br><br>
-  <button class="btn" onclick="location.reload()">خروج</button>
+  <button onclick="location.reload()" style="margin-top:40px">العودة للشاشة الرئيسية</button>
 </div>
 
 <script>
-let s = {f:0, p:0, e:1000, minerals:0};
+let s = {p:0, f:0, e:1000};
 
-function start(){ document.getElementById('welcome').style.display='none'; document.getElementById('game').style.display='block'; }
-function openTab(t){ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active')); document.getElementById(t).classList.add('active'); document.querySelector(`[onclick="openTab('${t}')"]`).classList.add('active'); }
-
-function addFleet(){ if(s.e>=200){ s.f++; s.e-=200; update(); } }
-function conquer(){ if(s.f>0){ s.p++; s.e+=600; s.f--; update(); } }
-function update(){ document.getElementById('p').textContent=s.p; document.getElementById('f').textContent=s.f; document.getElementById('e').textContent=s.e; }
-
-function attack(){
-  let dmg = Math.floor(Math.random()*300)+200;
-  let edmg = Math.floor(Math.random()*250)+150;
-  document.getElementById('power').textContent = (parseInt(document.getElementById('power').textContent)-edmg);
-  document.getElementById('enemy').textContent = (parseInt(document.getElementById('enemy').textContent)-dmg);
-  document.getElementById('battleLog').innerHTML += `<br>هجمت بـ ${dmg} | العدو ضربك بـ ${edmg}`;
+function enter(){
+  document.getElementById('welcome').style.display='none';
+  document.getElementById('game').style.display='block';
 }
 
-function mine(){ s.minerals += Math.floor(Math.random()*10)+5; document.getElementById('minerals').textContent = s.minerals; }
-
-function checkAnswer(){
-  let a = document.getElementById('answer').value;
-  if(a.includes('زحل') || a.includes('التنين')) alert('صحيح! +500 طاقة'); else alert('خطأ!');
+function addFleet(){
+  if(s.e >= 200){
+    s.f++; s.e -= 200;
+    update();
+  }
 }
 
-function generateMeme(){
-  let memes = ['علي آل عابد عندما يغزو كوكب جديد', 'أنا والشباب بعد غزو المجرة', 'للك لما تصير إمبراطور الكون', 'أول يوم في عرش الفراغ'];
-  document.getElementById('memeText').textContent = memes[Math.floor(Math.random()*memes.length)];
+function conquer(){
+  if(s.f > 0){
+    s.p++; s.e += 500; s.f--;
+    update();
+  }
+}
+
+function report(){
+  alert(`تقرير الإمبراطورية:\nكواكب محتلة: ${s.p}\nأساطيل: ${s.f}\nطاقة: ${s.e}`);
+}
+
+function update(){
+  document.getElementById('planets').textContent = s.p;
+  document.getElementById('fleets').textContent = s.f;
+  document.getElementById('energy').textContent = s.e;
 }
 </script>
 </body>
