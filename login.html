@@ -8,38 +8,30 @@
 </head>
 <body>
     <header>
-        <h1>Throne Void</h1>
-        <button onclick="window.location='index.html'">Home</button>
-        <button id="langToggle">العربية</button>
+        <h1>THRONES OF THE VOID</h1>
+        <div>
+            <button onclick="window.location='register.html'">REGISTER</button>
+            <button onclick="window.location='index.html'">HOME</button>
+        </div>
     </header>
+
     <main>
         <form id="loginForm">
-            <h2 data-key="login">Login</h2>
-            <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" required>
-            <input type="password" id="loginPassword" placeholder="كلمة المرور" required>
-            
-            <button type="submit" id="loginSubmitBtn" data-key="login">Login</button>
-            
-            <div class="social-login">
-                <button disabled>Google</button>
-                <button disabled>Facebook</button>
-                <button disabled>Twitter</button>
-            </div>
-            
+            <h2>تسجيل الدخول</h2>
+            <input type="email" id="email" placeholder="البريد الإلكتروني" required>
+            <input type="password" id="password" placeholder="كلمة المرور" required>
+            <button type="submit">تسجيل الدخول</button>
             <p style="margin-top: 20px;">
-                <a href="register.html">لا يوجد لديك حساب؟ سجل الآن!</a>
+                ليس لديك حساب؟ <a href="register.html">سجل الآن</a>
             </p>
         </form>
     </main>
-    
-    <script src="lang.js"></script>
 
     <script type="module">
-        // 1. استيراد دوال Firebase الضرورية
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // 2. إعدادات Firebase (كود مشروعك الفعلي)
+        // *** مفاتيح مشروعك الفعلي (thronevoid) ***
         const firebaseConfig = {
             apiKey: "AIzaSyB-bfHRJW3E8KW3-o-PkNW6xi5ytrTKMJE", 
             authDomain: "thronevoid.firebaseapp.com",
@@ -50,29 +42,25 @@
             measurementId: "G-N34T3VRGX0"
         };
         
-        // تهيئة Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-
-        // --- دالة تسجيل الدخول ---
+        
         document.getElementById('loginForm').addEventListener('submit', (e) => {
-            e.preventDefault(); // منع إرسال النموذج الافتراضي
+            e.preventDefault();
             
-            const email = document.getElementById('loginEmail').value;
-            const pass = document.getElementById('loginPassword').value;
-
-            signInWithEmailAndPassword(auth, email, pass)
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            signInWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
-                    // تسجيل دخول ناجح، يتم التوجيه إلى لوحة التحكم
-                    alert("تم تسجيل الدخول بنجاح! جاري التوجيه...");
-                    window.location.href = "dashboard.html";
+                    alert("تم تسجيل الدخول بنجاح! سيتم توجيهك إلى لوحة التحكم.");
+                    window.location.href = "dashboard.html"; 
                 })
                 .catch((error) => {
-                    // خطأ في تسجيل الدخول (مثل بريد إلكتروني غير موجود أو كلمة مرور خاطئة)
-                    alert("خطأ في تسجيل الدخول: " + error.message);
+                    const errorMessage = error.message;
+                    alert(`خطأ في الدخول: تأكد من الإيميل وكلمة المرور. ${errorMessage}`);
                 });
         });
-        
     </script>
 </body>
 </html>
