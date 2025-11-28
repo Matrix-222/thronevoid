@@ -3,138 +3,158 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>عرش الفراغ | الإمبراطور الأسود</title>
+<title>عرش الفراغ</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Arial',sans-serif}
-body{background:#000;color:#ffd700;overflow:hidden;height:100vh;position:relative}
-#imperialMarch{visibility:hidden}
-#scene{position:fixed;inset:0;z-index:1}
-#throne{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:600px;z-index:2}
-#skulls{position:absolute;bottom:10px;left:0;right:0;text-align:center;z-index:1;font-size:8rem;opacity:0.6}
-.container{position:relative;z-index:10;max-width:480px;margin:0 auto;padding:20px;height:100vh;display:flex;flex-direction:column}
-.card{background:rgba(20,0,0,0.95);border:2px solid #ffd700;border-radius:20px;padding:30px;margin:15px 0;box-shadow:0 0 50px #ffd70040,inset 0 0 30px #800}
-h1{color:#ffd700;text-align:center;font-size:3.5rem;text-shadow:0 0 30px #ffd700,0 0 60px #800;letter-spacing:3px}
-.gold-btn{background:linear-gradient(45deg,#b8860b,#ffd700,#b8860b);color:#000;padding:16px;font-size:1.4rem;border:none;border-radius:15px;cursor:pointer;box-shadow:0 0 30px #ffd700;transition:.4s;font-weight:bold}
-.gold-btn:hover{transform:scale(1.05);box-shadow:0 0 50px #ffd700,0 0 80px #800}
-input{width:100%;padding:15px;margin:12px 0;background:#111;color:#ffd700;border:1px solid #ffd700;border-radius:12px;font-size:1.2rem}
-#game{display:none;flex-direction:column}
-.stat{color:#ffd700;font-size:1.8rem;margin:15px 0;text-shadow:0 0 15px #ffd700}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:#000;
+    color:#ffd700;
+    font-family:Arial,Helvetica,sans-serif;
+    overflow:hidden;
+    height:100vh;
+    position:relative;
+  }
+  /* صوت الإمبراطورية */
+  #imperialMarch{visibility:hidden}
+
+  /* خلفية العرش */
+  #throne-bg{
+    position:fixed;
+    inset:0;
+    background:url('https://i.ibb.co/9h5Y7tQ/darth-vader-throne-skulls-gold.png') center bottom no-repeat;
+    background-size:contain;
+    opacity:0.85;
+    z-index:1;
+  }
+
+  /* الجماجم تحت العرش */
+  #skulls{
+    position:fixed;
+    bottom:15px;
+    left:0;right:0;
+    text-align:center;
+    font-size:clamp(3rem,8vw,10rem);
+    opacity:0.6;
+    z-index:2;
+    pointer-events:none;
+    animation:skullPulse 4s infinite;
+  }
+  @keyframes skullPulse{0%,100%{opacity:0.5}50%{opacity:0.8}}
+
+  /* الواجهة */
+  .center{
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    text-align:center;
+    z-index:10;
+    width:90%;
+    max-width:500px;
+  }
+  h1{
+    font-size:clamp(3rem,10vw,6rem);
+    text-shadow:0 0 30px #ffd700,0 0 60px #b8860b,0 0 90px #800;
+    margin-bottom:20px;
+    animation:glow 3s infinite alternate;
+  }
+  @keyframes glow{
+    from{text-shadow:0 0 30px #ffd700,0 0 60px #b8860b}
+    to{text-shadow:0 0 50px #ffd700,0 0 100px #b8860b,0 0 150px #800}
+  }
+
+  .gold-btn{
+    background:linear-gradient(45deg,#b8860b,#ffd700,#b8860b);
+    color:#000;
+    padding:18px 50px;
+    font-size:1.6rem;
+    font-weight:bold;
+    border:none;
+    border-radius:20px;
+    cursor:pointer;
+    box-shadow:0 0 40px #ffd700,0 0 80px #800;
+    transition:0.4s;
+    margin:15px;
+  }
+  .gold-btn:hover{
+    transform:scale(1.1);
+    box-shadow:0 0 60px #ffd700,0 0 120px #800;
+  }
+
+  /* لوحة التحكم بعد الدخول */
+  #dashboard{
+    display:none;
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,0.9);
+    z-index:20;
+    padding:20px;
+    text-align:center;
+  }
+  .stat{
+    font-size:2rem;
+    margin:20px;
+    text-shadow:0 0 20px #ffd700;
+  }
 </style>
 </head>
 <body>
 
 <audio id="imperialMarch" autoplay loop>
-  <source src="https://www.soundjay.com/human/sounds/imperial_march.mp3" type="audio/mpeg">
-  <source src="https://cdn.glitch.global/0c2f0c3d-8c18-4e2d-9c30-3d2d7e8f8e5d/imperial_march.ogg" type="audio/ogg">
+  <source src="https://cdn.glitch.global/0c2f0c3d-8c18-4e2d-9c30-3d2d7e8f8e5d/imperial_march.mp3" type="audio/mpeg">
 </audio>
 
-<div id="scene"></div>
-
-<img id="throne" src="https://i.ibb.co.com/9h5Y7tQ/darth-vader-throne-skulls-gold.png" alt="الإمبراطور على عرشه">
-
+<div id="throne-bg"></div>
 <div id="skulls">💀💀💀💀💀💀💀💀💀💀</div>
 
-<div class="container" id="auth">
-  <div class="card">
-    <h1>عرش الفراغ</h1>
-    <p style="text-align:center;color:#aaa;font-size:1.4rem">الإمبراطور الأسود ينتظرك...</p>
-    <input type="text" id="username" placeholder="اسمك في الظلام">
-    <input type="password" id="password" placeholder="كلمة السر الدموية">
-    <button class="gold-btn" onclick="enterEmpire()">ادخل الإمبراطورية</button>
-  </div>
+<div class="center" id="welcome">
+  <h1>عرش الفراغ</h1>
+  <p style="font-size:1.5rem;margin:30px;color:#aaa">الإمبراطور الأسود ينتظر أمرك...</p>
+  <button class="gold-btn" onclick="enter()">ابدأ إمبراطوريتك</button>
 </div>
 
-<div class="container" id="game">
-  <div class="card" style="flex:1;overflow-y:auto">
-    <h1 style="margin:10px 0">مرحبًا، <span id="playerName">الإمبراطور</span></h1>
-    
-    <div class="stat">كواكب محتلة: <span id="planets">0</span></div>
-    <div class="stat">أساطيل: <span id="fleets">0</span></div>
-    <div class="stat">طاقة الظلام: <span id="energy">1000</span></div>
+<div id="dashboard">
+  <h1 style="margin-top:50px">لوحة تحكم الإمبراطور</h1>
+  <div class="stat">كواكب محتلة: <span id="planets">0</span></div>
+  <div class="stat">أساطيل: <span id="fleets">0</span></div>
+  <div class="stat">طاقة الظلام: <span id="energy">1000</span></div>
 
-    <button class="gold-btn" onclick="addFleet()">إنشاء أسطول جديد</button>
-    <button class="gold-btn" onclick="conquer()">غزو كوكب جديد</button>
-    <button class="gold-btn" onclick="alert('الرنك العالمي قريبًا...')">الرنك العالمي</button>
-    <button class="gold-btn" onclick="alert('التحالفات قريبًا...')">التحالفات</button>
-
-    <button class="gold-btn" style="background:#800;margin-top:auto" onclick="logout()">الخروج من العرش</button>
-  </div>
+  <button class="gold-btn" onclick="addFleet()">إنشاء أسطول</button>
+  <button class="gold-btn" onclick="conquer()">غزو كوكب</button>
+  <button class="gold-btn" style="background:#800" onclick="back()">العودة للعرش</button>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.157.0/build/three.min.js"></script>
 <script>
 // تشغيل الموسيقى تلقائيًا
-document.body.addEventListener("click",()=>{document.getElementById("imperialMarch").play()}, {once:true});
+document.addEventListener("click",()=>document.getElementById("imperialMarch").play(),{once:true});
 
-// كواكب تدور حول العرش
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({alpha:true, antialias:true});
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.getElementById("scene").appendChild(renderer.domElement);
+let player = {planets:0,fleets:0,energy:1000};
 
-const planets = [];
-for(let i=0;i<8;i++){
-  const geometry = new THREE.SphereGeometry(1+Math.random()*2, 32, 32);
-  const material = new THREE.MeshBasicMaterial({color:0xffd700});
-  const planet = new THREE.Mesh(geometry, material);
-  const angle = Math.random()*Math.PI*2;
-  const radius = 8 + Math.random()*10;
-  planet.position.x = Math.cos(angle)*radius;
-  planet.position.z = Math.sin(angle)*radius;
-  planet.position.y = Math.random()*5-2.5;
-  scene.add(planet);
-  planets.push({mesh:planet, angle, radius, speed:0.005+Math.random()*0.01});
+function enter(){
+  document.getElementById("welcome").style.display="none";
+  document.getElementById("dashboard").style.display="block";
 }
-camera.position.z = 30;
 
-function animate(){
-  requestAnimationFrame(animate);
-  planets.forEach(p=>{
-    p.angle += p.speed;
-    p.mesh.position.x = Math.cos(p.angle)*p.radius;
-    p.mesh.position.z = Math.sin(p.angle)*p.radius;
-    p.mesh.rotation.y += 0.01;
-  });
-  renderer.render(scene, camera);
-}
-animate();
-
-// اللعبة
-let player = {name:"", planets:0, fleets:0, energy:1000};
-
-function enterEmpire(){
-  const name = document.getElementById("username").value.trim();
-  if(!name) return alert("أدخل اسمك يا إمبراطور");
-  player.name = name;
-  document.getElementById("playerName").textContent = name;
-  document.getElementById("auth").style.display = "none";
-  document.getElementById("game").style.display = "flex";
+function back(){
+  document.getElementById("dashboard").style.display="none";
+  document.getElementById("welcome").style.display="block";
 }
 
 function addFleet(){
-  if(player.energy >= 300){
-    player.fleets++; player.energy -= 300;
+  if(player.energy>=300){
+    player.fleets++; player.energy-=300;
     update();
   }
 }
-
 function conquer(){
-  if(player.fleets > 0){
-    player.planets++; player.energy += 800; player.fleets--;
+  if(player.fleets>0){
+    player.planets++; player.energy+=800; player.fleets--;
     update();
   }
 }
-
 function update(){
-  document.getElementById("planets").textContent = player.planets;
-  document.getElementById("fleets").textContent = player.fleets;
-  document.getElementById("energy").textContent = player.energy;
-}
-
-function logout(){
-  document.getElementById("game").style.display = "none";
-  document.getElementById("auth").style.display = "flex";
+  document.getElementById("planets").textContent=player.planets;
+  document.getElementById("fleets").textContent=player.fleets;
+  document.getElementById("energy").textContent=player.energy;
 }
 </script>
 </body>
