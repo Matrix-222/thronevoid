@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="GENERAL_CHAT">الشات العام - Throne Void</title>
+    <link rel="stylesheet" href="style.css"> 
+    <style>
+        .chat-container {
+            max-width: 700px;
+            margin: 40px auto;
+            background-color: var(--secondary-dark);
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(52, 152, 219, 0.5);
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+        }
+        .chat-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        #messagesBox {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #1a1a2e;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+        .message {
+            margin-bottom: 10px;
+            max-width: 80%;
+            display: flex;
+            align-items: flex-start;
+        }
+        .message-content {
+            padding: 10px 15px;
+            border-radius: 18px;
+            color: white;
+            word-wrap: break-word;
+        }
+        .my-message {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        .my-message .message-content {
+            background-color: #3498db;
+            border-bottom-right-radius: 0;
+        }
+        .other-message {
+            align-self: flex-start;
+            flex-direction: row;
+        }
+        .other-message .message-content {
+            background-color: #34495e;
+            border-bottom-left-radius: 0;
+        }
+        .message-sender {
+            font-weight: bold;
+            font-size: 0.8em;
+            margin-bottom: 5px;
+            color: var(--accent-yellow);
+            display: block;
+        }
+        .message-sender.admin {
+            color: var(--accent-red);
+        }
+        .message-time {
+            font-size: 0.7em;
+            color: #ccc;
+            margin-top: 3px;
+            display: block;
+            text-align: right;
+        }
+
+        /* حقل الإدخال */
+        .chat-input {
+            padding: 15px;
+            border-top: 1px solid #3c3c66;
+            display: flex;
+            gap: 10px;
+            background-color: #2c2c44;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+        .chat-input input {
+            flex-grow: 1;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #555;
+            background-color: #333;
+            color: #ddd;
+        }
+        .chat-input button {
+            padding: 12px 20px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .chat-input button:hover {
+            background-color: #27ae60;
+        }
+        /* رسالة الكتم */
+        #mutedMessage {
+            text-align: center;
+            padding: 15px;
+            color: var(--accent-red);
+            background-color: #333;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>THRONES OF THE VOID</h1>
+        <div>
+            <button onclick="window.location='dashboard.html'" style="background-color: #2ecc71;" data-i18n="DASHBOARD">لوحة التحكم</button>
+            <button onclick="window.location='alliances_chat.html'" style="background-color: #2ecc71;" data-i18n="ALLIANCES_CHAT">شات التحالفات (خاص)</button>
+            <button id="logoutBtn" style="background-color: var(--accent-red);" data-i18n="LOGOUT">تسجيل الخروج</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="chat-container">
+            <div class="chat-header" data-i18n="CHAT_TITLE_GENERAL">الشات العام لجميع المحاربين</div>
+            
+            <div id="messagesBox">
+                </div>
+
+            <div id="mutedMessage" data-i18n="USER_MUTED_MESSAGE"></div>
+
+            <div class="chat-input" id="chatInputArea">
+                <input type="text" id="messageInput" data-i18n="CHAT_PLACEHOLDER" placeholder="اكتب رسالتك..." maxlength="200">
+                <button id="sendBtn" data-i18n="SEND">إرسال</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="i18n.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            query, 
+            orderBy, 
+            limit, 
+            onSnapshot,
+            doc,
+            getDoc
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // *** مفاتيح مشروعك الفعلي (thronevoid) ***
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-bfHRJW3E8KW3-o-PkNW6xi5ytrTKMJE", 
+            authDomain: "thronevoid.firebaseapp.com",
+            projectId: "thronevoid",
+            storageBucket: "thronevoid.firebasestorage.app",
+            messagingSenderId: "958587822012",
+            appId: "1:958587822012:web:312cf3d9e7c87e1c6415b9",
+            measurementId: "G-N34T3VRGX0"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const ADMIN_EMAIL = "i3lawi01@gmail.com";
+        let currentUserData = {};
+        
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const messagesBox = document.getElementById('messagesBox');
+        const chatInputArea = document.getElementById('chatInputArea');
+        const mutedMessageDiv = document.getElementById('mutedMessage');
+        
+        // -------------------------------------------------------------
+        //                 دالة إرسال الرسالة (تستخدم "general_messages")
+        // -------------------------------------------------------------
+        async function sendMessage() {
+            const messageText = messageInput.value.trim();
+            if (messageText === "") return;
+
+            if (currentUserData.isMuted) {
+                alert("أنت مكتوم ولا يمكنك إرسال الرسائل.");
+                return;
+            }
+
+            try {
+                // 🔥 استخدام مجموعة "general_messages" للشات العام 🔥
+                await addDoc(collection(db, "general_messages"), {
+                    senderEmail: auth.currentUser.email,
+                    senderUsername: currentUserData.username || 'Anonymous',
+                    text: messageText,
+                    timestamp: new Date(),
+                    isAdmin: auth.currentUser.email === ADMIN_EMAIL 
+                });
+
+                messageInput.value = ""; 
+            } catch (error) {
+                console.error("Error sending message:", error);
+                alert("فشل إرسال الرسالة.");
+            }
+        }
+
+        // -------------------------------------------------------------
+        //                 دالة عرض الرسائل (لم تتغير)
+        // -------------------------------------------------------------
+        function displayMessage(msg, isMine) {
+            const time = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now';
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isMine ? 'my-message' : 'other-message'}`;
+
+            const contentSpan = document.createElement('span');
+            contentSpan.className = 'message-content';
+
+            const senderSpan = document.createElement('span');
+            senderSpan.className = `message-sender ${msg.isAdmin ? 'admin' : ''}`;
+            senderSpan.textContent = msg.senderUsername + (msg.isAdmin ? ' (Admin)' : '');
+
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'message-time';
+            timeSpan.textContent = time;
+
+            contentSpan.appendChild(senderSpan);
+            contentSpan.appendChild(document.createTextNode(msg.text));
+            contentSpan.appendChild(timeSpan);
+            
+            messageDiv.appendChild(contentSpan);
+
+            messagesBox.appendChild(messageDiv);
+        }
+
+        // -------------------------------------------------------------
+        //                 الاستماع لرسائل الشات (Real-time) (تم التحديث)
+        // -------------------------------------------------------------
+        function setupChatListener(currentEmail) {
+            // 🔥 الاستماع إلى مجموعة "general_messages" للشات العام 🔥
+            const q = query(collection(db, "general_messages"), orderBy("timestamp", "desc"), limit(50));
+            
+            onSnapshot(q, (snapshot) => {
+                messagesBox.innerHTML = ''; 
+
+                const messages = [];
+                snapshot.forEach(doc => {
+                    messages.push(doc.data());
+                });
+
+                messages.reverse().forEach(msg => {
+                    const isMine = msg.senderEmail === currentEmail;
+                    displayMessage(msg, isMine);
+                });
+
+                messagesBox.scrollTop = messagesBox.scrollHeight;
+            });
+        }
+        
+        // -------------------------------------------------------------
+        //                   التحقق من الدخول وحالة الكتم (لم يتغير)
+        // -------------------------------------------------------------
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userDocRef = doc(db, "users", user.email);
+                const userDoc = await getDoc(userDocRef);
+                
+                if (userDoc.exists()) {
+                    currentUserData = userDoc.data();
+                    
+                    if (currentUserData.isMuted) {
+                        chatInputArea.style.display = 'none';
+                        mutedMessageDiv.style.display = 'block';
+                    } else {
+                        chatInputArea.style.display = 'flex';
+                        mutedMessageDiv.style.display = 'none';
+                    }
+                }
+
+                setupChatListener(user.email);
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        // ربط زر الإرسال بالدالة
+        sendBtn.addEventListener('click', sendMessage);
+        
+        // دعم الإرسال بزر Enter
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // زر تسجيل الخروج
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => {
+                window.location.href = "index.html";
+            });
+        });
+
+        loadLanguage();
+    </script>
+</body>
+</html>
