@@ -1,176 +1,128 @@
 const translations = {
-    'ar': {
-        // عام
-        'HOME': 'الرئيسية',
-        'LOGOUT': 'تسجيل الخروج',
-        'DASHBOARD': 'لوحة التحكم',
-        'SETTINGS': 'الإعدادات',
-        'STORE': 'المتجر',
-        'SAVE': 'حفظ',
-        'DELETE': 'حذف',
-
-        // صفحة login.html (المحدثة لتسجيل الدخول بالإيميل والجوجل)
-        'LOGIN': 'تسجيل الدخول',
-        'LOG_IN_ACCOUNT': 'تسجيل الدخول',
-        'REGISTER_ACCOUNT': 'إنشاء حساب جديد', 
-        'USERNAME_PLACEHOLDER': 'اسم المستخدم', 
-        'EMAIL_PLACEHOLDER': 'البريد الإلكتروني',
-        'PASSWORD_PLACEHOLDER': 'كلمة المرور',
-        'CONFIRM_PASSWORD_PLACEHOLDER': 'تأكيد كلمة المرور', 
-        'FORGOT_PASSWORD': 'نسيت كلمة المرور؟',
-        'AUTH_BUTTON_LOGIN': 'تسجيل الدخول',
-        'AUTH_BUTTON_REGISTER': 'إنشاء حساب',
-        'TOGGLE_TO_REGISTER': 'لا تملك حساباً؟ انقر للتسجيل',
-        'TOGGLE_TO_LOGIN': 'لديك حساب بالفعل؟ انقر لتسجيل الدخول',
-        'SIGN_IN_WITH_GOOGLE': 'تسجيل الدخول باستخدام جوجل',
-        'SIGN_IN_WITH_FACEBOOK': 'تسجيل الدخول باستخدام فيسبوك', 
-        
-        // مفاتيح dashboard.html
-        'WELCOME_WARLORD': 'أهلاً بك أيها المحارب!',
-        'LOGGED_IN_AS': 'تم تسجيل دخولك باسم المستخدم:',
-        'HIGH_SCORE_DISPLAY': 'أعلى نتيجة لديك',
-        'START_CHALLENGE': 'ابدأ التحدي',
-        'GAME_INSTRUCTIONS': 'استخدم الأسهم للحركة والمسافة (Space) لإطلاق النار. اللعبة تستخدم محرك Phaser الاحترافي.',
-        
-        // مفاتيح settings.html
-        'SETTINGS_PAGE_TITLE': 'إعدادات الحساب واللعبة',
-        'PROFILE_SETTINGS': 'إعدادات الملف الشخصي',
-        'CHANGE_AVATAR': 'تغيير صورة البروفايل',
-        'USERNAME': 'اسم المستخدم:',
-        'CHANGE_USERNAME': 'تغيير اسم المستخدم',
-        'SAVE_USERNAME': 'حفظ الاسم',
-        'ACCOUNT_SETTINGS': 'إعدادات الحساب',
-        'CURRENT_EMAIL': 'البريد الإلكتروني الحالي:',
-        'LANGUAGE_SETTINGS': 'إعدادات اللغة',
-        'SELECT_LANGUAGE': 'اختر اللغة:',
-        'LANG_AR': 'العربية',
-        'LANG_EN': 'English',
-        'DANGER_ZONE': 'منطقة الخطر',
-        'DELETE_ACCOUNT': 'حذف الحساب نهائياً',
-        
-        // -------------------------------------------------------------
-        // مفاتيح لوحة تحكم المدير (admin.html)
-        // -------------------------------------------------------------
-        'ADMIN_DASHBOARD_TITLE': 'لوحة تحكم المدير',
-        'ADMIN_PANEL_WELCOME': 'أهلاً بك أيها المدير، تحكم في الإمبراطورية.',
-        'USER_MANAGEMENT_TITLE': 'إدارة المستخدمين والصلاحيات',
-        'USER_TABLE_USERNAME': 'اسم المستخدم',
-        'USER_TABLE_EMAIL': 'البريد الإلكتروني',
-        'USER_TABLE_ROLE': 'الصلاحية',
-        'USER_TABLE_SCORE': 'النقاط',
-        'USER_TABLE_ACTIONS': 'الإجراءات',
-
-        // -------------------------------------------------------------
-        // مفاتيح صفحة الدردشة (chat.html)
-        // -------------------------------------------------------------
-        'CHAT_CHANNELS': 'قنوات الدردشة',
-        'GENERAL_CHAT': 'الشات العام',
-        'ALLIANCES_CHAT': 'شات التحالفات (خاص)',
-        'GENERAL_CHAT_TITLE': 'الشات العام (الجميع)',
-        'ALLIANCES_CHAT_TITLE': 'شات التحالفات (الخاص)',
-        'SEND_MESSAGE': 'إرسال',
-        'CHAT_MESSAGE_PLACEHOLDER': 'اكتب رسالتك هنا...',
-        'WELCOME_CHAT': 'أهلاً بك! تبادل الرسائل مع اللاعبين الآخرين.',
-        'CHAT_NOTE': 'سيتم تمكين شات التحالفات بعد انضمامك لتحالف.'
-    },
+    // English (en) translations
     'en': {
         // General
-        'HOME': 'Home',
         'LOGOUT': 'Logout',
         'DASHBOARD': 'Dashboard',
-        'SETTINGS': 'Settings',
-        'STORE': 'Store',
-        'SAVE': 'Save',
-        'DELETE': 'Delete',
-
-        // login.html page
-        'LOGIN': 'Login',
-        'LOG_IN_ACCOUNT': 'Login Account',
-        'REGISTER_ACCOUNT': 'Register New Account', 
-        'USERNAME_PLACEHOLDER': 'Username', 
-        'EMAIL_PLACEHOLDER': 'Email',
-        'PASSWORD_PLACEHOLDER': 'Password',
-        'CONFIRM_PASSWORD_PLACEHOLDER': 'Confirm Password', 
-        'FORGOT_PASSWORD': 'Forgot Password?',
-        'AUTH_BUTTON_LOGIN': 'Login',
-        'AUTH_BUTTON_REGISTER': 'Register Account',
-        'TOGGLE_TO_REGISTER': 'Don\'t have an account? Click to register',
-        'TOGGLE_TO_LOGIN': 'Already have an account? Click to login',
-        'SIGN_IN_WITH_GOOGLE': 'Sign in with Google',
-        'SIGN_IN_WITH_FACEBOOK': 'Sign in with Facebook', 
+        'SETTINGS': 'Admin',
+        'PROFILE': 'Profile',
         
-        // dashboard.html page
-        'WELCOME_WARLORD': 'Welcome Warlord!',
-        'LOGGED_IN_AS': 'Logged in as:',
-        'HIGH_SCORE_DISPLAY': 'Your High Score',
-        'START_CHALLENGE': 'Start Challenge',
-        'GAME_INSTRUCTIONS': 'Use the arrows to move and Space to shoot. Game powered by Phaser.',
-        
-        // settings.html page
-        'SETTINGS_PAGE_TITLE': 'Account & Game Settings',
-        'PROFILE_SETTINGS': 'Profile Settings',
-        'CHANGE_AVATAR': 'Change Profile Avatar',
-        'USERNAME': 'Username:',
-        'CHANGE_USERNAME': 'Change Username',
-        'SAVE_USERNAME': 'Save Username',
-        'ACCOUNT_SETTINGS': 'Account Settings',
-        'CURRENT_EMAIL': 'Current Email:',
-        'LANGUAGE_SETTINGS': 'Language Settings',
-        'SELECT_LANGUAGE': 'Select Language:',
-        'LANG_AR': 'العربية',
-        'LANG_EN': 'English',
-        'DANGER_ZONE': 'Danger Zone',
-        'DELETE_ACCOUNT': 'Permanently Delete Account',
-        
-        // -------------------------------------------------------------
-        // مفاتيح لوحة تحكم المدير (admin.html)
-        // -------------------------------------------------------------
-        'ADMIN_DASHBOARD_TITLE': 'Admin Dashboard',
-        'ADMIN_PANEL_WELCOME': 'Welcome Admin, control the Empire.',
-        'USER_MANAGEMENT_TITLE': 'User & Permissions Management',
-        'USER_TABLE_USERNAME': 'Username',
-        'USER_TABLE_EMAIL': 'Email',
-        'USER_TABLE_ROLE': 'Role',
-        'USER_TABLE_SCORE': 'Score',
-        'USER_TABLE_ACTIONS': 'Actions',
-        
-        // -------------------------------------------------------------
-        // مفاتيح صفحة الدردشة (chat.html)
-        // -------------------------------------------------------------
-        'CHAT_CHANNELS': 'Chat Channels',
+        // Chat - General
         'GENERAL_CHAT': 'General Chat',
-        'ALLIANCES_CHAT': 'Alliances Chat (Private)',
-        'GENERAL_CHAT_TITLE': 'General Chat (Everyone)',
-        'ALLIANCES_CHAT_TITLE': 'Alliances Chat (Private)',
-        'SEND_MESSAGE': 'Send',
+        'GENERAL_CHAT_TITLE': 'General Chat (All)',
+        'CHAT_CHANNELS': 'Chat Channels',
         'CHAT_MESSAGE_PLACEHOLDER': 'Type your message here...',
+        'SEND_MESSAGE': 'Send',
         'WELCOME_CHAT': 'Welcome! Exchange messages with other players.',
-        'CHAT_NOTE': 'Alliance chat will be enabled after you join an alliance.'
+        
+        // Chat - Alliance
+        'ALLIANCES_CHAT': 'Alliance Chat (Private)',
+        'ALLIANCES_CHAT_TITLE': 'Alliance Chat (Private)',
+        'CHAT_NOTE': 'Alliance chat will be enabled after joining an alliance.',
+        'CLEAR_CHAT_HISTORY': 'Clear Chat History',
+        
+        // New Alliance Keys
+        'WELCOME_ALLIANCE_CHAT': 'Welcome to your Alliance Chat!',
+        'ALLIANCE_ACCESS_DENIED': 'Access Denied',
+        'ALLIANCE_ACCESS_DENIED_MSG': 'You must be a member of an alliance to join this channel.',
+
+        // Settings/User Data
+        'SAVE_NAME': 'Save Name',
+        'ACCOUNT_SETTINGS': 'Account Settings',
+        'USERNAME': 'Username',
+        'EMAIL': 'Email',
+        'PROFILE_AVATAR': 'Profile Avatar',
+        'FEATURE_DISABLED': '(This feature is currently disabled)',
+        'NAME_SAVE_SUCCESS': 'Username updated successfully.',
+        'NAME_SAVE_FAIL': 'Failed to update username. Please check your connection or try again.',
+        
+        // Login/Auth
+        'PHONE_LOGIN_TITLE': 'Sign in with Phone Number',
+        'FORGOT_PASSWORD': 'Forgot Password?',
+        'SEND_VERIFICATION_CODE': 'Send Verification Code',
+        'VERIFY_CODE_PLACEHOLDER': 'Enter verification code',
+        'VERIFY': 'Verify',
+        'NOT_A_ROBOT': 'I am not a robot',
+        'LOGIN_ERROR_PHONE_FORMAT': 'Failed to send verification code. Please make sure the correct phone number (+ country code) is provided.',
+        'LOGIN_ERROR_RECAPTCHA': 'reCAPTCHA setup is required or failed to verify. Try again.',
+        'LOGIN_SUCCESS': 'Login successful!',
+        'LOGIN_FAIL': 'Login failed. Please check your credentials.',
+
+    },
+    
+    // Arabic (ar) translations
+    'ar': {
+        // عام
+        'LOGOUT': 'تسجيل الخروج',
+        'DASHBOARD': 'لوحة التحكم',
+        'SETTINGS': 'المدير',
+        'PROFILE': 'الملف الشخصي',
+
+        // الدردشة - عام
+        'GENERAL_CHAT': 'الشات العام',
+        'GENERAL_CHAT_TITLE': 'الشات العام (الجميع)',
+        'CHAT_CHANNELS': 'قنوات الدردشة',
+        'CHAT_MESSAGE_PLACEHOLDER': 'اكتب رسالتك هنا...',
+        'SEND_MESSAGE': 'إرسال',
+        'WELCOME_CHAT': 'أهلاً بك! تبادل الرسائل مع اللاعبين الآخرين.',
+
+        // الدردشة - تحالفات
+        'ALLIANCES_CHAT': 'شات التحالفات (خاص)',
+        'ALLIANCES_CHAT_TITLE': 'شات التحالفات (الخاص)',
+        'CHAT_NOTE': 'سيتم تمكين شات التحالفات بعد انضمامك لتحالف.',
+        'CLEAR_CHAT_HISTORY': 'حذف تاريخ الدردشة',
+
+        // مفاتيح التحالف الجديدة (لصفحة الدردشة الموحدة)
+        'WELCOME_ALLIANCE_CHAT': 'أهلاً بك في شات تحالفك!',
+        'ALLIANCE_ACCESS_DENIED': 'غير مصرح بالدخول',
+        'ALLIANCE_ACCESS_DENIED_MSG': 'يجب أن تكون عضواً في تحالف للانضمام لهذه القناة.',
+
+
+        // الإعدادات/بيانات المستخدم
+        'SAVE_NAME': 'حفظ الاسم',
+        'ACCOUNT_SETTINGS': 'إعدادات الحساب والملف الشخصي',
+        'USERNAME': 'اسم المستخدم',
+        'EMAIL': 'البريد الإلكتروني',
+        'PROFILE_AVATAR': 'تغيير صورة البروفايل',
+        'FEATURE_DISABLED': '(هذه الميزة غير مفعلة حالياً)',
+        'NAME_SAVE_SUCCESS': 'تم تحديث اسم المستخدم بنجاح.',
+        'NAME_SAVE_FAIL': '❌ فشل تحديث الاسم. يرجى التحقق من اتصالك بالإنترنت أو المحاولة مجدداً.',
+
+        // تسجيل الدخول/المصادقة
+        'PHONE_LOGIN_TITLE': 'أو سجل برقم الجوال',
+        'FORGOT_PASSWORD': 'نسيت كلمة المرور؟',
+        'SEND_VERIFICATION_CODE': 'إرسال رمز التحقق',
+        'VERIFY_CODE_PLACEHOLDER': 'أدخل رمز التحقق',
+        'VERIFY': 'تحقق',
+        'NOT_A_ROBOT': 'أنا لست برنامج روبوت',
+        'LOGIN_ERROR_PHONE_FORMAT': '❌ فشل إرسال رمز التحقق. تأكد من تهيئة reCAPTCHA وتنسيق رقم الجوال الصحيح (+ رمز الدولة).',
+        'LOGIN_ERROR_RECAPTCHA': '❌ يتطلب إعداد reCAPTCHA أو فشل التحقق. حاول مرة أخرى.',
+        'LOGIN_SUCCESS': 'تم تسجيل الدخول بنجاح!',
+        'LOGIN_FAIL': 'فشل تسجيل الدخول. يرجى التحقق من بياناتك.',
+
     }
 };
 
-function setLanguage(lang) {
-    localStorage.setItem('lang', lang);
-    loadLanguage();
+let currentLang = 'ar'; // تعيين اللغة الافتراضية
+
+function loadLanguage(key, lang = currentLang) {
+    return translations[lang][key] || translations['en'][key] || key;
 }
 
-function loadLanguage() {
-    const lang = localStorage.getItem('lang') || 'ar';
-    document.documentElement.lang = lang; 
+document.addEventListener('DOMContentLoaded', () => {
+    // تحديد اللغة من المتصفح أو أي آلية أخرى
+    // حالياً نعتمد 'ar' كافتراضية
+    currentLang = 'ar'; 
+    document.documentElement.dir = 'rtl';
 
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
-        if (translations[lang] && translations[lang][key]) {
-            if (element.placeholder) {
-                element.placeholder = translations[lang][key];
-            } 
-            else {
-                element.textContent = translations[lang][key];
-            }
+        const translation = loadLanguage(key);
+        
+        if (element.tagName === 'INPUT' && element.getAttribute('type') === 'text' && element.hasAttribute('placeholder')) {
+            element.setAttribute('placeholder', translation);
+        } else {
+            element.textContent = translation;
         }
     });
-
-    return lang;
-}
-
-loadLanguage();
+});
