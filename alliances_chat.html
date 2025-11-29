@@ -1,122 +1,112 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="ALLIANCES_CHAT">شات التحالفات (خاص) - Throne Void</title>
-    <link rel="stylesheet" href="style.css"> 
+    <title data-i18n="ALLIANCES_CHAT_TITLE">شات التحالفات (الخاص)</title>
+    <link rel="stylesheet" href="style.css">
     <style>
         .chat-container {
-            max-width: 700px;
+            max-width: 800px;
             margin: 40px auto;
-            background-color: var(--secondary-dark);
-            border-radius: 12px;
-            box-shadow: 0 0 25px rgba(52, 152, 219, 0.5);
             display: flex;
             flex-direction: column;
-            height: 80vh;
-        }
-        .chat-header {
-            background-color: #3498db;
-            color: white;
-            padding: 15px;
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
-            text-align: center;
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-        #messagesBox {
-            flex-grow: 1;
+            background-color: var(--secondary-dark);
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(230, 126, 34, 0.6); /* ظل برتقالي خاص */
+            height: 70vh;
             padding: 20px;
+        }
+        
+        .chat-header {
+            text-align: center;
+            color: var(--accent-yellow);
+            margin-bottom: 20px;
+        }
+        
+        /* منطقة عرض الرسائل - الرسائل الجديدة في الأسفل */
+        #messagesContainer {
+            flex-grow: 1;
             overflow-y: auto;
-            background-color: #1a1a2e;
+            border: 1px solid #777;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background-color: #3a3a3a;
             display: flex;
-            flex-direction: column-reverse;
+            flex-direction: column; 
         }
-        .message {
-            margin-bottom: 10px;
-            max-width: 80%;
-            display: flex;
-            align-items: flex-start;
-        }
-        .message-content {
-            padding: 10px 15px;
-            border-radius: 18px;
-            color: white;
+        .message-item {
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 6px;
+            max-width: 85%;
             word-wrap: break-word;
         }
-        .my-message {
-            align-self: flex-end;
-            flex-direction: row-reverse;
+        .system-msg {
+            text-align: center;
+            color: #f39c12; /* لون برتقالي للنظام */
+            font-style: italic;
         }
-        .my-message .message-content {
-            background-color: #3498db;
-            border-bottom-right-radius: 0;
-        }
-        .other-message {
+        .self-msg {
+            background-color: #e67e22; /* برتقالي خاص */
             align-self: flex-start;
-            flex-direction: row;
-        }
-        .other-message .message-content {
-            background-color: #34495e;
-            border-bottom-left-radius: 0;
-        }
-        .message-sender {
-            font-weight: bold;
-            font-size: 0.8em;
-            margin-bottom: 5px;
-            color: var(--accent-yellow);
-            display: block;
-        }
-        .message-sender.admin {
-            color: var(--accent-red);
-        }
-        .message-time {
-            font-size: 0.7em;
-            color: #ccc;
-            margin-top: 3px;
-            display: block;
             text-align: right;
+            margin-right: auto;
         }
-        .chat-input {
-            padding: 15px;
-            border-top: 1px solid #3c3c66;
+        .other-msg {
+            background-color: #f1c40f; /* أصفر داكن */
+            align-self: flex-end;
+            text-align: right;
+            margin-left: auto;
+        }
+        .message-header {
+            font-size: 0.8em;
+            color: #2c3e50;
+            margin-bottom: 3px;
+            font-weight: bold;
+        }
+        .message-timestamp {
+            font-size: 0.7em;
+            color: #34495e;
+            text-align: left;
+            margin-top: 5px;
+        }
+
+        /* منطقة الإرسال */
+        .input-area {
             display: flex;
             gap: 10px;
-            background-color: #2c2c44;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
         }
-        .chat-input input {
+        #messageInput {
             flex-grow: 1;
-            padding: 12px;
+            padding: 10px;
+            border: 1px solid #777;
             border-radius: 6px;
-            border: 1px solid #555;
             background-color: #333;
-            color: #ddd;
+            color: #fff;
         }
-        .chat-input button {
-            padding: 12px 20px;
-            background-color: #2ecc71;
-            color: white;
+        #sendMessageBtn {
+            padding: 10px 20px;
+            background-color: #f39c12; /* برتقالي فاتح */
+            color: #2c3e50;
             border: none;
             border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .chat-input button:hover {
-            background-color: #27ae60;
-        }
-        #mutedMessage {
-            text-align: center;
-            padding: 15px;
-            color: var(--accent-red);
-            background-color: #333;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
             font-weight: bold;
-            display: none;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        #sendMessageBtn:hover {
+            opacity: 0.9;
+        }
+
+        .alert-box {
+            background-color: #c0392b;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -124,24 +114,28 @@
     <header>
         <h1>THRONES OF THE VOID</h1>
         <div>
-            <button onclick="window.location='dashboard.html'" style="background-color: #2ecc71;" data-i18n="DASHBOARD">لوحة التحكم</button>
-            <button onclick="window.location='general_chat.html'" style="background-color: #3498db;" data-i18n="GENERAL_CHAT">الشات العام</button>
-            <button id="logoutBtn" style="background-color: var(--accent-red);" data-i18n="LOGOUT">تسجيل الخروج</button>
+            <button onclick="window.location='dashboard.html'" style="background-color: #e67e22;" data-i18n="DASHBOARD">لوحة التحكم</button>
+            <button onclick="window.location='chat.html'" style="background-color: #3498db;" data-i18n="GENERAL_CHAT">الدردشة العامة</button>
+            <button onclick="logoutUser()" style="background-color: #e74c3c;" data-i18n="LOGOUT">تسجيل الخروج</button>
         </div>
     </header>
 
     <main>
         <div class="chat-container">
-            <div class="chat-header" data-i18n="CHAT_TITLE_ALLIANCE">شات التحالف (الخاص)</div>
-            
-            <div id="messagesBox">
+            <div class="chat-header">
+                <h2 data-i18n="ALLIANCES_CHAT_TITLE">شات التحالفات (الخاص)</h2>
+                <div id="allianceStatus" class="alert-box" style="display: none;">
+                    <p data-i18n="ALLIANCE_ACCESS_DENIED">يجب أن تكون عضواً في تحالف للانضمام لهذه القناة.</p>
                 </div>
+            </div>
+            
+            <div id="messagesContainer">
+                <div class="system-msg" data-i18n="WELCOME_ALLIANCE_CHAT">أهلاً بك في شات تحالفك!</div>
+            </div>
 
-            <div id="mutedMessage" data-i18n="USER_MUTED_MESSAGE"></div>
-
-            <div class="chat-input" id="chatInputArea">
-                <input type="text" id="messageInput" data-i18n="CHAT_PLACEHOLDER" placeholder="اكتب رسالتك..." maxlength="200">
-                <button id="sendBtn" data-i18n="SEND">إرسال</button>
+            <div class="input-area">
+                <input type="text" id="messageInput" data-i18n="CHAT_MESSAGE_PLACEHOLDER" placeholder="اكتب رسالتك هنا..." maxlength="250" disabled>
+                <button id="sendMessageBtn" data-i18n="SEND_MESSAGE" disabled>إرسال</button>
             </div>
         </div>
     </main>
@@ -152,14 +146,15 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { 
             getFirestore, 
+            doc, 
+            getDoc, 
             collection, 
-            addDoc, 
+            addDoc,
             query, 
             orderBy, 
             limit, 
-            onSnapshot,
-            doc,
-            getDoc
+            onSnapshot, 
+            serverTimestamp
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // *** مفاتيح مشروعك الفعلي (thronevoid) ***
@@ -177,142 +172,170 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        const ADMIN_EMAIL = "i3lawi01@gmail.com";
-        let currentUserData = {};
+        let currentUser = null;
+        let currentUsername = 'Anonymous';
+        let currentAllianceId = null; 
+        let unsubscribeListener = null; 
         
+        const messagesContainer = document.getElementById('messagesContainer');
         const messageInput = document.getElementById('messageInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const messagesBox = document.getElementById('messagesBox');
-        const chatInputArea = document.getElementById('chatInputArea');
-        const mutedMessageDiv = document.getElementById('mutedMessage');
-        
-        // -------------------------------------------------------------
-        //                 دالة إرسال الرسالة (تستخدم "alliance_messages")
-        // -------------------------------------------------------------
-        async function sendMessage() {
-            const messageText = messageInput.value.trim();
-            if (messageText === "") return;
+        const sendMessageBtn = document.getElementById('sendMessageBtn');
+        const allianceStatusDiv = document.getElementById('allianceStatus');
 
-            if (currentUserData.isMuted) {
-                alert("أنت مكتوم ولا يمكنك إرسال الرسائل.");
-                return;
-            }
-
-            try {
-                // 🔥 استخدام مجموعة "alliance_messages" للشات الخاص 🔥
-                await addDoc(collection(db, "alliance_messages"), {
-                    senderEmail: auth.currentUser.email,
-                    senderUsername: currentUserData.username || 'Anonymous',
-                    text: messageText,
-                    timestamp: new Date(),
-                    isAdmin: auth.currentUser.email === ADMIN_EMAIL 
-                });
-
-                messageInput.value = ""; 
-            } catch (error) {
-                console.error("Error sending message:", error);
-                alert("فشل إرسال الرسالة.");
-            }
-        }
 
         // -------------------------------------------------------------
-        //                 دالة عرض الرسائل (لم تتغير)
+        //             1. التحقق من الدخول وتحميل بيانات المستخدم
         // -------------------------------------------------------------
-        function displayMessage(msg, isMine) {
-            // ... (نفس الكود السابق) ...
-            const time = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now';
-            
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isMine ? 'my-message' : 'other-message'}`;
 
-            const contentSpan = document.createElement('span');
-            contentSpan.className = 'message-content';
-
-            const senderSpan = document.createElement('span');
-            senderSpan.className = `message-sender ${msg.isAdmin ? 'admin' : ''}`;
-            senderSpan.textContent = msg.senderUsername + (msg.isAdmin ? ' (Admin)' : '');
-
-            const timeSpan = document.createElement('span');
-            timeSpan.className = 'message-time';
-            timeSpan.textContent = time;
-
-            contentSpan.appendChild(senderSpan);
-            contentSpan.appendChild(document.createTextNode(msg.text));
-            contentSpan.appendChild(timeSpan);
-            
-            messageDiv.appendChild(contentSpan);
-
-            messagesBox.appendChild(messageDiv);
-        }
-
-        // -------------------------------------------------------------
-        //                 الاستماع لرسائل الشات (Real-time) (تم التحديث)
-        // -------------------------------------------------------------
-        function setupChatListener(currentEmail) {
-            // 🔥 الاستماع إلى مجموعة "alliance_messages" للشات الخاص 🔥
-            const q = query(collection(db, "alliance_messages"), orderBy("timestamp", "desc"), limit(50));
-            
-            onSnapshot(q, (snapshot) => {
-                messagesBox.innerHTML = ''; 
-
-                const messages = [];
-                snapshot.forEach(doc => {
-                    messages.push(doc.data());
-                });
-
-                messages.reverse().forEach(msg => {
-                    const isMine = msg.senderEmail === currentEmail;
-                    displayMessage(msg, isMine);
-                });
-
-                messagesBox.scrollTop = messagesBox.scrollHeight;
-            });
-        }
-        
-        // -------------------------------------------------------------
-        //                   التحقق من الدخول وحالة الكتم (لم يتغير)
-        // -------------------------------------------------------------
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                const userDocRef = doc(db, "users", user.email);
+                currentUser = user;
+                const userDocRef = doc(db, "users", user.email); 
                 const userDoc = await getDoc(userDocRef);
-                
-                if (userDoc.exists()) {
-                    currentUserData = userDoc.data();
-                    
-                    if (currentUserData.isMuted) {
-                        chatInputArea.style.display = 'none';
-                        mutedMessageDiv.style.display = 'block';
-                    } else {
-                        chatInputArea.style.display = 'flex';
-                        mutedMessageDiv.style.display = 'none';
-                    }
-                }
 
-                setupChatListener(user.email);
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    currentUsername = userData.username || user.email.split('@')[0];
+                    currentAllianceId = userData.allianceId; 
+                    
+                    if (currentAllianceId) {
+                        // تفعيل الدردشة وتحميل الرسائل
+                        allianceStatusDiv.style.display = 'none';
+                        messageInput.disabled = false;
+                        sendMessageBtn.disabled = false;
+                        startChatListener(currentAllianceId);
+                    } else {
+                        // عدم وجود تحالف - عرض رسالة الحظر
+                        allianceStatusDiv.style.display = 'block';
+                        messagesContainer.innerHTML = `<div class="system-msg" data-i18n="ALLIANCE_ACCESS_DENIED_MSG">${loadLanguage('ALLIANCE_ACCESS_DENIED')}</div>`;
+                    }
+
+                } else {
+                    console.error("خطأ: لم يتم العثور على بيانات المستخدم.");
+                    logoutUser();
+                }
             } else {
                 window.location.href = "login.html";
             }
         });
 
-        // ربط زر الإرسال بالدالة
-        sendBtn.addEventListener('click', sendMessage);
+        // -------------------------------------------------------------
+        //             2. دالة بدء الاستماع لرسائل Firestore (Real-time)
+        // -------------------------------------------------------------
+
+        function startChatListener(allianceId) {
+            if (unsubscribeListener) {
+                unsubscribeListener();
+            }
+            
+            messagesContainer.innerHTML = ''; 
+
+            const targetCollection = `alliance_messages/${allianceId}/messages`;
+            const chatRef = collection(db, targetCollection);
+            
+            // الترتيب تصاعدي (asc) لعرض الأقدم في الأعلى والأحدث في الأسفل
+            const q = query(chatRef, orderBy('timestamp', 'asc'), limit(50)); 
+
+            unsubscribeListener = onSnapshot(q, (snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === "added") {
+                        const messageData = change.doc.data();
+                        const messageElement = createMessageElement(messageData);
+                        
+                        // استخدام append لعرض الأحدث في الأسفل
+                        messagesContainer.append(messageElement); 
+                        
+                        // الانتقال لأسفل الدردشة تلقائياً
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }
+                });
+            });
+        }
         
-        // دعم الإرسال بزر Enter
+        // -------------------------------------------------------------
+        //             3. دالة بناء عنصر الرسالة HTML
+        // -------------------------------------------------------------
+
+        function createMessageElement(data) {
+            const div = document.createElement('div');
+            let timestampText = '';
+            
+            if (data.timestamp && data.timestamp.toDate) {
+                const date = data.timestamp.toDate();
+                timestampText = date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) + ' ' +
+                                date.toLocaleDateString('ar-EG');
+            } else {
+                timestampText = 'الآن';
+            }
+
+            const isSelf = currentUser && data.senderEmail === currentUser.email;
+            let senderName = data.senderUsername || "مستخدم غير معروف";
+
+            div.className = `message-item ${isSelf ? 'self-msg' : 'other-msg'}`;
+            div.innerHTML = `
+                <div class="message-header">
+                    ${isSelf ? 'أنت' : senderName}
+                </div>
+                <div class="message-body">
+                    ${data.text}
+                </div>
+                <div class="message-timestamp">
+                    ${timestampText}
+                </div>
+            `;
+            return div;
+        }
+
+        // -------------------------------------------------------------
+        //             4. دالة إرسال رسالة جديدة
+        // -------------------------------------------------------------
+
+        async function sendMessage() {
+            const text = messageInput.value.trim();
+
+            if (!text || !currentAllianceId) return;
+            
+            const targetCollection = `alliance_messages/${currentAllianceId}/messages`;
+
+            try {
+                await addDoc(collection(db, targetCollection), {
+                    senderEmail: currentUser.email,
+                    senderUsername: currentUsername,
+                    text: text,
+                    timestamp: serverTimestamp(),
+                    allianceId: currentAllianceId
+                });
+
+                messageInput.value = ''; 
+                
+            } catch (error) {
+                console.error("Error sending message:", error);
+                alert("❌ فشل إرسال الرسالة. يرجى التحقق من قواعد Firestore.");
+            }
+        }
+        
+        // -------------------------------------------------------------
+        //             5. ربط الأزرار ودالة الخروج
+        // -------------------------------------------------------------
+        
+        sendMessageBtn.addEventListener('click', sendMessage);
         messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 sendMessage();
             }
         });
 
-        // زر تسجيل الخروج
-        document.getElementById('logoutBtn').addEventListener('click', () => {
+        // دالة تسجيل الخروج (مُعرفة عالمياً)
+        window.logoutUser = function() {
+            if (unsubscribeListener) {
+                unsubscribeListener();
+            }
             signOut(auth).then(() => {
-                window.location.href = "index.html";
+                window.location.href = "login.html";
+            }).catch((error) => {
+                console.error("Logout Error:", error);
             });
-        });
-
-        loadLanguage();
+        }
     </script>
 </body>
 </html>
