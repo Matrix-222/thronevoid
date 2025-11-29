@@ -7,9 +7,9 @@ const translations = {
         'SETTINGS': 'Admin',
         'PROFILE': 'Profile',
         'SIGN_IN': 'Sign In', 
-        'REGISTER': 'Register Now', // إضافة مفتاح التسجيل
+        'REGISTER': 'Register Now', 
         
-        // Language Buttons (New Keys for clear text on buttons)
+        // Language Buttons 
         'ARABIC_BUTTON': 'العربية', 
         'ENGLISH_BUTTON': 'English',
         
@@ -43,7 +43,7 @@ const translations = {
         // Login/Auth
         'PHONE_LOGIN_TITLE': 'Sign in with Phone Number',
         'FORGOT_PASSWORD': 'Forgot Password?',
-        'SEND_VERIFICATION_CODE': 'SEND_VERIFICATION_CODE', // يجب أن تكون بالإنجليزية هنا
+        'SEND_VERIFICATION_CODE': 'Send Verification Code',
         'VERIFY_CODE_PLACEHOLDER': 'Enter verification code',
         'VERIFY': 'Verify',
         'NOT_A_ROBOT': 'I am not a robot',
@@ -64,7 +64,7 @@ const translations = {
         'SIGN_IN': 'تسجيل الدخول',
         'REGISTER': 'سجل الآن',
 
-        // أزرار اللغة (مفاتيح جديدة)
+        // أزرار اللغة 
         'ARABIC_BUTTON': 'العربية', 
         'ENGLISH_BUTTON': 'English',
         
@@ -118,7 +118,7 @@ window.translations = translations;
 function loadLanguage(key, lang = currentLang) {
     return translations[lang][key] || translations['en'][key] || key;
 }
-window.loadLanguage = loadLanguage; // جعل الدالة متاحة عالمياً (مهمة لـ chat.html و index.html)
+window.loadLanguage = loadLanguage; 
 
 
 // 2. الدالة التي تقوم بتغيير اللغة وحفظها
@@ -127,7 +127,6 @@ window.switchLanguage = function(newLang) {
         currentLang = newLang;
         localStorage.setItem('appLang', newLang); 
         
-        // إعادة تحميل الصفحة لتطبيق الترجمة على جميع العناصر بشكل فعال
         window.location.reload(); 
         
     } else {
@@ -137,10 +136,8 @@ window.switchLanguage = function(newLang) {
 
 // 3. الدالة التي تعمل عند تحميل الصفحة لأول مرة لتطبيق اللغة المحفوظة
 document.addEventListener('DOMContentLoaded', () => {
-    // تعيين اتجاه النص الأولي
     document.documentElement.dir = (currentLang === 'ar') ? 'rtl' : 'ltr';
 
-    // تطبيق الترجمة على جميع العناصر في الصفحة
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
         const translation = loadLanguage(key);
