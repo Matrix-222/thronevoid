@@ -25,7 +25,7 @@ const translations = {
         'SIGN_IN_WITH_GOOGLE': 'تسجيل الدخول باستخدام جوجل',
         'SIGN_IN_WITH_FACEBOOK': 'تسجيل الدخول باستخدام فيسبوك', 
         
-        // مفاتيح تسجيل الدخول برقم الجوال (تمت إزالتها من login.html، لكن تُركت هنا للتوثيق)
+        // مفاتيح تسجيل الدخول برقم الجوال (غير مستخدمة حالياً في login.html)
         'SIGN_IN_WITH_PHONE': 'أو سجل برقم الجوال', 
         'PHONE_NUMBER_PLACEHOLDER': 'رقم الجوال (+966xxxxxxxx)', 
         'SEND_VERIFICATION_CODE': 'إرسال رمز التحقق', 
@@ -39,7 +39,7 @@ const translations = {
         'START_CHALLENGE': 'ابدأ التحدي',
         'GAME_INSTRUCTIONS': 'استخدم الأسهم للحركة والمسافة (Space) لإطلاق النار. اللعبة تستخدم محرك Phaser الاحترافي.',
         
-        // صفحات الشات الجديدة
+        // صفحات الشات
         'GENERAL_CHAT': 'الشات العام',
         'ALLIANCES_CHAT': 'شات التحالفات (خاص)',
         'SEND_MESSAGE': 'إرسال',
@@ -61,7 +61,19 @@ const translations = {
         'LANG_AR': 'العربية',
         'LANG_EN': 'English',
         'DANGER_ZONE': 'منطقة الخطر',
-        'DELETE_ACCOUNT': 'حذف الحساب نهائياً'
+        'DELETE_ACCOUNT': 'حذف الحساب نهائياً',
+        
+        // -------------------------------------------------------------
+        // مفاتيح لوحة تحكم المدير (admin.html) - الجديدة
+        // -------------------------------------------------------------
+        'ADMIN_DASHBOARD_TITLE': 'لوحة تحكم المدير',
+        'ADMIN_PANEL_WELCOME': 'أهلاً بك أيها المدير، تحكم في الإمبراطورية.',
+        'USER_MANAGEMENT_TITLE': 'إدارة المستخدمين والصلاحيات',
+        'USER_TABLE_USERNAME': 'اسم المستخدم',
+        'USER_TABLE_EMAIL': 'البريد الإلكتروني',
+        'USER_TABLE_ROLE': 'الصلاحية',
+        'USER_TABLE_SCORE': 'النقاط',
+        'USER_TABLE_ACTIONS': 'الإجراءات'
     },
     'en': {
         // General
@@ -125,7 +137,19 @@ const translations = {
         'LANG_AR': 'العربية',
         'LANG_EN': 'English',
         'DANGER_ZONE': 'Danger Zone',
-        'DELETE_ACCOUNT': 'Permanently Delete Account'
+        'DELETE_ACCOUNT': 'Permanently Delete Account',
+        
+        // -------------------------------------------------------------
+        // مفاتيح لوحة تحكم المدير (admin.html) - الجديدة
+        // -------------------------------------------------------------
+        'ADMIN_DASHBOARD_TITLE': 'Admin Dashboard',
+        'ADMIN_PANEL_WELCOME': 'Welcome Admin, control the Empire.',
+        'USER_MANAGEMENT_TITLE': 'User & Permissions Management',
+        'USER_TABLE_USERNAME': 'Username',
+        'USER_TABLE_EMAIL': 'Email',
+        'USER_TABLE_ROLE': 'Role',
+        'USER_TABLE_SCORE': 'Score',
+        'USER_TABLE_ACTIONS': 'Actions'
     }
 };
 
