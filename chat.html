@@ -141,14 +141,20 @@
             onSnapshot(collection(db, "users"), (snapshot) => {
                 snapshot.docChanges().forEach((change) => {
                     const data = change.doc.data();
+                    // تحديث فقط إذا كان المستخدم ليس أنا
+                    if (data.email === currentUser.email) return;
+
                     const card = document.querySelector(`.user-card[data-email="${data.email}"]`);
                     
                     if (card) {
                         const h3 = card.querySelector('h3');
                         if (h3) {
-                            // تحديث نقطة الاتصال فقط
+                            // إزالة نقطة الاتصال القديمة (إن وجدت)
+                            h3.innerHTML = h3.innerHTML.replace(/<span class="online-dot" title="متصل"><\/span>/g, '');
+                            
+                            // إضافة نقطة الاتصال الجديدة (إذا كان متصلاً)
                             const isOnlineDot = data.isOnline ? '<span class="online-dot" title="متصل"></span>' : '';
-                            h3.innerHTML = isOnlineDot + h3.textContent.replace('<span class="online-dot" title="متصل"></span>', '');
+                            h3.innerHTML = isOnlineDot + h3.textContent;
                         }
                     }
                 });
