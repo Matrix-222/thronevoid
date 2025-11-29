@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alliance Chat - Throne Void</title>
+    <link rel="stylesheet" href="style.css"> 
+    <style>
+        .chat-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background-color: var(--secondary-dark);
+            border: 1px solid var(--accent-red);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+        }
+        .chat-list, .chat-window {
+            height: 500px;
+            border-radius: 6px;
+            padding: 10px;
+        }
+        .chat-list {
+            flex: 1;
+            background-color: #121212;
+            border: 1px solid #333;
+            overflow-y: auto;
+        }
+        .chat-window {
+            flex: 3;
+            background-color: #121212;
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+        }
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding: 5px;
+            color: #ddd;
+        }
+        .message-input {
+            display: flex;
+            gap: 10px;
+        }
+        .message-input input {
+            flex: 1;
+            background-color: #222;
+            border: 1px solid #444;
+            color: white;
+            padding: 10px;
+        }
+        .message-input button {
+            background-color: #3498db;
+        }
+        .message-item {
+            margin-bottom: 8px;
+            border-bottom: 1px dotted #333;
+            padding-bottom: 5px;
+        }
+        .message-item strong {
+            color: var(--accent-yellow);
+            margin-right: 5px;
+        }
+        .message-item .timestamp {
+            font-size: 0.7em;
+            color: #777;
+            float: right;
+        }
+        /* تنسيق التحالفات */
+        .alliance-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #333;
+            transition: background-color 0.2s;
+            color: #2ecc71;
+        }
+        .alliance-item:hover, .alliance-item.active {
+            background-color: #333;
+            color: white;
+        }
+        .chat-header {
+            color: var(--accent-red);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>THRONES OF THE VOID</h1>
+        <div>
+            <button onclick="window.location='dashboard.html'" style="background-color: #2ecc71;" data-i18n="DASHBOARD">لوحة التحكم</button>
+            <button onclick="window.location='index.html'" data-i18n="HOME">الرئيسية</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="chat-container">
+            <div class="chat-list">
+                <h3 class="chat-header">القنوات</h3>
+                <div class="alliance-item active" id="globalChat" data-channel="global">🌐 الشات العام</div>
+                <div class="alliance-item" id="alliance1" data-channel="alliance_alpha">تحالف: ألفا</div>
+                <div class="alliance-item" id="alliance2" data-channel="alliance_beta">تحالف: بيتا</div>
+            </div>
+
+            <div class="chat-window">
+                <h3 id="currentChatTitle" class="chat-header">🌐 الشات العام</h3>
+                <div id="messages">
+                    </div>
+                <div class="message-input">
+                    <input type="text" id="chatInput" placeholder="اكتب رسالتك...">
+                    <button id="sendBtn">إرسال</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script src="i18n.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, query, orderBy, limit, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // إعدادات Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-bfHRJW3E8KW3-o-PkNW6xi5ytrTKMJE", 
+            authDomain: "thronevoid.firebaseapp.com",
+            projectId: "thronevoid",
+            storageBucket: "thronevoid.firebasestorage.app",
+            messagingSenderId: "958587822012",
+            appId: "1:958587822012:web:312cf3d9e7c87e1c6415b9",
+            measurementId: "G-N34T3VRGX0"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let currentChannel = 'global';
+        let unsubscribe = null; // لحفظ دالة إيقاف الاستماع للرسائل
+
+        // التحقق من حالة الدخول
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                // ابدأ بالاستماع إلى الشات العام
+                startListeningToChannel('global');
+            } else {
+                alert("يجب عليك تسجيل الدخول للمشاركة في الشات!");
+                window.location.href = "login.html"; 
+            }
+        });
+
+        const messagesContainer = document.getElementById('messages');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const currentChatTitle = document.getElementById('currentChatTitle');
+
+        function displayMessage(data) {
+            const time = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleTimeString() : 'الآن';
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message-item');
+            
+            // تحديد لون الرسالة
+            const userColor = data.channel === 'alliance_alpha' ? '#FFC700' : '#2ecc71';
+            
+            messageElement.innerHTML = `
+                <span class="timestamp">${time}</span>
+                <strong style="color: ${userColor};">${data.username || data.email}:</strong>
+                ${data.text}
+            `;
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight; // التمرير للأسفل
+        }
+        
+        // دالة البدء بالاستماع إلى قناة معينة
+        function startListeningToChannel(channel) {
+            if (unsubscribe) {
+                unsubscribe(); // إيقاف الاستماع للقناة السابقة
+            }
+            messagesContainer.innerHTML = ''; // تفريغ الرسائل
+            currentChannel = channel;
+            currentChatTitle.textContent = channel === 'global' ? '🌐 الشات العام' : `🛡️ تحالف: ${channel.replace('alliance_', '').toUpperCase()}`;
+
+            const messagesRef = collection(db, "chats", channel, "messages");
+            const q = query(messagesRef, orderBy("timestamp", "desc"), limit(50));
+
+            // onSnapshot تستمع للتحديثات الفورية
+            unsubscribe = onSnapshot(q, (snapshot) => {
+                const newMessages = [];
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === "added") {
+                        newMessages.unshift({ id: change.doc.id, ...change.doc.data() });
+                    }
+                });
+                newMessages.sort((a, b) => a.timestamp - b.timestamp); // ترتيب الرسائل زمنياً
+                newMessages.forEach(displayMessage);
+            });
+        }
+        
+        // دالة إرسال الرسالة
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+            if (text.length === 0 || !currentUser) return;
+            
+            const messageData = {
+                email: currentUser.email,
+                username: currentUser.email.split('@')[0], // اسم مستخدم بسيط
+                text: text,
+                timestamp: serverTimestamp(),
+                channel: currentChannel 
+            };
+            
+            try {
+                // حفظ الرسالة في مسار القناة الحالية (e.g., chats/global/messages)
+                await addDoc(collection(db, "chats", currentChannel, "messages"), messageData);
+                chatInput.value = '';
+            } catch (error) {
+                console.error("Error sending message:", error);
+                alert("فشل في إرسال الرسالة!");
+            }
+        }
+        
+        sendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // تغيير القناة عند الضغط عليها
+        document.querySelectorAll('.alliance-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.alliance-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                startListeningToChannel(this.getAttribute('data-channel'));
+            });
+        });
+
+        // تحميل اللغة في نهاية الملف
+        loadLanguage();
+    </script>
+</body>
+</html>
