@@ -48,6 +48,44 @@
             color: var(--text-muted);
             font-style: italic;
         }
+
+        /* تنسيقات المرشحات المتقدمة */
+        .filters-container {
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: var(--secondary-dark);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .filters-container h2, .filters-container h3 {
+            color: var(--accent-blue);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        #applyFiltersBtn {
+            width: 100%;
+            margin-top: 15px;
+            background-color: var(--accent-green);
+        }
+        
+        #applyFiltersBtn:hover {
+            background-color: #1e7e34;
+        }
     </style>
 </head>
 <body>
@@ -60,7 +98,25 @@
     </header>
 
     <main>
-        <h2 style="text-align: center;" data-i18n="AVAILABLE_USERS">الملفات المتاحة للدردشة</h2>
+        <div class="filters-container">
+            <h2>ADVANCED_FILTERS</h2>
+            
+            <div class="filter-group">
+                <label data-i18n="SEARCH_BY_INTERESTS">ابحث بالاهتمامات المشتركة</label>
+                <input type="text" id="interestsInput" placeholder="مثال: قراءة, سفر, رياضة">
+            </div>
+
+            <div class="filter-group">
+                <label>
+                    <input type="checkbox" id="onlineOnlyCheckbox">
+                    <span data-i18n="SHOW_ONLINE_ONLY">عرض المتصلين فقط</span>
+                </label>
+            </div>
+            
+            <button id="applyFiltersBtn" data-i18n="APPLY_FILTERS">تطبيق التصفية</button>
+        </div>
+
+        <h2 style="text-align: center;" data-i18n="AVAILABLE_USERS">ابحث عن أشخاص جدد للدردشة</h2>
         <div id="userList" class="user-list">
             <p id="loadingMessage" style="color: var(--text-muted);">جاري تحميل الملفات...</p>
         </div>
@@ -99,15 +155,17 @@
         let currentUser = null;
         const userListContainer = document.getElementById('userList');
         const loadingMessage = document.getElementById('loadingMessage');
+        const interestsInput = document.getElementById('interestsInput');
+        const onlineOnlyCheckbox = document.getElementById('onlineOnlyCheckbox');
+        const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
-                // 1. تحديث حالة الاتصال عند تسجيل الدخول
                 updateOnlineStatus(true);
-                // 2. مراقبة حالة الاتصال للمستخدمين الآخرين
                 setupOnlineStatusListener();
-                // 3. جلب قائمة المستخدمين
+                // جلب المستخدمين بدون مرشحات عند التحميل الأولي
                 fetchUsers();
             } else {
                 window.location.href = "index.html";
@@ -130,7 +188,6 @@
         // --- وظيفة المراقبة عند إغلاق أو مغادرة الصفحة ---
         window.addEventListener('beforeunload', () => {
             if (currentUser) {
-                // تحديث الحالة إلى "غير متصل"
                 updateOnlineStatus(false);
             }
         });
@@ -148,35 +205,47 @@
                     if (card) {
                         const h3 = card.querySelector('h3');
                         if (h3) {
-                            // إزالة نقطة الاتصال القديمة
                             h3.innerHTML = h3.innerHTML.replace(/<span class="online-dot" title="متصل"><\/span>/g, '');
                             
-                            // إضافة نقطة الاتصال الجديدة (إذا كان متصلاً)
                             const isOnlineDot = data.isOnline ? '<span class="online-dot" title="متصل"></span>' : '';
-                            h3.innerHTML = isOnlineDot + h3.textContent.trim(); // Trim لحل مشكلة تكرار النص
+                            
+                            // نستخدم h3.childNodes[1].textContent للوصول إلى اسم المستخدم وتجنب تكرار النقطة
+                            const usernameElement = h3.querySelector('span:not(.online-dot)') || h3; 
+                            const username = usernameElement.textContent.trim();
+                            
+                            // إعادة بناء الـ H3 مع النقطة الصحيحة واسم المستخدم
+                            h3.innerHTML = isOnlineDot + username; 
                         }
                     }
                 });
             });
         }
         
-        // --- جلب قائمة المستخدمين ---
+        // --- الدالة الرئيسية لجلب المستخدمين وتطبيق المرشحات ---
         async function fetchUsers() {
             try {
-                // استعلام لجلب جميع المستخدمين باستثناء المستخدم الحالي
-                const usersQuery = query(collection(db, "users"), where("email", "!=", currentUser.email));
-                const querySnapshot = await getDocs(usersQuery);
-                
                 userListContainer.innerHTML = '';
+                loadingMessage.style.display = 'block';
+
+                let q = query(collection(db, "users"), where("email", "!=", currentUser.email));
+                
+                const querySnapshot = await getDocs(q);
+                let allUsers = [];
+                querySnapshot.forEach((doc) => {
+                    allUsers.push(doc.data());
+                });
+
+                // تطبيق المرشحات داخل JavaScript
+                const filteredUsers = getMatchingUsers(allUsers);
+                
                 loadingMessage.style.display = 'none';
 
-                if (querySnapshot.empty) {
-                    userListContainer.innerHTML = '<p style="color: var(--text-muted);">لا يوجد مستخدمون آخرون متاحون حاليًا.</p>';
+                if (filteredUsers.length === 0) {
+                    userListContainer.innerHTML = '<p style="color: var(--text-muted);">لا يوجد مستخدمون آخرون مطابقون للمعايير الحالية.</p>';
                     return;
                 }
 
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
+                filteredUsers.forEach((data) => {
                     displayUser(data);
                 });
                 
@@ -185,6 +254,34 @@
                 loadingMessage.textContent = 'حدث خطأ أثناء تحميل المستخدمين.';
             }
         }
+        
+        // --- دالة منطق تصفية المستخدمين (الاهتمامات وحالة الاتصال) ---
+        function getMatchingUsers(users) {
+            const onlineOnly = onlineOnlyCheckbox.checked;
+            const interestsQuery = interestsInput.value.trim().toLowerCase();
+            let matchedUsers = users;
+
+            // 1. تصفية حسب حالة الاتصال (Online Only)
+            if (onlineOnly) {
+                matchedUsers = matchedUsers.filter(user => user.isOnline === true);
+            }
+
+            // 2. تصفية حسب الاهتمامات المشتركة
+            if (interestsQuery) {
+                const searchInterests = interestsQuery.split(',').map(i => i.trim());
+                
+                matchedUsers = matchedUsers.filter(user => {
+                    if (!user.interests) return false;
+
+                    const userInterests = user.interests.toLowerCase().split(',').map(i => i.trim());
+                    
+                    // التحقق من وجود تطابق واحد على الأقل بين اهتمامات البحث واهتمامات المستخدم
+                    return searchInterests.some(si => userInterests.includes(si));
+                });
+            }
+
+            return matchedUsers;
+        }
 
         // --- بناء بطاقة المستخدم ---
         function displayUser(userData) {
@@ -192,7 +289,6 @@
             card.className = 'user-card';
             card.dataset.email = userData.email;
             card.onclick = () => {
-                // الانتقال لصفحة الدردشة الخاصة
                 window.location.href = `private_chat.html?user=${userData.email}`;
             };
             
@@ -215,7 +311,6 @@
         
         // --- تسجيل الخروج ---
         window.logoutUser = function() {
-            // تحديث حالة الاتصال إلى "غير متصل" عند تسجيل الخروج
             updateOnlineStatus(false).then(() => {
                 signOut(auth).then(() => { 
                     window.location.href = "index.html";
@@ -224,6 +319,9 @@
                 });
             });
         }
+
+        // --- ربط زر تطبيق التصفية بدالة الجلب ---
+        applyFiltersBtn.addEventListener('click', fetchUsers);
     </script>
 </body>
 </html>
