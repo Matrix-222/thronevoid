@@ -171,15 +171,90 @@ button:hover {
     background-color: #1e7e34;
 }
 
+/* ------------------------------------
+ * تنسيقات الدردشة الخاصة (private_chat.html)
+ * ------------------------------------ */
+.chat-messages {
+    /* إصلاح مهم: يجب أن تكون الرسائل قابلة للتمرير */
+    overflow-y: auto; 
+    padding: 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column; /* تم تغيير هذا ليعرض الرسائل بشكل تصاعدي طبيعي */
+}
+
+/* تم عكس هذا الترتيب عن المعتاد في تصميم RTL 
+   المرسل يكون على اليمين (flex-end) والمستقبل على اليسار (flex-start) */
+.message-row.sender {
+    justify-content: flex-end; /* رسائلي تذهب إلى اليمين */
+}
+
+.message-row.receiver {
+    justify-content: flex-start; /* رسائل الطرف الآخر تذهب إلى اليسار */
+}
+
+.message-bubble {
+    /* هذا مهم لإصلاح مشكلة الفقرات الطويلة غير المنسقة */
+    word-wrap: break-word; 
+    text-align: right; 
+    direction: rtl;
+    
+    max-width: 60%;
+    padding: 10px 15px;
+    border-radius: 20px;
+    line-height: 1.4;
+    position: relative;
+    /* تأكد من أن جميع الرسائل تظهر بوضوح */
+    color: var(--text-light); 
+}
+
+.message-row.sender .message-bubble {
+    background-color: var(--accent-green);
+    /* إصلاح: لون النص الداخلي يجب أن يكون داكناً للتمييز */
+    color: var(--primary-dark); 
+    border-bottom-left-radius: 20px; /* عكس المنحنى */
+    border-bottom-right-radius: 0;
+}
+
+.message-row.receiver .message-bubble {
+    background-color: var(--accent-blue);
+    color: var(--text-light);
+    border-bottom-right-radius: 20px; /* عكس المنحنى */
+    border-bottom-left-radius: 0;
+}
+
+.message-time {
+    font-size: 0.7em;
+    color: rgba(0, 0, 0, 0.7); /* لون داكن للساعة في فقاعة المرسل الخضراء */
+    display: block;
+    margin-top: 5px;
+    text-align: right;
+}
+
+.message-row.receiver .message-time {
+    color: rgba(255, 255, 255, 0.7); /* لون فاتح للساعة في فقاعة المستلم الزرقاء */
+}
+
+/* تنسيقات شريط الإدخال */
+.chat-input {
+    display: flex;
+    align-items: center;
+}
+
+.input-icon-btn {
+    font-size: 1.5em;
+    padding: 0 5px;
+    margin-right: 5px;
+}
 
 /* ------------------------------------
- * تنسيقات الإيموجي والـ GIF (لكلتا الصفحتين)
+ * تنسيقات الإيموجي والـ GIF
  * ------------------------------------ */
 
-/* لوحة الإيموجي (Emoji Picker) */
+/* لوحة الإيموجي */
 .emoji-picker {
     position: absolute;
-    bottom: 70px; /* فوق شريط الإدخال */
+    bottom: 70px;
     right: 15px;
     width: 250px;
     max-height: 200px;
@@ -192,11 +267,7 @@ button:hover {
     z-index: 10;
     border: 1px solid var(--border-color);
 }
-
-.emoji-picker.show {
-    display: block;
-}
-
+.emoji-picker.show { display: block; }
 .emoji-item {
     cursor: pointer;
     font-size: 1.5em;
@@ -205,14 +276,10 @@ button:hover {
     display: inline-block;
 }
 
-.emoji-item:hover {
-    transform: scale(1.1);
-}
-
-/* لوحة بحث GIF (GIF Picker) */
+/* لوحة بحث GIF */
 .gif-picker-container {
     position: absolute;
-    bottom: 70px; /* فوق شريط الإدخال */
+    bottom: 70px; 
     right: 60px; 
     width: 300px;
     height: 250px;
@@ -225,22 +292,7 @@ button:hover {
     flex-direction: column;
     border: 1px solid var(--border-color); 
 }
-
-.gif-picker-container.show {
-    display: flex;
-}
-
-#gifSearchInput {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    background-color: #444;
-    color: var(--text-light);
-}
-
+.gif-picker-container.show { display: flex; }
 #gifResults {
     flex-grow: 1;
     overflow-y: auto;
@@ -248,36 +300,14 @@ button:hover {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
 }
-
-.gif-item {
-    cursor: pointer;
-    border: 2px solid transparent;
-    border-radius: 4px;
-    transition: border-color 0.2s;
-    overflow: hidden;
-}
-
-.gif-item:hover {
-    border-color: var(--accent-blue);
-}
-
 .gif-item img {
     width: 100%;
     height: 100px;
     object-fit: cover;
     display: block;
 }
-
-/* تنسيق لعرض GIF داخل الرسائل */
 .message-bubble img.chat-gif {
     max-width: 100%;
     height: auto;
     border-radius: 6px;
-}
-
-/* تنسيق النقطة في شريط الإدخال */
-.input-icon-btn {
-    font-size: 1.5em;
-    padding: 0 5px;
-    margin-right: 5px;
 }
