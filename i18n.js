@@ -103,23 +103,54 @@ const translations = {
     }
 };
 
-let currentLang = 'ar'; // تعيين اللغة الافتراضية
+let currentLang = localStorage.getItem('appLang') || 'ar'; // قراءة اللغة المحفوظة
+window.translations = translations; // لجعل الترجمات متاحة عالميا
 
+// 1. الدالة الأساسية لتحميل الترجمة لمفتاح معين
 function loadLanguage(key, lang = currentLang) {
     return translations[lang][key] || translations['en'][key] || key;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // تحديد اللغة من المتصفح أو أي آلية أخرى
-    // حالياً نعتمد 'ar' كافتراضية
-    currentLang = 'ar'; 
-    document.documentElement.dir = 'rtl';
+// 2. الدالة التي تقوم بتغيير اللغة وحفظها
+window.switchLanguage = function(newLang) {
+    if (translations[newLang]) {
+        currentLang = newLang;
+        localStorage.setItem('appLang', newLang); // حفظ اللغة
+        
+        // تحديث اتجاه النص (RTL/LTR)
+        document.documentElement.dir = (newLang === 'ar') ? 'rtl' : 'ltr';
 
+        // إعادة تحميل جميع العناصر المترجمة في الصفحة الحالية
+        document.querySelectorAll('[data-i18n]').forEach(element => {
+            const key = element.getAttribute('data-i18n');
+            const translation = loadLanguage(key, newLang);
+            
+            if (element.tagName === 'INPUT' && element.hasAttribute('placeholder')) {
+                element.setAttribute('placeholder', translation);
+            } else {
+                element.textContent = translation;
+            }
+        });
+        
+        // إعادة تحميل محتويات العناصر الخاصة الأخرى (مثل العناوين الثابتة)
+        // إذا كان لديك أي عناصر تحتاج تحديث يدوي (مثل العناوين في لوحة التحكم)
+        
+    } else {
+        console.warn(`اللغة ${newLang} غير مدعومة.`);
+    }
+}
+
+// 3. الدالة التي تعمل عند تحميل الصفحة لأول مرة
+document.addEventListener('DOMContentLoaded', () => {
+    // تعيين اتجاه النص الأولي
+    document.documentElement.dir = (currentLang === 'ar') ? 'rtl' : 'ltr';
+
+    // تطبيق الترجمة على جميع العناصر في الصفحة
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
         const translation = loadLanguage(key);
         
-        if (element.tagName === 'INPUT' && element.getAttribute('type') === 'text' && element.hasAttribute('placeholder')) {
+        if (element.tagName === 'INPUT' && element.hasAttribute('placeholder')) {
             element.setAttribute('placeholder', translation);
         } else {
             element.textContent = translation;
