@@ -74,13 +74,6 @@
         #facebookLoginBtn:hover {
             opacity: 0.9;
         }
-        #phoneLoginBtn, #verifyCodeBtn {
-            background-color: #2ecc71; /* Green */
-            color: white;
-        }
-        #phoneLoginBtn:hover, #verifyCodeBtn:hover {
-            opacity: 0.9;
-        }
 
         .toggle-mode {
             margin-top: 20px;
@@ -90,11 +83,6 @@
             cursor: pointer;
             text-decoration: none;
             font-weight: bold;
-        }
-        #recaptcha-container {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
         }
     </style>
 </head>
@@ -110,49 +98,29 @@
         <div class="auth-container">
             <h2 id="formTitle" data-i18n="LOG_IN_ACCOUNT">تسجيل الدخول / إنشاء حساب</h2>
             
-            <div id="emailAuthSection">
-                <div class="input-group" id="usernameGroup" style="display: none;">
-                    <input type="text" id="usernameInput" data-i18n="USERNAME_PLACEHOLDER" placeholder="اسم المستخدم" minlength="3" maxlength="15">
-                </div>
-                <div class="input-group">
-                    <input type="email" id="emailInput" data-i18n="EMAIL_PLACEHOLDER" placeholder="البريد الإلكتروني">
-                </div>
-                <div class="input-group">
-                    <input type="password" id="passwordInput" data-i18n="PASSWORD_PLACEHOLDER" placeholder="كلمة المرور" minlength="6">
-                </div>
-                <div class="input-group" id="confirmPasswordGroup" style="display: none;">
-                    <input type="password" id="confirmPasswordInput" data-i18n="CONFIRM_PASSWORD_PLACEHOLDER" placeholder="تأكيد كلمة المرور" minlength="6">
-                </div>
-
-                <div class="auth-actions">
-                    <button id="authButton" data-i18n="AUTH_BUTTON_LOGIN">تسجيل الدخول</button>
-                    <div class="forgot-password" style="margin-top: 10px; text-align: right;">
-                        <a href="#" data-i18n="FORGOT_PASSWORD">نسيت كلمة المرور؟</a>
-                    </div>
-                </div>
+            <div class="input-group" id="usernameGroup" style="display: none;">
+                <input type="text" id="usernameInput" data-i18n="USERNAME_PLACEHOLDER" placeholder="اسم المستخدم" required minlength="3" maxlength="15">
             </div>
-
-            <hr style="margin: 25px 0; border-color: #555;">
-
-            <div id="phoneAuthSection">
-                <h3 style="color: #bdc3c7; margin-bottom: 15px;" data-i18n="SIGN_IN_WITH_PHONE">أو سجل برقم الجوال</h3>
-                
-                <div class="input-group">
-                    <input type="tel" id="phoneNumberInput" data-i18n="PHONE_NUMBER_PLACEHOLDER" placeholder="رقم الجوال (+966xxxxxxxx)">
-                </div>
-
-                <button id="phoneLoginBtn" data-i18n="SEND_VERIFICATION_CODE">إرسال رمز التحقق</button>
-                
-                <div id="verificationSection" style="display: none; margin-top: 15px;">
-                    <div class="input-group">
-                        <input type="number" id="verificationCodeInput" data-i18n="VERIFICATION_CODE_PLACEHOLDER" placeholder="رمز التحقق المكون من 6 أرقام">
-                    </div>
-                    <button id="verifyCodeBtn" data-i18n="VERIFY_CODE">تأكيد الرمز</button>
-                </div>
-            </div>
-
-            <div id="recaptcha-container"></div>
             
+            <div class="input-group">
+                <input type="email" id="emailInput" data-i18n="EMAIL_PLACEHOLDER" placeholder="البريد الإلكتروني" required>
+            </div>
+            
+            <div class="input-group">
+                <input type="password" id="passwordInput" data-i18n="PASSWORD_PLACEHOLDER" placeholder="كلمة المرور" required minlength="6">
+            </div>
+            
+            <div class="input-group" id="confirmPasswordGroup" style="display: none;">
+                <input type="password" id="confirmPasswordInput" data-i18n="CONFIRM_PASSWORD_PLACEHOLDER" placeholder="تأكيد كلمة المرور" required minlength="6">
+            </div>
+
+            <div class="auth-actions">
+                <button id="authButton" data-i18n="AUTH_BUTTON_LOGIN">تسجيل الدخول</button>
+                <div class="forgot-password" style="margin-top: 10px; text-align: right;">
+                    <a href="#" data-i18n="FORGOT_PASSWORD">نسيت كلمة المرور؟</a>
+                </div>
+            </div>
+
             <hr style="margin: 25px 0; border-color: #555;">
 
             <div class="social-login">
@@ -176,9 +144,7 @@
             GoogleAuthProvider, 
             FacebookAuthProvider,
             signInWithPopup,
-            onAuthStateChanged,
-            signInWithPhoneNumber, 
-            RecaptchaVerifier 
+            onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -200,14 +166,18 @@
         const facebookProvider = new FacebookAuthProvider();
 
         let isRegisterMode = false;
-        let confirmationResult = null; 
 
+        // التحقق من حالة الدخول
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                // إذا كان المستخدم مسجلاً دخوله، انتقل مباشرة إلى لوحة التحكم
                 window.location.href = "dashboard.html";
             }
         });
 
+        // -------------------------------------------------------------
+        //                 دالة تبديل وضع التسجيل/الدخول
+        // -------------------------------------------------------------
         window.toggleMode = function() {
             isRegisterMode = !isRegisterMode;
             const formTitle = document.getElementById('formTitle');
@@ -229,12 +199,19 @@
                 usernameGroup.style.display = 'none';
                 confirmPasswordGroup.style.display = 'none';
             }
+            // إعادة تطبيق الترجمة بعد تغيير المفاتيح
             loadLanguage();
         }
 
+        // -------------------------------------------------------------
+        //             دالة حفظ بيانات المستخدم في Firestore
+        // -------------------------------------------------------------
         async function saveUserData(user, username, email) {
-            const documentId = email || user.phoneNumber || user.uid; 
-            const finalUsername = username || (documentId.includes('@') ? "User_" + user.uid.substring(0, 5) : "PhoneUser_" + user.uid.substring(0, 5));
+            // استخدام البريد الإلكتروني كمعرف المستند (Document ID)
+            const documentId = email || user.uid; 
+            
+            // تحديد اسم المستخدم النهائي (يأتي من الإدخال اليدوي أو من Google)
+            const finalUsername = username || user.displayName || "User_" + user.uid.substring(0, 5);
 
             const userDocRef = doc(db, "users", documentId);
             const userDoc = await getDoc(userDocRef);
@@ -244,7 +221,6 @@
                     uid: user.uid,
                     email: user.email || null, 
                     username: finalUsername,
-                    phoneNumber: user.phoneNumber || null, 
                     createdAt: new Date(),
                     allianceId: null, 
                     score: 0
@@ -252,6 +228,9 @@
             }
         }
 
+        // -------------------------------------------------------------
+        //             دالة التعامل مع التسجيل/الدخول اليدوي
+        // -------------------------------------------------------------
         async function handleAuth() {
             const email = document.getElementById('emailInput').value;
             const password = document.getElementById('passwordInput').value;
@@ -274,13 +253,17 @@
                          return;
                     }
 
+                    // 1. إنشاء المستخدم باستخدام الإيميل وكلمة المرور
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    
+                    // 2. حفظ بيانات المستخدم في Firestore (لتضمين اسم المستخدم)
                     await saveUserData(userCredential.user, username, email);
                     
                     alert("✅ تم التسجيل بنجاح! سيتم توجيهك إلى لوحة التحكم.");
                     window.location.href = "dashboard.html";
 
                 } else {
+                    // وضع تسجيل الدخول
                     const userCredential = await signInWithEmailAndPassword(auth, email, password);
                     alert("✅ تم تسجيل الدخول بنجاح! سيتم توجيهك.");
                     window.location.href = "dashboard.html";
@@ -299,6 +282,9 @@
             }
         }
 
+        // -------------------------------------------------------------
+        //             دالة التسجيل/الدخول عبر موفري الهوية (Google/Facebook)
+        // -------------------------------------------------------------
         async function signInWithProvider(provider) {
             try {
                 const result = await signInWithPopup(auth, provider);
@@ -306,6 +292,7 @@
                 const email = user.email;
                 const username = user.displayName;
 
+                // حفظ بيانات المستخدم في Firestore.
                 await saveUserData(user, username, email);
 
                 alert(`✅ تم تسجيل الدخول بنجاح كـ ${username}!`);
@@ -313,72 +300,14 @@
 
             } catch (error) {
                 console.error("Social Sign-In Error:", error);
+                // معالجة الأخطاء الخاصة بالتسجيل الاجتماعي
                 if (error.code === 'auth/popup-closed-by-user') {
                     alert("❌ تم إغلاق نافذة الدخول.");
                 } else if (error.code === 'auth/account-exists-with-different-credential') {
-                    alert("❌ يوجد حساب بالفعل بهذا البريد الإلكتروني، ولكن تم التسجيل بطريقة مختلفة (مثل كلمة مرور).");
+                    alert("❌ يوجد حساب بالفعل بهذا البريد الإلكتروني، ولكن تم التسجيل بطريقة مختلفة.");
                 } else {
                     alert("❌ فشل تسجيل الدخول الاجتماعي: " + error.message);
                 }
-            }
-        }
-
-        // إعداد reCAPTCHA
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-            'size': 'normal',
-            'callback': (response) => {
-                // reCAPTCHA تم التحقق منه
-            },
-            'expired-callback': () => {
-                alert("انتهت صلاحية التحقق. يرجى المحاولة مجدداً.");
-            }
-        });
-        recaptchaVerifier.render(); 
-
-        // دالة إرسال رمز التحقق لرقم الجوال
-        async function sendVerificationCode() {
-            const phoneNumber = document.getElementById('phoneNumberInput').value.trim();
-
-            if (!phoneNumber) {
-                alert("يرجى إدخال رقم الجوال كاملاً مع رمز الدولة (+966...).");
-                return;
-            }
-
-            try {
-                const appVerifier = window.recaptchaVerifier;
-                confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
-                
-                document.getElementById('verificationSection').style.display = 'block';
-                document.getElementById('phoneLoginBtn').textContent = "تم الإرسال - أعد المحاولة إذا لم يصل";
-                alert("✅ تم إرسال رمز التحقق إلى رقمك.");
-
-            } catch (error) {
-                console.error("Phone Auth Error:", error);
-                alert("❌ فشل إرسال رمز التحقق. تأكد من تهيئة reCAPTCHA وتنسيق رقم الجوال الصحيح (+ رمز الدولة).");
-            }
-        }
-
-        // دالة تأكيد رمز التحقق (OTP)
-        async function verifyCode() {
-            const code = document.getElementById('verificationCodeInput').value.trim();
-
-            if (!code || confirmationResult === null) {
-                alert("يرجى إدخال الرمز السري المرسل.");
-                return;
-            }
-
-            try {
-                const result = await confirmationResult.confirm(code);
-                const user = result.user;
-                
-                await saveUserData(user, null, null);
-
-                alert("✅ تم تسجيل الدخول/التسجيل برقم الجوال بنجاح!");
-                window.location.href = "dashboard.html";
-
-            } catch (error) {
-                console.error("Verification Error:", error);
-                alert("❌ رمز التحقق غير صحيح أو انتهت صلاحيته. يرجى المحاولة مرة أخرى.");
             }
         }
 
@@ -386,8 +315,6 @@
         document.getElementById('authButton').addEventListener('click', handleAuth);
         document.getElementById('googleLoginBtn').addEventListener('click', () => signInWithProvider(googleProvider));
         document.getElementById('facebookLoginBtn').addEventListener('click', () => signInWithProvider(facebookProvider));
-        document.getElementById('phoneLoginBtn').addEventListener('click', sendVerificationCode); 
-        document.getElementById('verifyCodeBtn').addEventListener('click', verifyCode); 
     </script>
 </body>
 </html>
