@@ -19,6 +19,7 @@ const translations = {
     'LOG_IN_ACCOUNT': { 'en': 'Login / Create Account', 'ar': 'تسجيل الدخول / إنشاء حساب' },
     'EMAIL_PLACEHOLDER': { 'en': 'Email', 'ar': 'البريد الإلكتروني' },
     'PASSWORD_PLACEHOLDER': { 'en': 'Password', 'ar': 'كلمة المرور' },
+    'FORGOT_PASSWORD': { 'en': 'Forgot Password?', 'ar': 'نسيت كلمة المرور؟' }, // المفتاح الجديد
     'AUTH_BUTTON_LOGIN': { 'en': 'Login', 'ar': 'تسجيل الدخول' },
     'AUTH_BUTTON_REGISTER': { 'en': 'Create Account', 'ar': 'إنشاء حساب' },
     'TOGGLE_TO_REGISTER': { 'en': "Don't have an account? Click to Register", 'ar': 'لا تملك حساباً؟ انقر للتسجيل' },
@@ -32,7 +33,7 @@ const translations = {
     'UPDATED_TEXT': { 'en': 'Updated', 'ar': 'تم التحديث' },
     'GAME_INSTRUCTIONS': { 'en': 'Use arrows to move and Space to shoot. The game uses the professional Phaser engine.', 'ar': 'استخدم الأسهم للحركة والمسافة (Space) لإطلاق النار. اللعبة تستخدم محرك Phaser الاحترافي.' },
 
-    // --- مفاتيح الخدمات الجديدة ---
+    // --- مفاتيح الخدمات الجديدة (store.html, chat.html) ---
     'STORE': { 'en': 'STORE', 'ar': 'المتجر' },
     'ALLIANCES_CHAT': { 'en': 'ALLIANCES CHAT', 'ar': 'شات التحالفات' },
 
@@ -61,13 +62,13 @@ const translations = {
     'MEDIUM': { 'en': 'Medium', 'ar': 'متوسطة' },
     'LOW': { 'en': 'Low', 'ar': 'منخفضة' },
 
-    // 🔥 مفاتيح لوحة تحكم المشرف (Admin Panel) 🔥
+    // --- مفاتيح لوحة تحكم المشرف (Admin Panel) ---
     'ADMIN_PANEL': { 'en': 'ADMIN PANEL', 'ar': 'لوحة تحكم المشرف' },
     'MANAGE_USERS': { 'en': 'MANAGE USERS', 'ar': 'إدارة المستخدمين' },
     'USER_EMAIL': { 'en': 'USER EMAIL', 'ar': 'البريد الإلكتروني' },
     'AVATAR_URL': { 'en': 'AVATAR', 'ar': 'صورة البروفايل' },
     'HIGH_SCORE': { 'en': 'HIGH SCORE', 'ar': 'أعلى نتيجة' },
-    'ENERGY': { 'en': 'ENERGY', 'ar': 'الطاقة' }, // مفتاح جديد
+    'ENERGY': { 'en': 'ENERGY', 'ar': 'الطاقة' },
     'STATUS': { 'en': 'STATUS', 'ar': 'الحالة' },
     'ACTIONS': { 'en': 'ACTIONS', 'ar': 'الإجراءات' },
     'ACCESS_DENIED': { 'en': '⛔️ Access Denied. You do not have administrator privileges.', 'ar': '⛔️ لا تملك صلاحية الوصول إلى لوحة المشرف.' },
