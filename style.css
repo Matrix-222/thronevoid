@@ -41,7 +41,9 @@ main {
     padding: 20px;
 }
 
-/* تنسيق النماذج والعناصر التفاعلية */
+/* ------------------------------------
+ * تنسيق النماذج والعناصر التفاعلية
+ * ------------------------------------ */
 input[type="email"], 
 input[type="password"], 
 input[type="text"],
@@ -85,7 +87,7 @@ button:hover {
     background-color: #c82333;
 }
 
-/* التنسيق الخاص بالصفحات */
+/* التنسيق الخاص بصفحات تسجيل الدخول ولوحة التحكم */
 .auth-container, .form-container {
     max-width: 450px;
     margin: 50px auto;
@@ -95,7 +97,9 @@ button:hover {
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
 }
 
-/* نقطة الاتصال (لـ chat.html) */
+/* ------------------------------------
+ * تنسيق قائمة المستخدمين (chat.html)
+ * ------------------------------------ */
 .online-dot {
     height: 10px;
     width: 10px;
@@ -106,9 +110,32 @@ button:hover {
     margin-bottom: 2px;
 }
 
-/* --- تنسيقات المرشحات المتقدمة المُعدلة --- */
+.user-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.user-card {
+    background-color: var(--secondary-dark);
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative; 
+}
+
+.user-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.7);
+}
+
+/* تنسيقات المرشحات المتقدمة المُعدلة */
 .filters-container {
-    /* تم تصغير الحجم الأقصى وتوسيطه */
     max-width: 400px; 
     margin: 20px auto; 
     padding: 20px;
@@ -144,29 +171,113 @@ button:hover {
     background-color: #1e7e34;
 }
 
-/* --- تنسيقات الدردشة وقائمة المستخدمين (للتأكد من عدم وجود تعارض) --- */
-.user-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-    margin-top: 30px;
-}
 
-.user-card {
-    background-color: var(--secondary-dark);
-    padding: 20px;
-    border-radius: 10px;
-    width: 300px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    position: relative; 
-}
-/* ... باقي تنسيقات user-card و emoji/gif picker ... */
-/* في حال وجودها، تأكد من أنك نسختها أيضاً */
+/* ------------------------------------
+ * تنسيقات الإيموجي والـ GIF (لكلتا الصفحتين)
+ * ------------------------------------ */
 
-.emoji-picker, .gif-picker-container {
+/* لوحة الإيموجي (Emoji Picker) */
+.emoji-picker {
     position: absolute;
-    /* تأكد من أن تنسيقاتها موجودة إذا كنت تستخدمها في private_chat.html */
+    bottom: 70px; /* فوق شريط الإدخال */
+    right: 15px;
+    width: 250px;
+    max-height: 200px;
+    background-color: #3a3a3a;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    overflow-y: auto;
+    display: none; 
+    z-index: 10;
+    border: 1px solid var(--border-color);
+}
+
+.emoji-picker.show {
+    display: block;
+}
+
+.emoji-item {
+    cursor: pointer;
+    font-size: 1.5em;
+    margin: 5px;
+    transition: transform 0.1s;
+    display: inline-block;
+}
+
+.emoji-item:hover {
+    transform: scale(1.1);
+}
+
+/* لوحة بحث GIF (GIF Picker) */
+.gif-picker-container {
+    position: absolute;
+    bottom: 70px; /* فوق شريط الإدخال */
+    right: 60px; 
+    width: 300px;
+    height: 250px;
+    background-color: #3a3a3a;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    z-index: 20;
+    display: none;
+    flex-direction: column;
+    border: 1px solid var(--border-color); 
+}
+
+.gif-picker-container.show {
+    display: flex;
+}
+
+#gifSearchInput {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: #444;
+    color: var(--text-light);
+}
+
+#gifResults {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.gif-item {
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    transition: border-color 0.2s;
+    overflow: hidden;
+}
+
+.gif-item:hover {
+    border-color: var(--accent-blue);
+}
+
+.gif-item img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    display: block;
+}
+
+/* تنسيق لعرض GIF داخل الرسائل */
+.message-bubble img.chat-gif {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+}
+
+/* تنسيق النقطة في شريط الإدخال */
+.input-icon-btn {
+    font-size: 1.5em;
+    padding: 0 5px;
+    margin-right: 5px;
 }
