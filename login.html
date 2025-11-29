@@ -64,6 +64,23 @@
             text-decoration: underline;
             color: var(--accent-yellow);
         }
+        
+        /* تنسيق زر نسيت كلمة المرور الجديد */
+        #forgotPasswordBtn {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            text-align: right;
+            width: 100%;
+            padding: 5px 0 0 0;
+            font-size: 0.9em;
+            transition: color 0.2s;
+        }
+        #forgotPasswordBtn:hover {
+            color: var(--accent-yellow);
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -80,6 +97,8 @@
             <form id="authForm" class="auth-form">
                 <input type="email" id="email" data-i18n="EMAIL_PLACEHOLDER" placeholder="البريد الإلكتروني" required>
                 <input type="password" id="password" data-i18n="PASSWORD_PLACEHOLDER" placeholder="كلمة المرور" required>
+                
+                <button type="button" id="forgotPasswordBtn" data-i18n="FORGOT_PASSWORD">نسيت كلمة المرور؟</button> 
                 
                 <button type="submit" id="mainAuthBtn" data-i18n="AUTH_BUTTON_LOGIN" style="background-color: #3498db;">تسجيل الدخول</button>
             </form>
@@ -98,10 +117,11 @@
             signInWithEmailAndPassword, 
             createUserWithEmailAndPassword,
             GoogleAuthProvider,
-            signInWithPopup
+            signInWithPopup,
+            sendPasswordResetEmail // تم استيراد دالة إعادة تعيين كلمة المرور
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"; // لاستخدام Firestore
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"; 
 
         // *** مفاتيح مشروعك الفعلي (thronevoid) ***
         const firebaseConfig = {
@@ -116,7 +136,7 @@
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app); // تعريف خدمة Firestore
+        const db = getFirestore(app); 
         
         // -------------------------------------------------------------
         //                 دالة إنشاء ملف المستخدم في Firestore
@@ -129,12 +149,40 @@
                 highScore: 0,
                 energy: 100,
                 lastEnergyUpdate: new Date(),
-                avatarUrl: "https://via.placeholder.com/100/1e1e1e/ffffff?text=U",
+                avatarUrl: user.photoURL || "https://via.placeholder.com/100/1e1e1e/ffffff?text=U", // استخدام صورة جوجل إذا متاحة
                 isBanned: false,
                 isMuted: false,
                 language: localStorage.getItem('lang') || 'ar'
-            }, { merge: true }); // merge: true للتحديث إذا كان موجوداً
+            }, { merge: true });
         }
+
+        // -------------------------------------------------------------
+        //             🔥 دالة استعادة كلمة المرور الجديدة 🔥
+        // -------------------------------------------------------------
+        async function resetPassword() {
+            const email = document.getElementById('email').value;
+            
+            if (!email) {
+                alert("يرجى إدخال بريدك الإلكتروني أولاً في الحقل المخصص.");
+                return;
+            }
+
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert(`✅ تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني (${email}). يرجى التحقق من صندوق الوارد والبريد غير الهام (Spam).`);
+            } catch (error) {
+                console.error("Password Reset Error:", error);
+                
+                let errorMessage = "❌ حدث خطأ أثناء إرسال الرابط.";
+                if (error.code === 'auth/invalid-email') {
+                    errorMessage = "❌ البريد الإلكتروني غير صحيح.";
+                } else if (error.code === 'auth/user-not-found') {
+                    errorMessage = "❌ لا يوجد حساب مسجل بهذا البريد الإلكتروني.";
+                }
+                alert(errorMessage);
+            }
+        }
+
 
         // -------------------------------------------------------------
         //                 التحكم بالنموذج وحالة التسجيل
@@ -147,6 +195,9 @@
         const mainAuthBtn = document.getElementById('mainAuthBtn');
         const toggleAuthBtn = document.getElementById('toggleAuth');
         
+        // ربط دالة استعادة كلمة المرور بالزر
+        document.getElementById('forgotPasswordBtn').addEventListener('click', resetPassword);
+        
         // تبديل بين وضع التسجيل ووضع الدخول
         toggleAuthBtn.addEventListener('click', () => {
             isRegistering = !isRegistering;
@@ -155,11 +206,13 @@
                 mainAuthBtn.style.backgroundColor = '#2ecc71';
                 mainAuthBtn.setAttribute('data-i18n', 'AUTH_BUTTON_REGISTER');
                 toggleAuthBtn.setAttribute('data-i18n', 'TOGGLE_TO_LOGIN');
+                document.getElementById('forgotPasswordBtn').style.display = 'none'; // إخفاء الزر أثناء التسجيل
             } else {
                 // وضع الدخول
                 mainAuthBtn.style.backgroundColor = '#3498db';
                 mainAuthBtn.setAttribute('data-i18n', 'AUTH_BUTTON_LOGIN');
                 toggleAuthBtn.setAttribute('data-i18n', 'TOGGLE_TO_REGISTER');
+                document.getElementById('forgotPasswordBtn').style.display = 'block'; // إظهار الزر أثناء الدخول
             }
             // تطبيق الترجمة بعد تغيير المفاتيح
             setLanguage(loadLanguage()); 
@@ -174,7 +227,6 @@
             const email = emailInput.value;
             const password = passwordInput.value;
             
-            // تعطيل الزر أثناء العملية
             mainAuthBtn.disabled = true;
             mainAuthBtn.textContent = isRegistering ? '...Processing Registration' : '...Processing Login';
 
@@ -194,7 +246,6 @@
             } catch (error) {
                 console.error("Authentication Error:", error);
                 
-                // معالجة الأخطاء الشائعة
                 let errorMessage = "❌ حدث خطأ غير متوقع. يرجى مراجعة console.";
                 
                 switch (error.code) {
@@ -216,7 +267,6 @@
                 }
                 alert(errorMessage);
             } finally {
-                // تفعيل الزر وإعادة النص الأصلي (يتم تطبيقه بعد تطبيق اللغة)
                 mainAuthBtn.disabled = false;
                 setLanguage(loadLanguage());
             }
@@ -230,7 +280,6 @@
             const provider = new GoogleAuthProvider();
             try {
                 const result = await signInWithPopup(auth, provider);
-                // بعد الدخول، ننشئ ملف المستخدم (إذا لم يكن موجوداً)
                 await createUserProfile(result.user);
                 alert("✅ تم تسجيل الدخول عبر جوجل بنجاح! جارِ التوجيه.");
                 window.location.href = "dashboard.html";
