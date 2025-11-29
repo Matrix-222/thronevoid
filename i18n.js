@@ -25,7 +25,7 @@ const translations = {
         'SIGN_IN_WITH_GOOGLE': 'تسجيل الدخول باستخدام جوجل',
         'SIGN_IN_WITH_FACEBOOK': 'تسجيل الدخول باستخدام فيسبوك', 
         
-        // مفاتيح تسجيل الدخول برقم الجوال (جديدة)
+        // مفاتيح تسجيل الدخول برقم الجوال
         'SIGN_IN_WITH_PHONE': 'أو سجل برقم الجوال', 
         'PHONE_NUMBER_PLACEHOLDER': 'رقم الجوال (+966xxxxxxxx)', 
         'SEND_VERIFICATION_CODE': 'إرسال رمز التحقق', 
@@ -89,7 +89,7 @@ const translations = {
         'SIGN_IN_WITH_GOOGLE': 'Sign in with Google',
         'SIGN_IN_WITH_FACEBOOK': 'Sign in with Facebook', 
         
-        // Phone Number Sign-in Keys (New)
+        // Phone Number Sign-in Keys
         'SIGN_IN_WITH_PHONE': 'Or sign in with Phone', 
         'PHONE_NUMBER_PLACEHOLDER': 'Phone Number (+xxx...)', 
         'SEND_VERIFICATION_CODE': 'Send Verification Code', 
@@ -138,15 +138,12 @@ function loadLanguage() {
     const lang = localStorage.getItem('lang') || 'ar';
     document.documentElement.lang = lang; 
 
-    // تطبيق الترجمة على جميع العناصر التي تحمل خاصية data-i18n
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
         if (translations[lang] && translations[lang][key]) {
-            // للعناصر التي لها placeholder (مثل حقول الإدخال)
             if (element.placeholder) {
                 element.placeholder = translations[lang][key];
             } 
-            // لباقي العناصر (نصوص)
             else {
                 element.textContent = translations[lang][key];
             }
@@ -156,5 +153,4 @@ function loadLanguage() {
     return lang;
 }
 
-// تشغيل دالة loadLanguage عند تحميل الصفحة
 loadLanguage();
