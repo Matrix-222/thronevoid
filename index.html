@@ -37,7 +37,7 @@
             border-radius: 5px;
             background-color: #3a3a3a;
             color: white;
-            text-align: center; /* لمشكلة ظهور النص بالإنجليزية في المنتصف */
+            text-align: center; 
         }
         button {
             padding: 10px 20px;
@@ -101,7 +101,7 @@
             RecaptchaVerifier 
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         
-        // *** مفاتيح مشروعك الفعلي (thronevoid) - تأكد من صحتها ***
+        // *** مفاتيح مشروعك الفعلي (thronevoid) ***
         const firebaseConfig = {
             apiKey: "AIzaSyB-bfHRJW3E8KW3-o-PkNW6xi5ytrTKMJE", 
             authDomain: "thronevoid.firebaseapp.com",
@@ -115,7 +115,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         
-        // تعريف العناصر
         const phoneNumberInput = document.getElementById('phoneNumber');
         const sendCodeBtn = document.getElementById('sendCodeBtn');
         const verificationCodeInput = document.getElementById('verificationCode');
@@ -124,17 +123,13 @@
         let confirmationResult;
 
         window.onload = function() {
-            // إعداد RecaptchaVerifier
             window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
                 'size': 'normal',
                 'callback': (response) => {
-                    // reCAPTCHA تم التحقق بنجاح
                     console.log("reCAPTCHA verified");
                 },
                 'expired-callback': () => {
-                    // reCAPTCHA انتهت صلاحيته
                     console.warn("reCAPTCHA expired");
-                    // استخدام دالة الترجمة العالمية
                     alert(loadLanguage('LOGIN_ERROR_RECAPTCHA'));
                 }
             });
@@ -144,7 +139,6 @@
             const phoneNumber = phoneNumberInput.value.trim();
             if (!phoneNumber) return;
             
-            // تحقق من وجود reCAPTCHA
             if (!window.recaptchaVerifier) {
                 alert(loadLanguage('LOGIN_ERROR_RECAPTCHA'));
                 return;
@@ -155,7 +149,6 @@
                     confirmationResult = result;
                     alert("✅ تم إرسال رمز التحقق بنجاح!");
                     
-                    // إخفاء زر الإرسال وإظهار حقول التحقق
                     sendCodeBtn.style.display = 'none';
                     phoneNumberInput.disabled = true;
                     verificationCodeInput.style.display = 'block';
@@ -163,9 +156,7 @@
                 })
                 .catch((error) => {
                     console.error("Error sending code:", error);
-                    // عرض رسالة خطأ حسب نوع الخطأ
                     alert(loadLanguage('LOGIN_ERROR_PHONE_FORMAT'));
-                    // إعادة ضبط reCAPTCHA للسماح بالمحاولة مرة أخرى
                     window.recaptchaVerifier.render().then(function(widgetId) {
                         grecaptcha.reset(widgetId);
                     });
@@ -189,7 +180,6 @@
                 });
         });
 
-        // إذا كان المستخدم مسجلاً الدخول بالفعل، يُعاد توجيهه
         auth.onAuthStateChanged(user => {
             if (user) {
                 // window.location.href = "dashboard.html";
