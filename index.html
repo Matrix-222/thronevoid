@@ -123,6 +123,7 @@
         let confirmationResult;
 
         window.onload = function() {
+            // إعداد RecaptchaVerifier
             window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
                 'size': 'normal',
                 'callback': (response) => {
@@ -130,7 +131,8 @@
                 },
                 'expired-callback': () => {
                     console.warn("reCAPTCHA expired");
-                    alert(loadLanguage('LOGIN_ERROR_RECAPTCHA'));
+                    // استخدام دالة الترجمة العالمية
+                    alert(loadLanguage('LOGIN_ERROR_RECAPTCHA')); 
                 }
             });
         };
@@ -156,7 +158,8 @@
                 })
                 .catch((error) => {
                     console.error("Error sending code:", error);
-                    alert(loadLanguage('LOGIN_ERROR_PHONE_FORMAT'));
+                    // استخدام دالة الترجمة العالمية
+                    alert(loadLanguage('LOGIN_ERROR_PHONE_FORMAT')); 
                     window.recaptchaVerifier.render().then(function(widgetId) {
                         grecaptcha.reset(widgetId);
                     });
@@ -171,11 +174,13 @@
                 .then((result) => {
                     const user = result.user;
                     console.log("User signed in:", user);
+                    // استخدام دالة الترجمة العالمية
                     alert(loadLanguage('LOGIN_SUCCESS'));
                     window.location.href = "dashboard.html"; 
                 })
                 .catch((error) => {
                     console.error("Error verifying code:", error);
+                    // استخدام دالة الترجمة العالمية
                     alert(loadLanguage('LOGIN_FAIL'));
                 });
         });
