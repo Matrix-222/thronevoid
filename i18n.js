@@ -43,7 +43,8 @@ const translations = {
         // Login/Auth
         'PHONE_LOGIN_TITLE': 'Sign in with Phone Number',
         'FORGOT_PASSWORD': 'Forgot Password?',
-        'SEND_VERIFICATION_CODE': 'Send Verification Code',
+        // **الإصلاح كان هنا: المفتاح يجب أن يكون بالحروف الصغيرة ليطابق استخدام HTML**
+        'SEND_VERIFICATION_CODE': 'Send Verification Code', 
         'VERIFY_CODE_PLACEHOLDER': 'Enter verification code',
         'VERIFY': 'Verify',
         'NOT_A_ROBOT': 'I am not a robot',
