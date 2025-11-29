@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,23 +16,44 @@
     <header>
         <h1>THRONES OF THE VOID</h1>
         <div>
-            <button onclick="window.location='login.html'">LOGIN</button>
-            <button onclick="window.location='register.html'">REGISTER</button>
-            <button onclick="window.location='leaderboard.html'">LEADERBOARD</button> 
+            <button id="langToggleBtn" style="background-color: #3498db;">🌐 English</button>
+            
+            <button onclick="window.location='login.html'" data-i18n="LOGIN">تسجيل الدخول</button>
+            <button onclick="window.location='register.html'" data-i18n="REGISTER">تسجيل جديد</button>
+            <button onclick="window.location='leaderboard.html'" data-i18n="LEADERBOARD">لوحة المتصدرين</button> 
         </div>
     </header>
 
     <main>
         <div class="hero-section">
-            <h2>مرحباً بك أيها المحارب</h2>
-            <p>ادخل إلى ساحة المجرة، قاتل للبقاء، وأثبت هيمنتك على العرش.</p>
+            <h2 data-i18n="HERO_TITLE">مرحباً بك أيها المحارب</h2>
+            <p data-i18n="HERO_SUBTITLE">ادخل إلى ساحة المجرة، قاتل للبقاء، وأثبت هيمنتك على العرش.</p>
             <div style="margin-top: 30px;">
-                <button onclick="window.location='login.html'" style="background-color: var(--accent-red); padding: 15px 35px; font-size: 1.1em;">
+                <button onclick="window.location='login.html'" style="background-color: var(--accent-red); padding: 15px 35px; font-size: 1.1em;" data-i18n="START_CHALLENGE">
                     ابدأ التحدي
                 </button>
             </div>
         </div>
     </main>
-
+    
+    <script src="i18n.js"></script>
+    <script>
+        // تحميل اللغة عند بداية تشغيل الصفحة
+        let currentLang = loadLanguage();
+        
+        // تحديث زر التبديل بناءً على اللغة الحالية
+        const langBtn = document.getElementById('langToggleBtn');
+        function updateLangButton(lang) {
+            langBtn.textContent = lang === 'ar' ? '🌐 English' : '🌐 العربية';
+        }
+        updateLangButton(currentLang);
+        
+        // دالة التبديل عند الضغط على الزر
+        langBtn.addEventListener('click', () => {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            setLanguage(currentLang);
+            updateLangButton(currentLang);
+        });
+    </script>
 </body>
 </html>
