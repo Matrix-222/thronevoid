@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="GENERAL_CHAT">الشات العام</title>
+    <title data-i18n="GENERAL_CHAT">الدردشة</title>
     <link rel="stylesheet" href="style.css">
     <style>
         .chat-container {
@@ -13,7 +13,7 @@
             background-color: var(--secondary-dark);
             border-radius: 12px;
             box-shadow: 0 0 30px rgba(52, 152, 219, 0.4);
-            height: 70vh; /* تحديد ارتفاع للحاوية */
+            height: 70vh; 
         }
         .sidebar {
             width: 200px;
@@ -45,7 +45,7 @@
             color: white;
         }
         #allianceChatBtn {
-            background-color: #e67e22; /* برتقالي للخاص */
+            background-color: #e67e22; 
             color: white;
         }
         .chat-channel-btn:hover:not(.active-channel) {
@@ -65,8 +65,9 @@
             margin-bottom: 15px;
             border-radius: 8px;
             background-color: #3a3a3a;
+            /* الترتيب: الرسائل الجديدة في الأسفل */
             display: flex;
-            flex-direction: column-reverse; /* لعرض أحدث رسالة في الأسفل */
+            flex-direction: column; 
         }
         .message-item {
             padding: 8px;
@@ -81,13 +82,13 @@
             font-style: italic;
         }
         .self-msg {
-            background-color: #2980b9; /* أزرق غامق */
+            background-color: #2980b9; 
             align-self: flex-start;
             text-align: right;
             margin-right: auto;
         }
         .other-msg {
-            background-color: #1abc9c; /* أخضر فيروزي */
+            background-color: #1abc9c; 
             align-self: flex-end;
             text-align: right;
             margin-left: auto;
@@ -182,10 +183,12 @@
             orderBy, 
             limit, 
             onSnapshot, 
-            serverTimestamp 
+            serverTimestamp,
+            writeBatch,
+            getDocs
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // *** مفاتيح مشروعك الفعلي (thronevoid) ***
+        // *** مفاتيح مشروعك الفعلي (thronevoid) - تأكد من صحتها ***
         const firebaseConfig = {
             apiKey: "AIzaSyB-bfHRJW3E8KW3-o-PkNW6xi5ytrTKMJE", 
             authDomain: "thronevoid.firebaseapp.com",
@@ -202,42 +205,35 @@
 
         let currentUser = null;
         let currentUsername = 'Anonymous';
-        let currentAllianceId = null; // سيتم تحديده لاحقاً من بيانات المستخدم
-        let currentChatCollection = 'general_messages'; // القناة الافتراضية
-        let unsubscribeListener = null; // لتخزين مستمع Firestore وإيقافه عند تغيير القناة
-
+        let currentAllianceId = null; 
+        let currentChatCollection = 'general_messages'; 
+        let unsubscribeListener = null; 
+        
         const allianceChatBtn = document.getElementById('allianceChatBtn');
         const generalChatBtn = document.getElementById('generalChatBtn');
         const messagesContainer = document.getElementById('messagesContainer');
         const messageInput = document.getElementById('messageInput');
         const channelTitle = document.getElementById('channelTitle');
 
-        // -------------------------------------------------------------
-        //             1. التحقق من الدخول وتحميل بيانات المستخدم
-        // -------------------------------------------------------------
-
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-                // نستخدم الإيميل كمعرف للمستند، كما هو مُنفذ في login.html
                 const userDocRef = doc(db, "users", user.email); 
                 const userDoc = await getDoc(userDocRef);
 
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
                     currentUsername = userData.username || user.email.split('@')[0];
-                    currentAllianceId = userData.allianceId; // تحميل ID التحالف
-
-                    // تفعيل زر شات التحالفات إذا كان لديه تحالف
+                    currentAllianceId = userData.allianceId; 
+                    
                     if (!currentAllianceId) {
                         allianceChatBtn.disabled = true;
                         allianceChatBtn.style.opacity = 0.5;
                     }
                     
-                    // ابدأ الدردشة العامة افتراضياً
                     startChatListener('general_messages', 'GENERAL_CHAT_TITLE');
                 } else {
-                    alert("خطأ: لم يتم العثور على بيانات المستخدم في Firestore. يرجى تسجيل الدخول مرة أخرى.");
+                    console.error("خطأ: لم يتم العثور على بيانات المستخدم.");
                     logoutUser();
                 }
             } else {
@@ -245,51 +241,42 @@
             }
         });
 
-        // -------------------------------------------------------------
-        //             2. دالة بدء الاستماع لرسائل Firestore (Real-time)
-        // -------------------------------------------------------------
-
         function startChatListener(collectionName, titleKey) {
-            // إيقاف المستمع الحالي إذا كان موجوداً
             if (unsubscribeListener) {
                 unsubscribeListener();
             }
             
-            // تحديث الواجهة
             currentChatCollection = collectionName;
             channelTitle.setAttribute('data-i18n', titleKey);
-            loadLanguage(); // لتحديث العنوان المترجم
-            messagesContainer.innerHTML = ''; // تفريغ الرسائل القديمة
+            loadLanguage(); 
+            messagesContainer.innerHTML = ''; 
 
-            const chatRef = collection(db, collectionName);
-            const q = query(chatRef, orderBy('timestamp', 'desc'), limit(50)); // آخر 50 رسالة
+            let targetPath = collectionName;
+            if (collectionName === 'alliance_messages' && currentAllianceId) {
+                 targetPath = `alliance_messages/${currentAllianceId}/messages`;
+            }
 
-            // onSnapshot هو مستمع الزمن الفعلي
+            const chatRef = collection(db, targetPath);
+            const q = query(chatRef, orderBy('timestamp', 'asc'), limit(50)); 
+
             unsubscribeListener = onSnapshot(q, (snapshot) => {
-                // نستخدم تغيرات الرسائل فقط للتحديثات الدقيقة
                 snapshot.docChanges().forEach((change) => {
                     if (change.type === "added") {
                         const messageData = change.doc.data();
-                        
-                        // لإضافة الرسالة في الأعلى، نستخدم insertBefore
                         const messageElement = createMessageElement(messageData);
-                        messagesContainer.prepend(messageElement); 
+                        
+                        messagesContainer.append(messageElement); 
+                        
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
                     }
                 });
-                // تأكد من أننا دائماً في الأسفل بعد وصول رسائل جديدة
-                // messagesContainer.scrollTop = messagesContainer.scrollHeight;
             });
         }
         
-        // -------------------------------------------------------------
-        //             3. دالة بناء عنصر الرسالة HTML
-        // -------------------------------------------------------------
-
         function createMessageElement(data) {
             const div = document.createElement('div');
             let timestampText = '';
             
-            // تحويل ختم الوقت إلى تنسيق محلي قابل للقراءة
             if (data.timestamp && data.timestamp.toDate) {
                 const date = data.timestamp.toDate();
                 timestampText = date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) + ' ' +
@@ -298,9 +285,7 @@
                 timestampText = 'الآن';
             }
 
-            // تحديد ما إذا كانت رسالتي أم رسالة شخص آخر
             const isSelf = currentUser && data.senderEmail === currentUser.email;
-            
             let senderName = data.senderUsername || "مستخدم غير معروف";
 
             div.className = `message-item ${isSelf ? 'self-msg' : 'other-msg'}`;
@@ -318,31 +303,19 @@
             return div;
         }
 
-        // -------------------------------------------------------------
-        //             4. دالة إرسال رسالة جديدة
-        // -------------------------------------------------------------
-
         async function sendMessage() {
             const text = messageInput.value.trim();
 
             if (!text) return;
-            if (currentChatCollection === 'alliance_messages' && !currentAllianceId) {
-                alert("يجب أن تكون عضواً في تحالف لإرسال رسائل خاصة.");
-                return;
-            }
-            
-            // تحديد المجموعة المستهدفة
+
             let targetCollection = currentChatCollection;
             
-            // إذا كانت قناة تحالف، نجعل اسم المجموعة هو alliance_messages/ALLIANCE_ID/messages
             if (currentChatCollection === 'alliance_messages' && currentAllianceId) {
                  targetCollection = `alliance_messages/${currentAllianceId}/messages`;
             } else if (currentChatCollection === 'alliance_messages' && !currentAllianceId) {
-                 // هذا الشرط يجب أن يتم منعه بواسطة زر التعطيل
                  alert("لا يمكن الإرسال. لا تملك تحالفاً.");
                  return;
             }
-
 
             try {
                 await addDoc(collection(db, targetCollection), {
@@ -350,42 +323,53 @@
                     senderUsername: currentUsername,
                     text: text,
                     timestamp: serverTimestamp(),
-                    // نضيف ID التحالف للرسائل الخاصة (إذا كنا في قناة التحالف)
                     ...(currentAllianceId && currentChatCollection === 'alliance_messages' && { allianceId: currentAllianceId })
                 });
 
-                messageInput.value = ''; // مسح حقل الإدخال بعد الإرسال
+                messageInput.value = ''; 
                 
             } catch (error) {
                 console.error("Error sending message:", error);
                 alert("❌ فشل إرسال الرسالة. يرجى التحقق من قواعد Firestore.");
             }
         }
-
-        // -------------------------------------------------------------
-        //             5. ربط الأزرار والدوال
-        // -------------------------------------------------------------
         
-        // تبديل إلى الشات العام
+        async function clearChatHistory(collectionName) {
+            if(collectionName !== 'general_messages') return;
+
+            try {
+                const collectionRef = collection(db, collectionName);
+                const snapshot = await getDocs(collectionRef);
+                
+                if (snapshot.empty) return; 
+                
+                const batch = writeBatch(db);
+                snapshot.docs.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+
+                await batch.commit();
+                console.log(`✅ تم حذف جميع رسائل ${collectionName} بنجاح.`);
+                
+            } catch (error) {
+                console.error("Error bulk deleting chat:", error);
+            }
+        }
+
         generalChatBtn.addEventListener('click', () => {
             setActiveChannel(generalChatBtn);
             startChatListener('general_messages', 'GENERAL_CHAT_TITLE');
         });
 
-        // تبديل إلى شات التحالفات
         allianceChatBtn.addEventListener('click', () => {
             if (currentAllianceId) {
                 setActiveChannel(allianceChatBtn);
-                // ملاحظة: عند استخدام الشات الخاص، يجب أن يكون اسم المجموعة كاملاً: alliance_messages/ALLIANCE_ID/messages
-                // لكننا سنستخدم 'alliance_messages' كعلامة، وستقوم دالة الإرسال بتحديد المسار الصحيح.
-                // لتشغيل الاستماع، سنفترض وجود مجموعة فرعية باسم التحالف
-                startChatListener(`alliance_messages/${currentAllianceId}/messages`, 'ALLIANCES_CHAT_TITLE');
+                startChatListener('alliance_messages', 'ALLIANCES_CHAT_TITLE');
             } else {
                 alert("يجب أن تكون عضواً في تحالف للانضمام لهذه القناة.");
             }
         });
 
-        // دالة تحديد القناة النشطة
         function setActiveChannel(activeButton) {
             generalChatBtn.classList.remove('active-channel');
             allianceChatBtn.classList.remove('active-channel');
@@ -399,12 +383,17 @@
             }
         });
 
-        // دالة تسجيل الخروج (مُعرفة عالمياً)
         window.logoutUser = function() {
-            signOut(auth).then(() => {
-                window.location.href = "login.html";
-            }).catch((error) => {
-                console.error("Logout Error:", error);
+            if (unsubscribeListener) {
+                unsubscribeListener();
+            }
+            
+            clearChatHistory('general_messages').then(() => {
+                signOut(auth).then(() => { 
+                    window.location.href = "login.html"; 
+                }).catch((error) => {
+                    console.error("Logout Error:", error);
+                });
             });
         }
     </script>
