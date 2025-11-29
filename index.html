@@ -3,47 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="SIGN_IN">تسجيل الدخول</title> 
+    <title>تسجيل الدخول / التسجيل</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* تنسيقات إضافية خاصة بهذه الصفحة */
+        .auth-container h2 {
+            color: var(--accent-blue);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .switch-link {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        .switch-link a {
+            color: var(--accent-green);
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        /* تنسيق لحقل الجنس المضاف */
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <div class="box-container">
-        
-        <div class="language-switcher" style="position: absolute; top: 15px; left: 15px;">
-            <button onclick="switchLanguage('ar')" data-i18n="ARABIC_BUTTON">العربية</button>
-            <button onclick="switchLanguage('en')" data-i18n="ENGLISH_BUTTON">English</button>
+    <main>
+        <div class="auth-container">
+            <div id="loginForm" class="form-container">
+                <h2>تسجيل الدخول</h2>
+                <form id="signInForm">
+                    <label for="signInEmail">الإيميل:</label>
+                    <input type="email" id="signInEmail" required>
+
+                    <label for="signInPassword">كلمة المرور:</label>
+                    <input type="password" id="signInPassword" required>
+
+                    <button type="submit">دخول</button>
+                </form>
+                <p class="switch-link">
+                    ليس لديك حساب؟ <a href="#" onclick="showSignUp()">سجل الآن</a>
+                </p>
+            </div>
+
+            <div id="signUpForm" class="form-container" style="display: none;">
+                <h2>إنشاء حساب جديد</h2>
+                <form id="createAccountForm">
+                    <label for="signupEmail">الإيميل:</label>
+                    <input type="email" id="signupEmail" required>
+
+                    <label for="signupPassword">كلمة المرور:</label>
+                    <input type="password" id="signupPassword" required>
+
+                    <label for="signupUsername">اسم المستخدم:</label>
+                    <input type="text" id="signupUsername" required>
+                    
+                    <div class="filter-group" style="text-align: right;">
+                        <label for="gender">الجنس:</label>
+                        <select id="gender" required style="width: 100%; padding: 12px; margin: 8px 0; display: inline-block; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; background-color: #333; color: var(--text-light); font-size: 1em;">
+                            <option value="" disabled selected>اختر الجنس</option>
+                            <option value="male">ذكر</option>
+                            <option value="female">أنثى</option>
+                        </select>
+                    </div>
+                    <button type="submit">تسجيل</button>
+                </form>
+                <p class="switch-link">
+                    لديك حساب بالفعل؟ <a href="#" onclick="showSignIn()">سجل دخول</a>
+                </p>
+            </div>
         </div>
+    </main>
 
-        <h1>THRONES OF THE VOID - CHAT</h1>
-        
-        <p data-i18n="SIGN_IN_EMAIL_TITLE" style="color: var(--text-light);">تسجيل الدخول</p> 
-        
-        <div class="input-group">
-            <input type="email" id="emailInput" data-i18n="EMAIL_PLACEHOLDER" placeholder="البريد الإلكتروني">
-        </div>
-
-        <div class="input-group">
-            <input type="password" id="passwordInput" data-i18n="PASSWORD_PLACEHOLDER" placeholder="كلمة المرور">
-        </div>
-        
-        <button id="loginBtn" data-i18n="SIGN_IN">تسجيل الدخول</button>
-        
-        <p style="margin-top: 15px; margin-bottom: 0;"><a href="#" id="forgotPasswordLink" data-i18n="FORGOT_PASSWORD">نسيت كلمة المرور؟</a></p>
-
-        <p style="margin-top: 10px;"><a href="register.html" style="color: var(--accent-green);" data-i18n="REGISTER">ليس لديك حساب؟ سجل الآن</a></p>
-        
-    </div>
-
-    <script src="i18n.js"></script> 
+    <script src="i18n.js"></script>
+    <script src="api.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { 
-            getAuth, 
-            signInWithEmailAndPassword,
-            sendPasswordResetEmail,
-            onAuthStateChanged
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
         // *** مفاتيح مشروعك الفعلي (thronevoid) - تأكد من صحتها ***
         const firebaseConfig = {
             apiKey: "AIzaSyB-bfHRJW3E8KW3-o-PkNW6xi5ytrTKMJE", 
@@ -54,61 +98,88 @@
             appId: "1:958587822012:web:312cf3d9e7c87e1c6415b9",
             measurementId: "G-N34T3VRGX0"
         };
-
+        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        
-        const emailInput = document.getElementById('emailInput');
-        const passwordInput = document.getElementById('passwordInput');
-        const loginBtn = document.getElementById('loginBtn');
-        const forgotPasswordLink = document.getElementById('forgotPasswordLink'); 
+        const db = getFirestore(app);
 
-        forgotPasswordLink.addEventListener('click', (e) => {
-            e.preventDefault(); 
-            resetPassword();
-        });
-
-        loginBtn.addEventListener('click', () => {
-            const email = emailInput.value.trim();
-            const password = passwordInput.value.trim();
-
-            if (!email || !password) {
-                alert(loadLanguage('LOGIN_FIELDS_REQUIRED'));
-                return;
+        // التحقق من حالة المستخدم عند تحميل الصفحة
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // إذا كان المستخدم مسجلاً بالفعل، حوله إلى صفحة الدردشة
+                window.location.href = "chat.html";
             }
-
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    alert(loadLanguage('LOGIN_SUCCESS'));
-                    window.location.href = "chat.html"; // التوجيه لصفحة الدردشة
-                })
-                .catch((error) => {
-                    console.error("Login Error:", error.code, error.message);
-                    alert(loadLanguage('LOGIN_FAIL'));
-                });
         });
 
-        async function resetPassword() {
-            const email = emailInput.value.trim();
-            if (!email) {
-                alert("الرجاء إدخال البريد الإلكتروني الذي تريد استعادة كلمة مروره في الحقل المخصص.");
+        // --- تبديل النماذج ---
+        function showSignUp() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signUpForm').style.display = 'block';
+        }
+
+        function showSignIn() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('signUpForm').style.display = 'none';
+        }
+
+        window.showSignUp = showSignUp;
+        window.showSignIn = showSignIn;
+
+        // --- التعامل مع تسجيل الدخول (Sign In) ---
+        document.getElementById('signInForm').addEventListener('submit', handleSignIn);
+
+        async function handleSignIn(event) {
+            event.preventDefault();
+            const email = document.getElementById('signInEmail').value;
+            const password = document.getElementById('signInPassword').value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // تحديث حالة المستخدم إلى 'online' عند تسجيل الدخول
+                await setDoc(doc(db, "users", email), { status: 'online' }, { merge: true });
+                window.location.href = "chat.html";
+            } catch (error) {
+                alert(`فشل تسجيل الدخول: ${error.message}`);
+            }
+        }
+
+        // --- التعامل مع التسجيل (Sign Up) ---
+        document.getElementById('createAccountForm').addEventListener('submit', handleSignUp);
+
+        async function handleSignUp(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const username = document.getElementById('signupUsername').value;
+            // ⭐️ جلب قيمة حقل الجنس
+            const gender = document.getElementById('gender').value; 
+            
+            if (!gender) {
+                alert("الرجاء اختيار الجنس.");
                 return;
             }
 
             try {
-                await sendPasswordResetEmail(auth, email);
-                alert(`✅ تم إرسال رابط استعادة كلمة المرور إلى البريد الإلكتروني: ${email}.`);
+                // 1. إنشاء المستخدم في Firebase Authentication
+                const newUser = await createUserWithEmailAndPassword(auth, email, password);
+
+                // 2. حفظ بيانات المستخدم الإضافية (بما في ذلك الجنس) في Firestore
+                await setDoc(doc(db, "users", newUser.user.email), {
+                    username: username,
+                    gender: gender, // ⭐️ حفظ قيمة الجنس
+                    createdAt: serverTimestamp(),
+                    status: 'online'
+                });
+
+                alert("تم إنشاء الحساب بنجاح! جاري تسجيل الدخول...");
+                window.location.href = "chat.html";
+
             } catch (error) {
-                console.error("Password Reset Error:", error);
-                alert("❌ فشل إرسال رابط استعادة كلمة المرور. تأكد من صحة البريد الإلكتروني وأن الحساب موجود.");
+                alert(`فشل التسجيل: ${error.message}`);
             }
         }
 
-        onAuthStateChanged(auth, user => {
-            if (user) {
-                // window.location.href = "chat.html"; // يمكن تفعيله لإعادة التوجيه التلقائي
-            }
-        });
     </script>
 </body>
 </html>
