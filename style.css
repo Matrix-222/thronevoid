@@ -95,8 +95,6 @@ button:hover {
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
 }
 
-/* لا توجد تنسيقات لـ .toast-notification-container و .toast-message هنا */
-
 /* نقطة الاتصال (لـ chat.html) */
 .online-dot {
     height: 10px;
