@@ -38,21 +38,15 @@ const translations = {
 
     // --- مفاتيح صفحة الإعدادات (settings.html) ---
     'SETTINGS_PAGE_TITLE': { 'en': 'Account and Game Settings', 'ar': 'إعدادات الحساب واللعبة' },
-    
-    // إعدادات الملف الشخصي
     'PROFILE_SETTINGS': { 'en': 'Profile Settings', 'ar': 'إعدادات الملف الشخصي' },
     'CHANGE_AVATAR': { 'en': 'Change Profile Picture', 'ar': 'تغيير صورة البروفايل' },
     'CHOOSE_AVATAR': { 'en': 'Choose from Avatars:', 'ar': 'اختر من الأيقونات الجاهزة:' },
     'UPLOAD_IMAGE': { 'en': 'Upload New Image', 'ar': 'رفع صورة جديدة' },
     'SAVE_CHANGES': { 'en': 'Save Changes', 'ar': 'حفظ التغييرات' },
-    
-    // إعدادات اللغة
     'LANGUAGE_SETTINGS': { 'en': 'Language Settings', 'ar': 'إعدادات اللغة' },
     'SELECT_LANGUAGE': { 'en': 'Select Language:', 'ar': 'اختر اللغة:' },
     'LANG_AR': { 'en': 'Arabic', 'ar': 'العربية' },
     'LANG_EN': { 'en': 'English', 'ar': 'English' },
-
-    // إعدادات الحساب
     'ACCOUNT_SETTINGS': { 'en': 'Account Settings', 'ar': 'إعدادات الحساب' },
     'CHANGE_PASSWORD': { 'en': 'Change Password', 'ar': 'تغيير كلمة المرور' },
     'CURRENT_EMAIL': { 'en': 'Current Email:', 'ar': 'البريد الإلكتروني الحالي:' },
@@ -60,38 +54,40 @@ const translations = {
     'DANGER_ZONE': { 'en': 'DANGER ZONE', 'ar': 'منطقة الخطر' },
     'DELETE_ACCOUNT': { 'en': 'Delete Account Permanently', 'ar': 'حذف الحساب نهائياً' },
     'DELETE': { 'en': 'Delete', 'ar': 'حذف' },
-    
-    // إعدادات اللعبة
     'GAME_SETTINGS': { 'en': 'Game Settings', 'ar': 'إعدادات اللعبة' },
     'SOUND_VOLUME': { 'en': 'Sound Volume', 'ar': 'مستوى الصوت' },
     'GRAPHICS_QUALITY': { 'en': 'Graphics Quality', 'ar': 'جودة الرسوميات' },
     'HIGH': { 'en': 'High', 'ar': 'عالية' },
     'MEDIUM': { 'en': 'Medium', 'ar': 'متوسطة' },
     'LOW': { 'en': 'Low', 'ar': 'منخفضة' },
+
+    // 🔥 مفاتيح لوحة تحكم المشرف (Admin Panel) 🔥
+    'ADMIN_PANEL': { 'en': 'ADMIN PANEL', 'ar': 'لوحة تحكم المشرف' },
+    'MANAGE_USERS': { 'en': 'MANAGE USERS', 'ar': 'إدارة المستخدمين' },
+    'USER_EMAIL': { 'en': 'USER EMAIL', 'ar': 'البريد الإلكتروني' },
+    'AVATAR_URL': { 'en': 'AVATAR', 'ar': 'صورة البروفايل' },
+    'HIGH_SCORE': { 'en': 'HIGH SCORE', 'ar': 'أعلى نتيجة' },
+    'ENERGY': { 'en': 'ENERGY', 'ar': 'الطاقة' }, // مفتاح جديد
+    'STATUS': { 'en': 'STATUS', 'ar': 'الحالة' },
+    'ACTIONS': { 'en': 'ACTIONS', 'ar': 'الإجراءات' },
+    'ACCESS_DENIED': { 'en': '⛔️ Access Denied. You do not have administrator privileges.', 'ar': '⛔️ لا تملك صلاحية الوصول إلى لوحة المشرف.' },
 };
 
 // الدالة الرئيسية للترجمة
 function setLanguage(lang) {
-    // حفظ اختيار المستخدم
     localStorage.setItem('lang', lang);
 
-    // تطبيق اتجاه الكتابة (RTL/LTR)
     document.body.style.direction = (lang === 'ar' ? 'rtl' : 'ltr');
 
-    // تغيير اللغة على جميع العناصر التي تحمل وسم 'data-i18n'
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
         
-        // التحقق من وجود القيمة وتطبيقها
         if (translations[key] && translations[key][lang]) {
             if (element.tagName === 'INPUT' && element.hasAttribute('placeholder')) {
-                // لـ placeholder في حقول الإدخال
                 element.placeholder = translations[key][lang];
             } else if (element.tagName === 'TITLE') {
-                 // لـ وسم <title>
                 document.title = translations[key][lang];
             } else {
-                // للعناصر العادية و الأزرار
                 element.textContent = translations[key][lang];
             }
         }
@@ -100,7 +96,6 @@ function setLanguage(lang) {
 
 // دالة التحقق من اللغة المحفوظة وتحميلها
 function loadLanguage() {
-    // القراءة من Firestore (تم التعامل معها في settings.html)
     const defaultLang = 'ar';
     const lang = localStorage.getItem('lang') || defaultLang;
     setLanguage(lang);
