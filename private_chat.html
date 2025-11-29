@@ -9,7 +9,7 @@
         /* تنسيقات خاصة بالدردشة الخاصة */
         .chat-container {
             max-width: 800px;
-            height: 80vh; /* ارتفاع الشاشة */
+            height: 80vh; 
             margin: 20px auto;
             background-color: var(--secondary-dark);
             border-radius: 12px;
@@ -37,7 +37,8 @@
             padding: 15px;
             overflow-y: auto;
             display: flex;
-            flex-direction: column-reverse; /* لعرض أحدث رسالة في الأسفل */
+            /* ⭐️ التعديل الأول: لجعل الرسائل تظهر من الأعلى للأسفل */
+            flex-direction: column; 
         }
 
         .message-row {
@@ -47,12 +48,12 @@
 
         /* رسائل المرسل (أنا) */
         .message-row.sender {
-            justify-content: flex-start; /* اليمين في اللغة العربية */
+            justify-content: flex-end; /* رسائلي تذهب إلى اليمين في اللغة العربية */
         }
 
         /* رسائل المستلم (الطرف الآخر) */
         .message-row.receiver {
-            justify-content: flex-end; /* اليسار في اللغة العربية */
+            justify-content: flex-start; /* رسائل الطرف الآخر تذهب إلى اليسار */
         }
 
         .message-bubble {
@@ -61,34 +62,44 @@
             border-radius: 20px;
             line-height: 1.4;
             position: relative;
+            word-wrap: break-word; 
+            text-align: right; 
+            direction: rtl;
         }
 
         .message-row.sender .message-bubble {
-            background-color: var(--accent-green); /* أخضر للمرسل */
+            background-color: var(--accent-green); 
             color: var(--primary-dark);
             border-bottom-right-radius: 0;
+            border-bottom-left-radius: 20px;
         }
 
         .message-row.receiver .message-bubble {
-            background-color: var(--accent-blue); /* أزرق للمستلم */
+            background-color: var(--accent-blue); 
             color: var(--text-light);
             border-bottom-left-radius: 0;
+            border-bottom-right-radius: 20px;
         }
         
         .message-time {
             display: block;
             font-size: 0.7em;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(0, 0, 0, 0.7);
             margin-top: 5px;
-            text-align: right;
+            text-align: left;
         }
+        
+        .message-row.receiver .message-time {
+             color: rgba(255, 255, 255, 0.7);
+        }
+
 
         .chat-input {
             padding: 15px;
             background-color: var(--primary-dark);
             display: flex;
             align-items: center;
-            position: relative; /* لتحديد موقع لوحة الإيموجي/GIF */
+            position: relative; 
         }
 
         #messageInput {
@@ -97,7 +108,6 @@
             margin-bottom: 0;
         }
         
-        /* تنسيق الأيقونات في شريط الإدخال */
         .input-icon-btn {
             background: none;
             border: none;
@@ -105,13 +115,15 @@
             font-size: 1.5em;
             cursor: pointer;
             padding: 0 5px;
-            margin: 0;
+            margin: 0 5px;
             transition: color 0.2s;
         }
         
         .input-icon-btn:hover {
             color: var(--accent-blue);
         }
+        
+        /* تنسيقات الإيموجي و GIF (الموجودة في style.css) */
 
     </style>
 </head>
@@ -129,7 +141,7 @@
 
             <div id="chatMessages" class="chat-messages">
                 <p id="loadingMessages" style="text-align: center; color: var(--text-muted);">... يتم تحميل الرسائل ...</p>
-                </div>
+            </div>
 
             <div class="chat-input">
                 <button id="sendMessageBtn" data-i18n="SEND_BUTTON" style="background-color: var(--accent-green);">إرسال</button>
@@ -150,7 +162,8 @@
     </main>
 
     <script src="i18n.js"></script>
-    <script src="api.js"></script> <script type="module">
+    <script src="api.js"></script> 
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { 
@@ -158,7 +171,6 @@
             collection, 
             doc, 
             query, 
-            where, 
             orderBy, 
             limit, 
             onSnapshot, 
@@ -190,7 +202,6 @@
         const sendMessageBtn = document.getElementById('sendMessageBtn');
         const chatPartnerNameElement = document.getElementById('chatPartnerName');
         
-        // عناصر الإيموجي و GIF
         const emojiBtn = document.getElementById('emojiBtn');
         const emojiPicker = document.getElementById('emojiPicker');
         const gifBtn = document.getElementById('gifBtn');
@@ -210,22 +221,17 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
-                // توليد ID المحادثة
                 chatId = getChatId(currentUser.email, chatPartnerEmail);
                 
-                // جلب اسم شريك الدردشة
                 fetchChatPartnerName(chatPartnerEmail);
                 
-                // بدء مراقبة الرسائل
                 listenForMessages();
 
-                // تفعيل الإرسال
                 sendMessageBtn.addEventListener('click', () => sendMessage());
                 messageInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') sendMessage();
                 });
                 
-                // تفعيل الإيموجي والـ GIF
                 setupEmojiPicker();
                 setupGifPicker();
 
@@ -234,13 +240,12 @@
             }
         });
         
-        // --- دالة توليد ID المحادثة ---
+        // --- دالة توليد ID المحادثة (نفس الكود) ---
         function getChatId(email1, email2) {
-            // ضمان ترتيب ثابت لـ ID المحادثة
             return email1 < email2 ? `${email1}_${email2}` : `${email2}_${email1}`;
         }
         
-        // --- جلب اسم شريك الدردشة ---
+        // --- جلب اسم شريك الدردشة (نفس الكود) ---
         async function fetchChatPartnerName(email) {
             try {
                 const docRef = doc(db, "users", email);
@@ -258,11 +263,10 @@
             }
         }
         
-        // --- إرسال رسالة نصية أو GIF ---
+        // --- إرسال رسالة نصية أو GIF (نفس الكود) ---
         async function sendMessage(type = 'text', content = messageInput.value.trim()) {
             if (content === '') return;
 
-            // إخفاء الـ pickers بعد الإرسال
             emojiPicker.classList.remove('show');
             gifPickerContainer.classList.remove('show');
             
@@ -271,11 +275,10 @@
                     sender: currentUser.email,
                     receiver: chatPartnerEmail,
                     content: content,
-                    type: type, // 'text' أو 'gif'
+                    type: type, 
                     timestamp: serverTimestamp()
                 });
                 
-                // مسح حقل الإدخال بعد الإرسال
                 messageInput.value = '';
 
             } catch (error) {
@@ -284,12 +287,13 @@
             }
         }
 
-        // --- مراقبة الرسائل الجديدة ---
+        // --- مراقبة الرسائل الجديدة (تم تعديل الترتيب) ---
         function listenForMessages() {
             const messagesQuery = query(
                 collection(db, "chats", chatId, "messages"),
-                orderBy("timestamp", "desc"),
-                limit(50) // جلب آخر 50 رسالة
+                // ⭐️ التعديل الثاني: جلب الأقدم أولاً
+                orderBy("timestamp", "asc"), 
+                limit(50) 
             );
 
             onSnapshot(messagesQuery, (snapshot) => {
@@ -299,7 +303,7 @@
                     messages.push(doc.data());
                 });
 
-                messages.reverse().forEach(msg => {
+                messages.forEach(msg => { // عرض الرسائل بترتيب الجلب (الأقدم ثم الأحدث)
                     displayMessage(msg);
                 });
                 
@@ -312,7 +316,7 @@
             });
         }
         
-        // --- عرض الرسالة في الواجهة ---
+        // --- عرض الرسالة في الواجهة (نفس الكود) ---
         function displayMessage(message) {
             const messageRow = document.createElement('div');
             messageRow.className = `message-row ${message.sender === currentUser.email ? 'sender' : 'receiver'}`;
@@ -323,112 +327,5 @@
             let contentHTML = '';
             
             if (message.type === 'gif' && message.content) {
-                // عرض الصورة إذا كانت GIF
                 contentHTML = `<img src="${message.content}" alt="GIF" class="chat-gif">`;
             } else {
-                // عرض النص إذا كانت رسالة نصية
-                contentHTML = message.content || '...';
-            }
-
-            const time = message.timestamp ? new Date(message.timestamp.toDate()).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : 'جاري الإرسال..';
-            
-            bubble.innerHTML = `${contentHTML}<span class="message-time">${time}</span>`;
-            messageRow.appendChild(bubble);
-            
-            chatMessagesContainer.appendChild(messageRow);
-        }
-
-        // ------------------------------------
-        // منطق الإيموجي
-        // ------------------------------------
-        const emojis = ['😀', '😂', '😍', '👍', '🙏', '❤️', '🔥', '🎉', '🌟', '😊'];
-        
-        function setupEmojiPicker() {
-            emojis.forEach(emoji => {
-                const span = document.createElement('span');
-                span.textContent = emoji;
-                span.className = 'emoji-item';
-                span.onclick = () => {
-                    messageInput.value += emoji;
-                    messageInput.focus();
-                };
-                emojiPicker.appendChild(span);
-            });
-
-            emojiBtn.addEventListener('click', () => {
-                // إخفاء GIF إذا كان مفتوحاً
-                gifPickerContainer.classList.remove('show');
-                emojiPicker.classList.toggle('show');
-            });
-        }
-
-        // ------------------------------------
-        // منطق GIF (يتطلب ملف api.js لـ GIPHY_API_KEY)
-        // ------------------------------------
-        let gifTimeout = null;
-        
-        function setupGifPicker() {
-            gifBtn.addEventListener('click', () => {
-                // إخفاء الإيموجي إذا كان مفتوحاً
-                emojiPicker.classList.remove('show');
-                gifPickerContainer.classList.toggle('show');
-                if (gifPickerContainer.classList.contains('show')) {
-                    searchGifs('trending'); // عرض الشائع عند الفتح
-                }
-            });
-
-            gifSearchInput.addEventListener('input', () => {
-                clearTimeout(gifTimeout);
-                gifTimeout = setTimeout(() => {
-                    const query = gifSearchInput.value.trim();
-                    searchGifs(query || 'trending');
-                }, 500);
-            });
-        }
-
-        async function searchGifs(query) {
-            const apiKey = window.GIPHY_API_KEY; // يفترض أن المفتاح موجود في api.js
-            if (!apiKey) {
-                gifResults.innerHTML = '<p style="color:red; text-align:center;">خطأ: GIPHY API Key مفقود في api.js</p>';
-                return;
-            }
-
-            let url = '';
-            if (query === 'trending') {
-                url = `https://api.giphy.com/v1/gifs/trending?api_key=${apiKey}&limit=10&rating=g`;
-            } else {
-                url = `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${encodeURIComponent(query)}&limit=10&rating=g`;
-            }
-
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                gifResults.innerHTML = ''; // مسح النتائج القديمة
-                
-                if (data.data.length === 0) {
-                    gifResults.innerHTML = '<p style="text-align:center;">لا توجد نتائج مطابقة.</p>';
-                    return;
-                }
-                
-                data.data.forEach(gif => {
-                    const imgUrl = gif.images.fixed_height.url;
-                    const item = document.createElement('div');
-                    item.className = 'gif-item';
-                    item.innerHTML = `<img src="${imgUrl}" alt="GIF">`;
-                    item.onclick = () => {
-                        sendMessage('gif', imgUrl);
-                        gifPickerContainer.classList.remove('show');
-                    };
-                    gifResults.appendChild(item);
-                });
-
-            } catch (error) {
-                console.error("Error fetching GIFs:", error);
-                gifResults.innerHTML = '<p style="color:red; text-align:center;">فشل جلب صور GIF.</p>';
-            }
-        }
-
-    </script>
-</body>
-</html>
