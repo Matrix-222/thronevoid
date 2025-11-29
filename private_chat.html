@@ -37,23 +37,25 @@
             padding: 15px;
             overflow-y: auto;
             display: flex;
-            /* الترتيب: القديم في الأعلى، الجديد في الأسفل */
             flex-direction: column; 
         }
 
         .message-row {
             display: flex;
             margin-bottom: 10px;
+            align-items: flex-end; /* لمحاذاة الأفاتار والفقاعة */
         }
 
         /* رسائل المرسل (أنا) */
         .message-row.sender {
-            justify-content: flex-end; 
+            flex-direction: row-reverse; /* الأفاتار على اليسار، الفقاعة على اليمين */
+            justify-content: flex-start;
         }
 
         /* رسائل المستلم (الطرف الآخر) */
         .message-row.receiver {
-            justify-content: flex-start; 
+            flex-direction: row; /* الأفاتار على اليمين، الفقاعة على اليسار */
+            justify-content: flex-start;
         }
 
         .message-bubble {
@@ -65,6 +67,8 @@
             word-wrap: break-word; 
             text-align: right; 
             direction: rtl;
+            margin-left: 10px; 
+            margin-right: 10px; 
         }
 
         .message-row.sender .message-bubble {
@@ -72,6 +76,8 @@
             color: var(--primary-dark);
             border-bottom-right-radius: 0;
             border-bottom-left-radius: 20px;
+            margin-right: 0; 
+            margin-left: 10px; 
         }
 
         .message-row.receiver .message-bubble {
@@ -79,6 +85,8 @@
             color: var(--text-light);
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 20px;
+            margin-left: 0;
+            margin-right: 10px;
         }
         
         .message-time {
@@ -92,6 +100,7 @@
         .message-row.receiver .message-time {
              color: rgba(255, 255, 255, 0.7);
         }
+
 
         .chat-input {
             padding: 15px;
@@ -173,7 +182,8 @@
             onSnapshot, 
             addDoc,
             getDoc,
-            serverTimestamp
+            serverTimestamp,
+            updateDoc // ⭐️ جديد: لاستخدام تعديل الرسائل
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // *** مفاتيح مشروعك الفعلي (thronevoid) - تأكد من صحتها ***
@@ -192,6 +202,8 @@
         const db = getFirestore(app);
 
         let currentUser = null;
+        let currentUserGender = null; // ⭐️ جديد: جنس المستخدم الحالي
+        let chatPartnerGender = null; // ⭐️ جديد: جنس الشريك
         let chatPartnerEmail = null;
         let chatId = null;
         const chatMessagesContainer = document.getElementById('chatMessages');
@@ -206,6 +218,7 @@
         const gifSearchInput = document.getElementById('gifSearchInput');
         const gifResults = document.getElementById('gifResults');
 
+        // جلب الإيميل من الرابط
         const urlParams = new URLSearchParams(window.location.search);
         chatPartnerEmail = urlParams.get('user');
 
@@ -214,12 +227,15 @@
             window.location.href = 'chat.html';
         }
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => { // ⭐️ تم إضافة async
             if (user) {
                 currentUser = user;
                 chatId = getChatId(currentUser.email, chatPartnerEmail);
                 
-                fetchChatPartnerName(chatPartnerEmail);
+                // ⭐️ جلب معلومات جنس المستخدم الحالي
+                await fetchCurrentUserInfo(currentUser.email); 
+                // ⭐️ جلب معلومات الشريك
+                await fetchChatPartnerName(chatPartnerEmail);
                 
                 listenForMessages();
 
@@ -236,12 +252,25 @@
             }
         });
         
-        // --- دالة توليد ID المحادثة ---
         function getChatId(email1, email2) {
             return email1 < email2 ? `${email1}_${email2}` : `${email2}_${email1}`;
         }
         
-        // --- جلب اسم شريك الدردشة ---
+        // ⭐️ جديد: دالة جلب معلومات المستخدم الحالي
+        async function fetchCurrentUserInfo(email) {
+            try {
+                const docRef = doc(db, "users", email);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    currentUserGender = data.gender; // افتراض أن حقل الجنس هو 'male' أو 'female'
+                }
+            } catch (error) {
+                console.error("Error fetching current user info:", error);
+            }
+        }
+        
+        // ⭐️ تم تعديل: دالة جلب اسم الشريك (لجلب الجنس أيضاً)
         async function fetchChatPartnerName(email) {
             try {
                 const docRef = doc(db, "users", email);
@@ -249,6 +278,7 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     const name = data.username || email.split('@')[0];
+                    chatPartnerGender = data.gender; // افتراض أن حقل الجنس هو 'male' أو 'female'
                     chatPartnerNameElement.textContent = `محادثة مع: ${name}`;
                 } else {
                     chatPartnerNameElement.textContent = `محادثة مع: ${email}`;
@@ -259,7 +289,6 @@
             }
         }
         
-        // --- إرسال رسالة نصية أو GIF ---
         async function sendMessage(type = 'text', content = messageInput.value.trim()) {
             if (content === '') return;
 
@@ -272,7 +301,8 @@
                     receiver: chatPartnerEmail,
                     content: content,
                     type: type, 
-                    timestamp: serverTimestamp()
+                    timestamp: serverTimestamp(),
+                    edited: false // ⭐️ جديد: مؤشر للتعديل
                 });
                 
                 messageInput.value = '';
@@ -283,23 +313,22 @@
             }
         }
 
-        // --- مراقبة الرسائل الجديدة (تم تثبيت الإصلاح) ---
+        // --- مراقبة الرسائل الجديدة (لجلب ID الرسالة) ---
         function listenForMessages() {
             const messagesQuery = query(
                 collection(db, "chats", chatId, "messages"),
-                // جلب الأقدم أولاً
                 orderBy("timestamp", "asc"), 
                 limit(50) 
             );
 
             onSnapshot(messagesQuery, (snapshot) => {
-                // حفظ حالة التمرير الحالية قبل مسح المحتوى
                 const shouldScroll = chatMessagesContainer.scrollTop + chatMessagesContainer.clientHeight >= chatMessagesContainer.scrollHeight;
                 
                 chatMessagesContainer.innerHTML = '';
                 const messages = [];
                 snapshot.forEach((doc) => {
-                    messages.push(doc.data());
+                    // ⭐️ جلب ID الرسالة (doc.id) للاستخدام في التعديل
+                    messages.push({ ...doc.data(), id: doc.id }); 
                 });
 
                 messages.forEach(msg => { 
@@ -310,9 +339,7 @@
                      chatMessagesContainer.innerHTML = '<p style="text-align: center; color: var(--text-muted);">ابدأ المحادثة!</p>';
                 }
                 
-                // التمرير التلقائي: فقط إذا كنا بالفعل في الأسفل أو إذا كانت هذه أول رسالة
                 if (shouldScroll || snapshot.docChanges().length === messages.length) {
-                    // نستخدم setTimeout لضمان اكتمال العرض قبل التمرير
                     setTimeout(() => {
                         chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
                     }, 50); 
@@ -320,32 +347,143 @@
             });
         }
         
-        // --- عرض الرسالة في الواجهة ---
+        // --- عرض الرسالة في الواجهة (تم التعديل للأفاتار والتعديل) ---
         function displayMessage(message) {
+            const isSender = message.sender === currentUser.email;
+            // ⭐️ تحديد جنس المرسل لعرض الأفاتار
+            const senderGender = isSender ? currentUserGender : chatPartnerGender;
+
             const messageRow = document.createElement('div');
-            messageRow.className = `message-row ${message.sender === currentUser.email ? 'sender' : 'receiver'}`;
+            messageRow.className = `message-row ${isSender ? 'sender' : 'receiver'}`;
+            messageRow.dataset.messageId = message.id;
+
+            // ⭐️ منطق الأفاتار
+            const avatar = document.createElement('div');
+            // استخدام الفئة بناءً على الجنس أو القيمة الافتراضية
+            avatar.className = `avatar ${senderGender || 'male'}`; 
+            // إضافة نص بسيط للأفاتار الافتراضي
+            avatar.textContent = (senderGender || 'male') === 'male' ? 'M' : 'F';
+            messageRow.appendChild(avatar); 
             
+            // --- فقاعة الرسالة والمحتوى ---
             const bubble = document.createElement('div');
             bubble.className = 'message-bubble';
             
-            let contentHTML = '';
+            let contentHTML = message.content || '...';
             
             if (message.type === 'gif' && message.content) {
                 contentHTML = `<img src="${message.content}" alt="GIF" class="chat-gif">`;
-            } else {
-                contentHTML = message.content || '...';
-            }
+            } 
+            
+            // ⭐️ مؤشر التعديل
+            const editedTag = message.edited ? `<span style="font-size:0.7em; color:var(--text-muted); margin-right: 5px;"> (مُعدّلة)</span>` : '';
 
             const time = message.timestamp ? new Date(message.timestamp.toDate()).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : 'جاري الإرسال..';
             
-            bubble.innerHTML = `${contentHTML}<span class="message-time">${time}</span>`;
+            
+            // ⭐️ زر التعديل (فقط للمرسل والرسائل النصية)
+            if (isSender && message.type === 'text') {
+                const editIcon = document.createElement('span');
+                editIcon.className = 'edit-icon';
+                editIcon.innerHTML = '✏️';
+                editIcon.title = 'تعديل الرسالة';
+                // تمرير ID الرسالة والمحتوى الأصلي للدالة
+                editIcon.onclick = (e) => startEdit(e, message.content, message.id);
+                bubble.appendChild(editIcon);
+            }
+            
+            bubble.innerHTML += `${contentHTML}${editedTag}<span class="message-time">${time}</span>`;
             messageRow.appendChild(bubble);
             
             chatMessagesContainer.appendChild(messageRow);
         }
 
         // ------------------------------------
-        // منطق الإيموجي و GIF
+        // ⭐️ منطق تعديل الرسائل (جديد)
+        // ------------------------------------
+        function startEdit(event, originalContent, messageId) {
+            event.stopPropagation();
+
+            const bubble = event.target.closest('.message-bubble');
+            
+            // منع بدء التعديل إذا كنا بالفعل في وضع التعديل
+            if (bubble.classList.contains('edit-mode')) return;
+
+            // حفظ HTML الأصلي للفقاعة (لتجنب فقاعة GIF)
+            const contentOnly = originalContent; 
+            
+            // حفظ HTML الأصلي للاسترجاع عند الإلغاء
+            bubble.dataset.originalHtml = bubble.innerHTML;
+            
+            bubble.innerHTML = '';
+            bubble.classList.add('edit-mode');
+
+            // إنشاء حقل الإدخال
+            const editInput = document.createElement('input');
+            editInput.type = 'text';
+            editInput.value = contentOnly;
+            editInput.style.direction = 'rtl';
+            editInput.style.textAlign = 'right';
+            bubble.appendChild(editInput);
+
+            // زر الحفظ
+            const saveBtn = document.createElement('button');
+            saveBtn.textContent = 'حفظ';
+            saveBtn.className = 'save-btn';
+            saveBtn.onclick = () => saveEdit(messageId, editInput.value, bubble);
+            bubble.appendChild(saveBtn);
+
+            // زر الإلغاء
+            const cancelBtn = document.createElement('button');
+            cancelBtn.textContent = 'إلغاء';
+            cancelBtn.style.backgroundColor = '#6c757d'; 
+            cancelBtn.className = 'save-btn';
+            cancelBtn.onclick = () => cancelEdit(bubble);
+            bubble.appendChild(cancelBtn);
+
+            editInput.focus();
+            
+            editInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    saveEdit(messageId, editInput.value, bubble);
+                }
+            });
+        }
+
+        function cancelEdit(bubble) {
+            // استرجاع المحتوى الأصلي
+            bubble.innerHTML = bubble.dataset.originalHtml;
+            bubble.classList.remove('edit-mode');
+            delete bubble.dataset.originalHtml;
+        }
+
+        async function saveEdit(messageId, newContent, bubble) {
+            if (newContent.trim() === '') {
+                alert("لا يمكن حفظ رسالة فارغة.");
+                return;
+            }
+            
+            try {
+                const messageRef = doc(db, "chats", chatId, "messages", messageId);
+                await updateDoc(messageRef, {
+                    content: newContent.trim(),
+                    edited: true, 
+                    timestamp: serverTimestamp() 
+                });
+
+                // إعادة UI مؤقتًا لحين تحديث onSnapshot
+                bubble.innerHTML = `<p style="margin:0;">... جاري التعديل ...</p>`;
+                bubble.classList.remove('edit-mode');
+
+            } catch (error) {
+                console.error("Error updating message:", error);
+                alert("فشل في تعديل الرسالة.");
+                cancelEdit(bubble);
+            }
+        }
+        
+        // ------------------------------------
+        // منطق الإيموجي و GIF (نفس الكود)
         // ------------------------------------
         const emojis = ['😀', '😂', '😍', '👍', '🙏', '❤️', '🔥', '🎉', '🌟', '😊'];
         
