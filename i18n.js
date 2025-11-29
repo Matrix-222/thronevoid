@@ -22,7 +22,7 @@ const translations = {
         'CHAT_MESSAGE_PLACEHOLDER': 'Type your message here...',
         'SEND_MESSAGE': 'Send',
         'ADVANCED_FILTERS': 'Advanced Filters',
-        'NEW_MESSAGE_NOTIFICATION': 'New Message from', // جديد
+        'NEW_MESSAGE_NOTIFICATION': 'New Message from', // مفتاح جديد
         
         // Login/Auth 
         'SIGN_IN_EMAIL_TITLE': 'Sign In with Email',
@@ -77,7 +77,7 @@ const translations = {
         'CHAT_MESSAGE_PLACEHOLDER': 'اكتب رسالتك هنا...',
         'SEND_MESSAGE': 'إرسال',
         'ADVANCED_FILTERS': 'تصفية متقدمة',
-        'NEW_MESSAGE_NOTIFICATION': 'رسالة جديدة من', // جديد
+        'NEW_MESSAGE_NOTIFICATION': 'رسالة جديدة من', // مفتاح جديد
 
         // تسجيل الدخول/المصادقة 
         'SIGN_IN_EMAIL_TITLE': 'تسجيل الدخول بالبريد الإلكتروني',
