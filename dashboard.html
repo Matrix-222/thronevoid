@@ -3,62 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Throne Void</title>
+    <title data-i18n="DASHBOARD_TITLE">Dashboard - Throne Void</title>
     <link rel="stylesheet" href="style.css"> 
+    
     <style>
         /* التنسيقات الإضافية للداشبورد */
         .container { 
-            background: #1f2a36; 
+            background: rgba(31, 42, 54, 0.9); /* خلفية داكنة بشفافية خفيفة */
             padding: 40px; 
             border-radius: 12px; 
-            max-width: 800px; 
-            margin: 0 auto; 
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            max-width: 950px; /* زيادة العرض لاستيعاب اللعبة */
+            margin: 40px auto; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
             border: 1px solid var(--accent-yellow);
+            position: relative;
+            z-index: 10;
         }
         /* سنستخدم هذا الـ ID لتحميل اللعبة داخله */
         #game-container {
             width: 100%;
-            height: 400px; /* يمكن تعديل الارتفاع حسب الرغبة */
+            height: 400px; 
             margin: 20px auto;
-            background-color: #121212;
-            border: 2px solid #3498db;
+            background-color: #05050f; /* لون فضائي داكن */
+            border: 2px solid var(--accent-red);
+            /* لضمان أن Phaser يملأ الكونتينر */
+            overflow: hidden; 
         }
-        #highScoreDisplay { color: var(--accent-yellow); margin-bottom: 15px; } 
+        #highScoreDisplay { 
+            color: var(--accent-yellow); 
+            margin-bottom: 15px; 
+        } 
+        /* تنسيق لعرض الطاقة */
+        .energy-display {
+            color: #2ecc71; 
+            margin-right: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+            padding: 8px 15px;
+            border: 1px solid #2ecc71;
+            border-radius: 4px;
+        }
     </style>
     
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
 
 </head>
 <body>
+    
+    <video autoplay muted loop id="background-video">
+        <source src="background_void.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
     <header>
         <h1>THRONES OF THE VOID</h1>
         <div>
-            <button onclick="window.location='settings.html'" style="background-color: #3498db;">SETTINGS</button>
-            <button onclick="window.location='leaderboard.html'" style="background-color: var(--accent-yellow); color: var(--primary-dark);">LEADERBOARD</button>
-            <button id="logoutBtn" style="background-color: var(--accent-red);">LOGOUT</button>
+            <span id="currentEnergy" class="energy-display">⚡ 0 Energy</span> 
+            
+            <button onclick="window.location='store.html'" style="background-color: #2ecc71;" data-i18n="STORE">المتجر</button>
+            <button onclick="window.location='chat.html'" style="background-color: #E31B23;" data-i18n="ALLIANCES_CHAT">شات التحالفات</button>
+            
+            <button onclick="window.location='settings.html'" style="background-color: #3498db;" data-i18n="SETTINGS">الإعدادات</button>
+            <button id="logoutBtn" style="background-color: var(--accent-red);" data-i18n="LOGOUT">تسجيل الخروج</button>
+            
+            <button id="langToggleBtn" style="background-color: #3498db;">🌐 English</button>
         </div>
     </header>
 
     <main>
         <div class="container">
-            <h1>أهلاً بك أيها المحارب!</h1>
-            <p>تم تسجيل دخولك باسم المستخدم: <span id="userEmailDisplay" style="color: #2ecc71;">جاري التحميل...</span></p>
+            <h1 data-i18n="WELCOME_WARLORD">أهلاً بك أيها المحارب!</h1>
+            <p data-i18n="LOGGED_IN_AS">تم تسجيل دخولك باسم المستخدم:</p>
+            <span id="userEmailDisplay" style="color: #2ecc71; font-size: 1.1em; font-weight: bold;">جاري التحميل...</span>
             
-            <p id="highScoreDisplay">أعلى نتيجة لديك: 0</p>
+            <p id="highScoreDisplay" data-i18n="HIGH_SCORE_DISPLAY">أعلى نتيجة لديك: 0</p>
             
-            <p style="margin-top: 10px;">استخدم الأسهم للحركة والمسافة (Space) لإطلاق النار. اللعبة تستخدم محرك Phaser الاحترافي.</p>
+            <p style="margin-top: 10px;" data-i18n="GAME_INSTRUCTIONS">استخدم الأسهم للحركة والمسافة (Space) لإطلاق النار. اللعبة تستخدم محرك Phaser الاحترافي.</p>
 
             <div id="game-container"></div>
             
         </div>
     </main>
 
+    <script src="i18n.js"></script>
+    
     <script type="module">
         // استيراد مكتبات Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // *** مفاتيح مشروعك الفعلي (thronevoid) ***
         const firebaseConfig = {
@@ -77,20 +110,28 @@
 
         let currentUserEmail = null;
         let currentHighScore = 0; 
+        const energyDisplay = document.getElementById('currentEnergy');
         
-        // --- دوال Firebase (كما هي) ---
-        async function loadHighScore(email) {
+        // --- دوال Firebase للنتائج والطاقة ---
+        async function loadUserData(email) {
             const userDocRef = doc(db, "users", email);
             try {
                 const docSnap = await getDoc(userDocRef);
-                if (docSnap.exists() && docSnap.data().highScore !== undefined) {
-                    currentHighScore = docSnap.data().highScore;
-                    document.getElementById('highScoreDisplay').innerText = `أعلى نتيجة لديك: ${currentHighScore}`;
-                } else {
-                    document.getElementById('highScoreDisplay').innerText = `أعلى نتيجة لديك: 0`;
+                let energy = 0;
+                
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    
+                    // تحديث أعلى نتيجة
+                    currentHighScore = data.highScore !== undefined ? data.highScore : 0;
+                    document.getElementById('highScoreDisplay').innerText = `${translations['HIGH_SCORE_DISPLAY'][loadLanguage()]}: ${currentHighScore}`;
+                    
+                    // تحديث الطاقة
+                    energy = data.energy !== undefined ? data.energy : 0;
                 }
+                energyDisplay.textContent = `⚡ ${energy} Energy`;
             } catch (error) {
-                console.error("Error loading high score:", error);
+                console.error("Error loading user data:", error);
             }
         }
 
@@ -98,12 +139,20 @@
             if (newScore > currentHighScore && currentUserEmail) {
                 const userDocRef = doc(db, "users", currentUserEmail);
                 try {
+                    // حفظ النتيجة الجديدة
                     await setDoc(userDocRef, { highScore: newScore }, { merge: true });
+                    
+                    // خصم 10 وحدات طاقة عند انتهاء اللعبة (مثال لاستخدام الطاقة)
+                    await updateDoc(userDocRef, { energy: increment(-10) });
+                    
                     currentHighScore = newScore;
-                    document.getElementById('highScoreDisplay').innerText = `أعلى نتيجة لديك: ${currentHighScore} (تم تحديثها!)`;
-                    console.log("High score saved successfully!");
+                    document.getElementById('highScoreDisplay').innerText = `${translations['HIGH_SCORE_DISPLAY'][loadLanguage()]}: ${currentHighScore} (${translations['UPDATED_TEXT'][loadLanguage()]})`;
+                    
+                    // تحديث عرض الطاقة بعد الخصم
+                    loadUserData(currentUserEmail); 
+
                 } catch (error) {
-                    console.error("Error saving high score:", error);
+                    console.error("Error saving high score/deducting energy:", error);
                 }
             }
         }
@@ -113,7 +162,7 @@
             if (user) {
                 currentUserEmail = user.email;
                 document.getElementById('userEmailDisplay').innerText = currentUserEmail;
-                loadHighScore(currentUserEmail);
+                loadUserData(currentUserEmail);
                 // ** تشغيل لعبة Phaser فقط بعد التأكد من تسجيل الدخول **
                 initPhaserGame(); 
             } else {
@@ -130,16 +179,39 @@
             });
         });
 
-        // --- كود لعبة قتال فضائي احترافية باستخدام Phaser 3 ---
+        // -------------------------------------------------------------
+        //               🔥 كود اللغة (من ملف i18n.js) 🔥
+        // -------------------------------------------------------------
+        
+        let currentLang = loadLanguage();
+        
+        // تحديث زر التبديل بناءً على اللغة الحالية
+        const langBtn = document.getElementById('langToggleBtn');
+        function updateLangButton(lang) {
+            langBtn.textContent = lang === 'ar' ? '🌐 English' : '🌐 العربية';
+        }
+        updateLangButton(currentLang);
+        
+        // دالة التبديل عند الضغط على الزر
+        langBtn.addEventListener('click', () => {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            setLanguage(currentLang);
+            updateLangButton(currentLang);
+            loadUserData(currentUserEmail); // تحديث أي نصوص ديناميكية تعتمد على اللغة
+        });
+
+
+        // -------------------------------------------------------------
+        //             🚀 كود لعبة قتال فضائي (Phaser 3) 🚀
+        // -------------------------------------------------------------
         
         function initPhaserGame() {
-            // كود Phaser يتطلب تحميل مكتبته أولاً (في وسم <script> أعلى الصفحة)
             
             const config = {
                 type: Phaser.AUTO,
                 width: 600,
                 height: 400,
-                parent: 'game-container', // يجب أن يتطابق مع الـ ID في HTML
+                parent: 'game-container', 
                 physics: {
                     default: 'arcade',
                     arcade: {
@@ -157,7 +229,7 @@
             const game = new Phaser.Game(config);
 
             let player;
-            let stars; // نجوم أو أعداء
+            let stars; 
             let cursors;
             let score = 0;
             let scoreText;
@@ -165,19 +237,16 @@
 
             function preload ()
             {
-                // لكي تعمل اللعبة بشكل صحيح، تحتاج إلى توفير صور للأصول (Assets)
-                // هنا نستخدم لون كبديل للصورة لتشغيل الكود.
-                this.load.image('starfield', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFXQAAAF0AQHwI3kAAAAOSURBVBhXY3R1/A8DCIAEAAIHAQfBvO9sAAAAAElFTkSuQmCC'); // خلفية سوداء كبديل
-                this.load.image('ship', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAAB3RJTUUH5QgVDA0gE6I+eAAAAMZJREFUSEvtljEOgDAIxP+v2Jt2t0l637gDBp2M5r4fCgLg/wEQpL3d40E8A8F9wD5tI8KqL9j+sNdw8t7W5g6gA8gB1+b205oEa9BqgRpoA9bAPF7o0k/oD703E6lVvVd3YmK036yF093L3L85oT8Y9K79hHwgR2wF5dE9/kGk/iP8y40wAGm+q888wB696zO96v6g/jMTRF4gQvYg0e9A7w3x5y/jM0l8QIvYN/34d9X7g99AAAAAElFTkSuQmCC'); // صورة سفينة افتراضية (مربع أخضر)
-                this.load.image('laser', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAACCAYAAAB7XA/XAAAABmJLR0QA/wD/AP+gvaeTAAAAB3RJTUUH5QgVDA0yD1n7zAAAADJJREFUCBNjYWBg2AYyJgYQkEAwMDIxMjMyBghA3AwM/k3YDAwMDYxM0gIMw9C1AwBN3QySgKkX5AAAAABJRU5ErkJggg=='); // ليزر افتراضي (خط أزرق)
+                // *** لتشغيل هذا الكود بشكل احترافي، قم بتوفير ملفات الصور الحقيقية ***
+                this.load.image('starfield', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFXQAAAF0AQHwI3kAAAAOSURBVBhXY3R1/A8DCIAEAAIHAQfBvO9sAAAAAElFTkSuQmCC'); 
+                this.load.image('ship', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAAB3RJTUUH5QgVDA0gE6I+eAAAAMZJREFUSEvtljEOgDAIxP+v2Jt2t0l637gDBp2M5r4fCgLg/wEQpL3d40E8A8F9wD5tI8KqL9j+sNdw8t7W5g6gA8gB1+b205oEa9BqgRpoA9bAPF7o0k/oD703E6lVvVd3YmK036yF093L3L85oT8Y9K79hHwgR2wF5dE9/kGk/iP8y40wAGm+q888wB696zO96v6g/jMTRF4gQvYg0e9A7w3x5y/jM0l8QIvYN/34d9X7g99AAAAAElFTkSuQmCC'); 
+                this.load.image('laser', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAACCAYAAAB7XA/XAAAABmJLR0QA/wD/AP+gvaeTAAAAB3RJTUUH5QgVDA0yD1n7zAAAADJJREFUCBNjYWBg2AYyJgYQkEAwMDIxMjMyBghA3AwM/k3YDAwMDYxM0gIMw9C1AwBN3QySgKkX5AAAAABJRU5ErkJggg=='); 
             }
 
             function create ()
             {
-                // إعداد خلفية اللعبة
                 this.add.tileSprite(0, 0, config.width, config.height, 'starfield').setOrigin(0, 0);
 
-                // اللاعب
                 player = this.physics.add.image(config.width / 2, config.height - 50, 'ship').setDepth(1);
                 player.setCollideWorldBounds(true);
                 player.setDrag(100);
@@ -185,29 +254,25 @@
                 player.setMaxVelocity(200);
                 player.health = 100;
                 
-                // الأعداء (كمجموعة)
                 stars = this.physics.add.group({
-                    key: 'laser', // نستخدم الليزر كبديل مؤقت لظهور نقاط الأعداء
+                    key: 'laser', 
                     repeat: 11,
                     setXY: { x: 12, y: 0, stepX: 70 }
                 });
 
                 stars.children.iterate(function (child) {
-                    child.setTint(0xffc700); // لون أصفر للأعداء
+                    child.setTint(0xffc700); 
                     child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
                     child.setCollideWorldBounds(true);
                     child.setVelocityY(Phaser.Math.Between(50, 100));
                 });
                 
-                // مدخلات التحكم
                 cursors = this.input.keyboard.createCursorKeys();
                 this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
 
-                // عرض النتيجة
                 scoreText = this.add.text(16, 16, 'SCORE: 0\nHEALTH: 100', { fontSize: '18px', fill: '#FFC700' }).setDepth(2);
 
-                // إضافة تصادم بين اللاعب والأعداء (مؤقت)
                 this.physics.add.collider(player, stars, hitStar, null, this);
             }
 
@@ -218,7 +283,6 @@
                     return;
                 }
 
-                // تحريك اللاعب بالأسهم
                 if (cursors.left.isDown)
                 {
                     player.setAngularVelocity(-150);
@@ -241,10 +305,7 @@
                     player.setAcceleration(0);
                 }
                 
-                // إطلاق النار بالمسافة (Space) - يمكنك تطوير هذه الدالة لتطلق ليزر
                 if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
-                   // يتم تطوير نظام إطلاق النار في إصدارات Phaser الأكثر تعقيدًا
-                   // هنا سنقوم فقط بزيادة النتيجة كبديل بسيط
                    score += 5;
                    scoreText.setText('SCORE: ' + score + '\nHEALTH: ' + player.health);
                 }
@@ -252,7 +313,6 @@
 
             function hitStar (player, star)
             {
-                // دالة عند اصطدام اللاعب بالعدو
                 star.disableBody(true, true);
                 player.health -= 20;
 
@@ -263,7 +323,6 @@
                     this.physics.pause();
                     player.setTint(0xff0000);
                     gameOver = true;
-                    // حفظ أعلى نتيجة هنا
                     saveHighScore(score); 
                 }
             }
