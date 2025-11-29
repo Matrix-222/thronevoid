@@ -6,6 +6,7 @@
     <title data-i18n="PRIVATE_CHAT_TITLE">الدردشة الخاصة</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        /* تصميم صندوق الدردشة */
         .chat-area {
             max-width: 800px;
             margin: 40px auto;
@@ -16,6 +17,7 @@
             display: flex;
             flex-direction: column;
         }
+        /* حاوية الرسائل */
         #messagesContainer {
             flex-grow: 1;
             overflow-y: auto;
@@ -24,6 +26,7 @@
             flex-direction: column;
             gap: 10px;
         }
+        /* تصميم الرسالة الفردية */
         .message-item {
             padding: 10px 15px;
             border-radius: 15px;
@@ -31,12 +34,14 @@
             word-wrap: break-word;
             font-size: 0.95em;
         }
+        /* رسائل المستخدم الحالي */
         .self-msg {
             background-color: var(--accent-blue);
             align-self: flex-start;
             margin-right: auto;
             border-top-right-radius: 0;
         }
+        /* رسائل الطرف الآخر */
         .other-msg {
             background-color: #3a3a3a; 
             align-self: flex-end;
@@ -49,6 +54,7 @@
             margin-top: 5px;
             text-align: left;
         }
+        /* منطقة إدخال الرسائل */
         .input-area {
             display: flex;
             padding: 15px;
@@ -127,6 +133,10 @@
         const messageInput = document.getElementById('messageInput');
         const chatPartnerName = document.getElementById('chatPartnerName');
 
+        /**
+         * تحدد معرف الدردشة (chatId) بترتيب أبجدي لبريدي المستخدمين.
+         * مثال: a@mail_b@mail
+         */
         function getChatId(email1, email2) {
             const sortedEmails = [email1, email2].sort();
             return sortedEmails.join('_');
@@ -140,10 +150,12 @@
             }
             
             currentUser = user;
+            // 1. تحديد الـ chatId بناءً على إيميل المستخدم الحالي وإيميل الطرف الآخر
             chatId = getChatId(currentUser.email, chatPartnerEmail);
             
             await fetchPartnerInfo(chatPartnerEmail);
             
+            // 2. بدء الاستماع للرسائل الجديدة
             startChatListener();
         });
         
@@ -157,10 +169,12 @@
             document.title = `${loadLanguage('PRIVATE_CHAT_TITLE')} - ${partnerName}`;
         }
 
-
+        /**
+         * تبدأ الاستماع للرسائل الجديدة في Firestore في الوقت الفعلي (Real-time).
+         */
         function startChatListener() {
             if (unsubscribeListener) {
-                unsubscribeListener();
+                unsubscribeListener(); // إيقاف الاستماع القديم إذا وجد
             }
             
             const chatRef = collection(db, "chats", chatId, "messages");
@@ -176,6 +190,7 @@
                     if (change.type === "added") {
                         const messageData = change.doc.data();
                         messagesContainer.appendChild(createMessageElement(messageData)); 
+                        // التمرير إلى أسفل الرسائل تلقائياً
                         messagesContainer.scrollTop = messagesContainer.scrollHeight;
                     }
                 });
@@ -187,6 +202,7 @@
         
         function createMessageElement(data) {
             const div = document.createElement('div');
+            // تحويل الطابع الزمني (Timestamp) إلى وقت محلي
             const date = data.timestamp && data.timestamp.toDate ? data.timestamp.toDate() : new Date();
             const timestampText = date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
             
@@ -200,18 +216,22 @@
             return div;
         }
 
+        /**
+         * ترسل الرسالة إلى Firestore.
+         */
         async function sendMessage() {
             const text = messageInput.value.trim();
             if (!text || !chatId) return;
 
             try {
+                // 3. إرسال الرسالة إلى مسار الدردشة الصحيح
                 await addDoc(collection(db, "chats", chatId, "messages"), {
                     senderEmail: currentUser.email,
                     text: text,
                     timestamp: serverTimestamp(),
                 });
 
-                messageInput.value = ''; 
+                messageInput.value = ''; // مسح حقل الإدخال
                 
             } catch (error) {
                 console.error("Error sending message:", error);
@@ -219,7 +239,10 @@
             }
         }
         
+        // ربط زر الإرسال بوظيفة sendMessage
         document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
+        
+        // دعم الإرسال عبر الضغط على مفتاح Enter
         messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 sendMessage();
