@@ -35,18 +35,20 @@ const translations = {
 
     // --- مفاتيح الخدمات الجديدة (store.html, chat.html) ---
     'STORE': { 'en': 'STORE', 'ar': 'المتجر' },
-    'ALLIANCES_CHAT': { 'en': 'ALLIANCES CHAT', 'ar': 'شات التحالفات' },
-    'CHAT_TITLE': { 'en': 'Alliance Global Chat', 'ar': 'الشات العالمي للتحالف' }, // جديد
-    'CHAT_PLACEHOLDER': { 'en': 'Type your message...', 'ar': 'اكتب رسالتك...' }, // جديد
-    'SEND': { 'en': 'Send', 'ar': 'إرسال' }, // جديد
-    'USER_MUTED_MESSAGE': { 'en': 'You are currently muted and cannot send messages.', 'ar': 'أنت مكتوم حالياً ولا يمكنك إرسال الرسائل.' }, // جديد
+    'GENERAL_CHAT': { 'en': 'GENERAL CHAT', 'ar': 'الشات العام' }, // جديد
+    'ALLIANCES_CHAT': { 'en': 'ALLIANCES CHAT', 'ar': 'شات التحالفات (خاص)' }, // تحديث
+    'CHAT_TITLE_GENERAL': { 'en': 'Global Public Chat', 'ar': 'الشات العام لجميع المحاربين' }, // جديد
+    'CHAT_TITLE_ALLIANCE': { 'en': 'Alliance Private Chat', 'ar': 'شات التحالف (الخاص)' }, // جديد
+    'CHAT_PLACEHOLDER': { 'en': 'Type your message...', 'ar': 'اكتب رسالتك...' },
+    'SEND': { 'en': 'Send', 'ar': 'إرسال' },
+    'USER_MUTED_MESSAGE': { 'en': 'You are currently muted and cannot send messages.', 'ar': 'أنت مكتوم حالياً ولا يمكنك إرسال الرسائل.' },
 
     // --- مفاتيح صفحة الإعدادات (settings.html) ---
     'SETTINGS_PAGE_TITLE': { 'en': 'Account and Game Settings', 'ar': 'إعدادات الحساب واللعبة' },
     'PROFILE_SETTINGS': { 'en': 'Profile Settings', 'ar': 'إعدادات الملف الشخصي' },
-    'USERNAME': { 'en': 'Username:', 'ar': 'اسم المستخدم:' }, // جديد
-    'CHANGE_USERNAME': { 'en': 'Change Username', 'ar': 'تغيير اسم المستخدم' }, // جديد
-    'SAVE_USERNAME': { 'en': 'Save Username', 'ar': 'حفظ الاسم' }, // جديد
+    'USERNAME': { 'en': 'Username:', 'ar': 'اسم المستخدم:' }, 
+    'CHANGE_USERNAME': { 'en': 'Change Username', 'ar': 'تغيير اسم المستخدم' }, 
+    'SAVE_USERNAME': { 'en': 'Save Username', 'ar': 'حفظ الاسم' },
     'CHANGE_AVATAR': { 'en': 'Change Profile Picture', 'ar': 'تغيير صورة البروفايل' },
     'CHOOSE_AVATAR': { 'en': 'Choose from Avatars:', 'ar': 'اختر من الأيقونات الجاهزة:' },
     'UPLOAD_IMAGE': { 'en': 'Upload New Image', 'ar': 'رفع صورة جديدة' },
