@@ -72,20 +72,19 @@
 
         <h1>THRONES OF THE VOID</h1>
         
-        <p data-i18n="PHONE_LOGIN_TITLE">أو سجل برقم الجوال</p> 
+        <p data-i18n="SIGN_IN">تسجيل الدخول</p> 
         
         <div class="input-group">
-            <input type="tel" id="phoneNumber" placeholder="+9665xxxxxxxx">
+            <input type="email" id="emailInput" placeholder="البريد الإلكتروني">
         </div>
-        
-        <div id="recaptcha-container"></div>
 
-        <button id="sendCodeBtn" data-i18n="SEND_VERIFICATION_CODE">إرسال رمز التحقق</button>
-        
-        <div class="input-group" style="margin-top: 20px;">
-            <input type="text" id="verificationCode" data-i18n="VERIFY_CODE_PLACEHOLDER" placeholder="أدخل رمز التحقق" style="display: none;">
-            <button id="verifyBtn" data-i18n="VERIFY" style="display: none;">تحقق</button>
+        <div class="input-group">
+            <input type="password" id="passwordInput" placeholder="كلمة المرور">
         </div>
+        
+        <button id="loginBtn" data-i18n="SIGN_IN">تسجيل الدخول</button>
+        
+        <p style="margin-top: 10px;"><a href="#" style="color: #9b59b6;" data-i18n="FORGOT_PASSWORD">نسيت كلمة المرور؟</a></p>
 
         <p style="margin-top: 20px;"><a href="register.html" style="color: var(--accent-yellow);" data-i18n="REGISTER">ليس لديك حساب؟ سجل الآن</a></p>
         
@@ -97,8 +96,8 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { 
             getAuth, 
-            signInWithPhoneNumber, 
-            RecaptchaVerifier 
+            signInWithEmailAndPassword, // دالة تسجيل الدخول بالإيميل
+            onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         
         // *** مفاتيح مشروعك الفعلي (thronevoid) ***
@@ -115,78 +114,37 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         
-        const phoneNumberInput = document.getElementById('phoneNumber');
-        const sendCodeBtn = document.getElementById('sendCodeBtn');
-        const verificationCodeInput = document.getElementById('verificationCode');
-        const verifyBtn = document.getElementById('verifyBtn');
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const loginBtn = document.getElementById('loginBtn');
         
-        let confirmationResult;
+        loginBtn.addEventListener('click', () => {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
 
-        window.onload = function() {
-            // إعداد RecaptchaVerifier
-            window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-                'size': 'normal',
-                'callback': (response) => {
-                    console.log("reCAPTCHA verified");
-                },
-                'expired-callback': () => {
-                    console.warn("reCAPTCHA expired");
-                    // استخدام دالة الترجمة العالمية
-                    alert(loadLanguage('LOGIN_ERROR_RECAPTCHA')); 
-                }
-            });
-        };
-
-        sendCodeBtn.addEventListener('click', () => {
-            const phoneNumber = phoneNumberInput.value.trim();
-            if (!phoneNumber) return;
-            
-            if (!window.recaptchaVerifier) {
-                alert(loadLanguage('LOGIN_ERROR_RECAPTCHA'));
+            if (!email || !password) {
+                alert("الرجاء إدخال البريد الإلكتروني وكلمة المرور.");
                 return;
             }
 
-            signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier)
-                .then((result) => {
-                    confirmationResult = result;
-                    alert("✅ تم إرسال رمز التحقق بنجاح!");
-                    
-                    sendCodeBtn.style.display = 'none';
-                    phoneNumberInput.disabled = true;
-                    verificationCodeInput.style.display = 'block';
-                    verifyBtn.style.display = 'block';
-                })
-                .catch((error) => {
-                    console.error("Error sending code:", error);
-                    // استخدام دالة الترجمة العالمية
-                    alert(loadLanguage('LOGIN_ERROR_PHONE_FORMAT')); 
-                    window.recaptchaVerifier.render().then(function(widgetId) {
-                        grecaptcha.reset(widgetId);
-                    });
-                });
-        });
-
-        verifyBtn.addEventListener('click', () => {
-            const code = verificationCodeInput.value.trim();
-            if (!code || !confirmationResult) return;
-
-            confirmationResult.confirm(code)
-                .then((result) => {
-                    const user = result.user;
-                    console.log("User signed in:", user);
-                    // استخدام دالة الترجمة العالمية
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // تسجيل الدخول ناجح
                     alert(loadLanguage('LOGIN_SUCCESS'));
                     window.location.href = "dashboard.html"; 
                 })
                 .catch((error) => {
-                    console.error("Error verifying code:", error);
+                    console.error("Login Error:", error.code, error.message);
                     // استخدام دالة الترجمة العالمية
                     alert(loadLanguage('LOGIN_FAIL'));
                 });
         });
 
-        auth.onAuthStateChanged(user => {
+
+        // إذا كان المستخدم مسجلاً الدخول بالفعل، يُعاد توجيهه
+        onAuthStateChanged(auth, user => {
             if (user) {
+                // يمكنك تفعيل هذا لإعادة التوجيه التلقائي
                 // window.location.href = "dashboard.html";
             }
         });
