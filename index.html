@@ -72,14 +72,14 @@
 
         <h1>THRONES OF THE VOID</h1>
         
-        <p data-i18n="SIGN_IN">تسجيل الدخول</p> 
+        <p data-i18n="SIGN_IN_EMAIL_TITLE">تسجيل الدخول</p> 
         
         <div class="input-group">
-            <input type="email" id="emailInput" placeholder="البريد الإلكتروني">
+            <input type="email" id="emailInput" data-i18n="EMAIL_PLACEHOLDER" placeholder="البريد الإلكتروني">
         </div>
 
         <div class="input-group">
-            <input type="password" id="passwordInput" placeholder="كلمة المرور">
+            <input type="password" id="passwordInput" data-i18n="PASSWORD_PLACEHOLDER" placeholder="كلمة المرور">
         </div>
         
         <button id="loginBtn" data-i18n="SIGN_IN">تسجيل الدخول</button>
@@ -96,11 +96,11 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { 
             getAuth, 
-            signInWithEmailAndPassword, // دالة تسجيل الدخول بالإيميل
+            signInWithEmailAndPassword, 
             onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         
-        // *** مفاتيح مشروعك الفعلي (thronevoid) ***
+        // *** مفاتيح مشروعك الفعلي (thronevoid) - تأكد من صحتها ***
         const firebaseConfig = {
             apiKey: "AIzaSyB-bfHRJW3E8KW3-o-PkNW6xi5ytrTKMJE", 
             authDomain: "thronevoid.firebaseapp.com",
@@ -123,19 +123,17 @@
             const password = passwordInput.value.trim();
 
             if (!email || !password) {
-                alert("الرجاء إدخال البريد الإلكتروني وكلمة المرور.");
+                alert(loadLanguage('LOGIN_FIELDS_REQUIRED'));
                 return;
             }
 
             signInWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
-                    // تسجيل الدخول ناجح
                     alert(loadLanguage('LOGIN_SUCCESS'));
                     window.location.href = "dashboard.html"; 
                 })
                 .catch((error) => {
                     console.error("Login Error:", error.code, error.message);
-                    // استخدام دالة الترجمة العالمية
                     alert(loadLanguage('LOGIN_FAIL'));
                 });
         });
@@ -144,7 +142,6 @@
         // إذا كان المستخدم مسجلاً الدخول بالفعل، يُعاد توجيهه
         onAuthStateChanged(auth, user => {
             if (user) {
-                // يمكنك تفعيل هذا لإعادة التوجيه التلقائي
                 // window.location.href = "dashboard.html";
             }
         });
