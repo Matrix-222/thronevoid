@@ -3,139 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="MATCHING_PAGE_TITLE">صفحة الدردشة</title>
+    <title>قائمة المستخدمين</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* تنسيقات خاصة بصفحة chat.html */
-        .user-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 30px;
+        /* تنسيقات خاصة بقائمة المستخدمين */
+        /* تم دمج الأفاتار هنا */
+        .user-card .avatar {
+            font-size: 1.5em;
         }
 
-        .user-card {
-            background-color: var(--secondary-dark);
-            padding: 20px;
-            border-radius: 10px;
-            width: 300px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            position: relative; 
-        }
-
-        .user-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.7);
-        }
-        
-        .user-card h3 {
-            color: var(--accent-green);
-            margin-top: 0;
-            display: flex;
-            align-items: center;
-        }
-
-        .user-card p {
-            font-size: 0.9em;
-            color: var(--text-light);
-            margin-top: 10px;
-        }
-
-        .user-card .bio {
-            color: var(--text-muted);
-            font-style: italic;
-        }
-
-        /* تنسيقات المرشحات المتقدمة */
-        .filters-container {
-            max-width: 400px; 
-            margin: 20px auto; 
-            padding: 20px;
-            background-color: var(--secondary-dark);
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-
-        .filters-container h2 {
-            color: var(--accent-blue);
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .filter-group {
-            margin-bottom: 15px;
-            padding: 10px 0;
-            border-bottom: 1px dashed var(--border-color);
-        }
-
-        .filter-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        #applyFiltersBtn {
-            width: 100%;
-            margin-top: 15px;
-            background-color: var(--accent-green);
-        }
-        
-        #applyFiltersBtn:hover {
-            background-color: #1e7e34;
-        }
     </style>
 </head>
 <body>
     <header>
+        <div id="usernameDisplay"></div>
         <h1>THRONES OF THE VOID</h1>
         <div class="header-buttons">
-            <button onclick="window.location='dashboard.html'" data-i18n="PROFILE" style="background-color: var(--accent-blue);">ملفي الشخصي</button>
-            <button onclick="logoutUser()" class="logout-btn" data-i18n="LOGOUT">تسجيل الخروج</button>
+            <button onclick="window.location='dashboard.html'" data-i18n="DASHBOARD_BUTTON">لوحة التحكم</button>
+            <button id="logoutBtn" class="logout-btn" data-i18n="LOGOUT_BUTTON">تسجيل الخروج</button>
         </div>
     </header>
 
     <main>
         <div class="filters-container">
-            <h2 data-i18n="ADVANCED_FILTERS">مرشحات البحث المتقدمة</h2>
-            
+            <h2 data-i18n="ADVANCED_FILTERS">مرشحات متقدمة</h2>
             <div class="filter-group">
-                <label data-i18n="SEARCH_BY_INTERESTS">ابحث بالاهتمامات المشتركة</label>
-                <input type="text" id="interestsInput" placeholder="مثال: قراءة, سفر, رياضة">
+                <label for="genderFilter" data-i18n="GENDER_FILTER">تصفية حسب الجنس:</label>
+                <select id="genderFilter">
+                    <option value="" data-i18n="ALL">الكل</option>
+                    <option value="male" data-i18n="MALE">ذكر</option>
+                    <option value="female" data-i18n="FEMALE">أنثى</option>
+                </select>
             </div>
-
             <div class="filter-group">
-                <label>
-                    <input type="checkbox" id="onlineOnlyCheckbox">
-                    <span data-i18n="SHOW_ONLINE_ONLY">عرض المتصلين فقط</span>
-                </label>
+                <label for="searchFilter" data-i18n="SEARCH_FILTER">البحث بالاسم أو الإيميل:</label>
+                <input type="text" id="searchFilter" placeholder="البحث...">
             </div>
-            
-            <button id="applyFiltersBtn" data-i18n="APPLY_FILTERS">تطبيق التصفية</button>
+            <button id="applyFiltersBtn" data-i18n="APPLY_FILTERS">تطبيق المرشحات</button>
         </div>
 
-        <h2 style="text-align: center;" data-i18n="CHAT_LIST_HEADER">ابحث عن أشخاص جدد للدردشة</h2>
         <div id="userList" class="user-list">
-            <p id="loadingMessage" style="color: var(--text-muted);">جاري تحميل الملفات...</p>
+            <p id="loadingText" style="text-align: center;">... يتم تحميل المستخدمين ...</p>
         </div>
     </main>
 
     <script src="i18n.js"></script>
+    <script src="api.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { 
-            getFirestore, 
-            collection, 
-            query, 
-            where, 
-            getDocs,
-            doc,
-            onSnapshot,
-            updateDoc
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // *** مفاتيح مشروعك الفعلي (thronevoid) - تأكد من صحتها ***
         const firebaseConfig = {
@@ -152,165 +69,124 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let currentUser = null;
         const userListContainer = document.getElementById('userList');
-        const loadingMessage = document.getElementById('loadingMessage');
-        const interestsInput = document.getElementById('interestsInput');
-        const onlineOnlyCheckbox = document.getElementById('onlineOnlyCheckbox');
-        const applyFiltersBtn = document.getElementById('applyFiltersBtn');
-
+        let currentUserEmail = null;
+        let allUsers = [];
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                currentUser = user;
-                updateOnlineStatus(true);
-                setupOnlineStatusListener();
-                fetchUsers();
+                currentUserEmail = user.email;
+                displayCurrentUserName(user.email);
+                listenForUsers();
             } else {
                 window.location.href = "index.html";
             }
         });
-        
-        // --- تحديث حالة الاتصال (نفس الكود) ---
-        async function updateOnlineStatus(isOnline) {
-            if (!currentUser) return;
-            try {
-                await updateDoc(doc(db, "users", currentUser.email), {
-                    isOnline: isOnline,
-                    lastSeen: new Date().toISOString()
-                });
-            } catch (error) {
-                console.error("Error updating online status:", error);
-            }
-        }
-        
-        window.addEventListener('beforeunload', () => {
-            if (currentUser) {
-                updateOnlineStatus(false);
-            }
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => {
+                window.location.href = "index.html";
+            }).catch((error) => {
+                console.error("Logout failed:", error);
+            });
         });
 
+        document.getElementById('applyFiltersBtn').addEventListener('click', applyFilters);
 
-        // --- مراقبة حالة الاتصال (نفس الكود) ---
-        function setupOnlineStatusListener() {
-            onSnapshot(collection(db, "users"), (snapshot) => {
-                snapshot.docChanges().forEach((change) => {
-                    const data = change.doc.data();
-                    if (data.email === currentUser.email) return;
+        function displayCurrentUserName(email) {
+            const usernameDisplay = document.getElementById('usernameDisplay');
+            usernameDisplay.textContent = `مرحباً، ${email.split('@')[0]}`;
+        }
+        
+        // --- دالة جلب المستخدمين ---
+        function listenForUsers() {
+            const usersRef = collection(db, "users");
+            // استخدام onSnapshot لمراقبة التغييرات في الوقت الفعلي
+            onSnapshot(usersRef, (snapshot) => {
+                allUsers = [];
+                snapshot.forEach((doc) => {
+                    const user = doc.data();
+                    const email = doc.id; 
 
-                    const card = document.querySelector(`.user-card[data-email="${data.email}"]`);
-                    
-                    if (card) {
-                        const h3 = card.querySelector('h3');
-                        if (h3) {
-                            h3.innerHTML = h3.innerHTML.replace(/<span class="online-dot" title="متصل"><\/span>/g, '');
-                            const isOnlineDot = data.isOnline ? '<span class="online-dot" title="متصل"></span>' : '';
-                            const username = data.username || data.email.split('@')[0];
-                            h3.innerHTML = `${isOnlineDot}${username}`;
-                        }
+                    if (email !== currentUserEmail) {
+                        allUsers.push({ email, ...user });
                     }
                 });
+                applyFilters(); // تطبيق المرشحات بعد جلب البيانات
+            }, (error) => {
+                console.error("Error fetching users:", error);
+                document.getElementById('loadingText').textContent = 'فشل تحميل قائمة المستخدمين.';
             });
         }
-        
-        // --- الدالة الرئيسية لجلب المستخدمين (نفس الكود) ---
-        async function fetchUsers() {
-            if (!currentUser) return;
 
-            try {
-                userListContainer.innerHTML = '';
-                loadingMessage.style.display = 'block';
+        function applyFilters() {
+            const genderFilter = document.getElementById('genderFilter').value;
+            const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
+            
+            userListContainer.innerHTML = '';
+            let filteredUsers = allUsers;
 
-                const q = query(collection(db, "users"));
-                const querySnapshot = await getDocs(q);
-                let allUsers = [];
-                querySnapshot.forEach((doc) => {
-                    allUsers.push(doc.data());
-                });
-
-                const usersExcludingMe = allUsers.filter(user => user.email !== currentUser.email);
-                const filteredUsers = getMatchingUsers(usersExcludingMe);
-                
-                loadingMessage.style.display = 'none';
-
-                if (filteredUsers.length === 0) {
-                    userListContainer.innerHTML = '<p style="color: var(--text-muted);">لا يوجد مستخدمون آخرون مطابقون للمعايير الحالية.</p>';
-                    return;
-                }
-
-                filteredUsers.forEach((data) => {
-                    displayUser(data);
-                });
-                
-            } catch (error) {
-                console.error("Error fetching users:", error);
-                loadingMessage.textContent = 'حدث خطأ أثناء تحميل المستخدمين.';
-            }
-        }
-        
-        // --- دالة منطق التصفية (نفس الكود) ---
-        function getMatchingUsers(users) {
-            const onlineOnly = onlineOnlyCheckbox.checked;
-            const interestsQuery = interestsInput.value.trim().toLowerCase();
-            let matchedUsers = users;
-
-            if (onlineOnly) {
-                matchedUsers = matchedUsers.filter(user => user.isOnline === true);
+            if (genderFilter) {
+                filteredUsers = filteredUsers.filter(user => user.gender === genderFilter);
             }
 
-            if (interestsQuery) {
-                const searchInterests = interestsQuery.split(',').map(i => i.trim());
-                
-                matchedUsers = matchedUsers.filter(user => {
-                    if (!user.interests) return false;
-
-                    const userInterests = user.interests.toLowerCase().split(',').map(i => i.trim());
-                    
-                    return searchInterests.some(si => userInterests.includes(si));
-                });
+            if (searchFilter) {
+                filteredUsers = filteredUsers.filter(user => 
+                    (user.username && user.username.toLowerCase().includes(searchFilter)) ||
+                    (user.email && user.email.toLowerCase().includes(searchFilter))
+                );
+            }
+            
+            if (filteredUsers.length === 0) {
+                 userListContainer.innerHTML = '<p style="text-align: center;">لا يوجد مستخدمون مطابقون للمرشحات.</p>';
+                 return;
             }
 
-            return matchedUsers;
+            filteredUsers.forEach(displayUserCard);
         }
 
-        // --- بناء بطاقة المستخدم (نفس الكود) ---
-        function displayUser(userData) {
+        // --- دالة عرض بطاقة المستخدم (تم التعديل) ---
+        function displayUserCard(user) {
+            const email = user.email;
+            const username = user.username || email.split('@')[0];
+            
             const card = document.createElement('div');
             card.className = 'user-card';
-            card.dataset.email = userData.email;
-            card.onclick = () => {
-                window.location.href = `private_chat.html?user=${userData.email}`;
-            };
+            card.setAttribute('data-user-email', email);
             
-            const username = userData.username || userData.email.split('@')[0];
-            const profileImage = `https://i.pravatar.cc/150?u=${userData.email}`;
-            const isOnlineDot = userData.isOnline ? '<span class="online-dot" title="متصل"></span>' : '';
-            const interestsList = userData.interests ? userData.interests.split(',').map(i => `<span style="background-color: #4a4a4a; padding: 3px 8px; border-radius: 4px; margin-left: 5px; display: inline-block;">${i.trim()}</span>`).join('') : '<p style="color: #999;">لا توجد اهتمامات محددة.</p>';
+            // ⭐️ إضافة الأفاتار بناءً على الجنس
+            const gender = user.gender || 'male'; // قيمة افتراضية 'male'
+            
+            const avatar = document.createElement('div');
+            // نستخدم الفئة avatar.male أو avatar.female التي عرفناها في style.css
+            avatar.className = `avatar ${gender}`;
+            // إضافة رمز M أو F للوضوح في حالة استخدام الألوان كأفاتار افتراضي
+            avatar.textContent = gender === 'male' ? 'M' : 'F'; 
+            card.appendChild(avatar);
+            
+            // حاوية لمعلومات المستخدم
+            const infoContainer = document.createElement('div');
+            infoContainer.style.flexGrow = 1;
 
-            card.innerHTML = `
-                <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                    <img src="${profileImage}" alt="صورة الملف" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-left: 10px;">
-                    <h3>${isOnlineDot}${username}</h3>
-                </div>
-                <p class="bio">${userData.bio || 'لم يكتب نبذة بعد.'}</p>
-                <p><strong>الاهتمامات:</strong> ${interestsList}</p>
-            `;
+            const nameElement = document.createElement('h3');
+            nameElement.innerHTML = `<span class="online-dot"></span>${username}`;
+            infoContainer.appendChild(nameElement);
+
+            const emailElement = document.createElement('p');
+            emailElement.textContent = email;
+            emailElement.style.color = 'var(--text-muted)';
+            infoContainer.appendChild(emailElement);
+
+            card.appendChild(infoContainer);
+            
+            card.addEventListener('click', () => {
+                window.location.href = `private_chat.html?user=${email}`;
+            });
 
             userListContainer.appendChild(card);
         }
-        
-        // --- تسجيل الخروج (نفس الكود) ---
-        window.logoutUser = function() {
-            updateOnlineStatus(false).then(() => {
-                signOut(auth).then(() => { 
-                    window.location.href = "index.html";
-                }).catch((error) => {
-                    console.error("Logout Error:", error);
-                });
-            });
-        }
 
-        applyFiltersBtn.addEventListener('click', fetchUsers);
+        // ... (باقي الكود) ...
     </script>
 </body>
 </html>
