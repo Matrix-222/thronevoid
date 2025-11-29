@@ -1,162 +1,141 @@
 :root {
-    --primary-dark: #121212; /* خلفية التطبيق */
-    --secondary-dark: #1e1e1e; /* لون الخلفية الثانوية/البطاقات */
-    --accent-blue: #007bff; /* لون التمييز الأساسي (أزرق) */
-    --accent-green: #2ecc71; /* لون النجاح/الدردشة (أخضر) */
-    --text-light: #f5f5f5; /* لون النص الرئيسي */
-    --text-muted: #aaaaaa; /* لون النص الثانوي */
-    --border-color: #333333;
+    --primary-dark: #1e1e1e; /* خلفية الموقع */
+    --secondary-dark: #2a2a2a; /* خلفية البطاقات/المربعات */
+    --accent-blue: #007bff; /* لون أساسي لـ Firebase/الأزرار */
+    --accent-green: #28a745; /* لون التأكيد/النجاح/الدردشة */
+    --text-light: #f8f9fa; /* لون النص الأساسي */
+    --text-muted: #adb5bd; /* لون النص الخفيف */
+    --border-color: #444; /* لون الحدود */
 }
 
-/* التنسيق الأساسي لجميع المتصفحات */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--primary-dark);
     color: var(--text-light);
+    font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
-    direction: rtl; 
-    text-align: right; 
-    transition: background-color 0.3s;
+    direction: rtl; /* اتجاه الكتابة من اليمين لليسار */
 }
 
-/* الـ Header */
 header {
     background-color: var(--secondary-dark);
-    padding: 15px 30px;
+    padding: 15px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 3px solid var(--accent-green);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    z-index: 10;
-    position: sticky;
-    top: 0;
 }
+
 header h1 {
-    color: var(--accent-blue);
     margin: 0;
+    color: var(--accent-blue);
     font-size: 1.5em;
 }
 
-/* الأزرار العامة */
-button {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: opacity 0.3s, background-color 0.3s;
-    background-color: var(--accent-blue);
-    color: white;
-}
-button:hover {
-    opacity: 0.9;
+.header-buttons button {
+    margin-right: 10px;
 }
 
-/* الحقول العامة */
-input:not([type="checkbox"]), textarea {
+main {
+    padding: 20px;
+}
+
+/* تنسيق النماذج والعناصر التفاعلية */
+input[type="email"], 
+input[type="password"], 
+input[type="text"],
+textarea {
     width: 100%;
     padding: 12px;
     margin: 8px 0;
+    display: inline-block;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background-color: #2a2a2a;
-    color: var(--text-light);
+    border-radius: 6px;
     box-sizing: border-box;
-    transition: border-color 0.3s;
-}
-input:focus, textarea:focus {
-    border-color: var(--accent-blue);
-    outline: none;
+    background-color: #333;
+    color: var(--text-light);
+    font-size: 1em;
 }
 
-/* الروابط */
-a {
-    color: var(--accent-blue);
-    text-decoration: none;
-    transition: color 0.3s;
-}
-a:hover {
-    color: #4da5ff;
+input[type="checkbox"] {
+    width: auto;
 }
 
-/* الصندوق الرئيسي (Login Box) */
-.box-container {
-    background-color: var(--secondary-dark);
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.7);
+button {
+    background-color: var(--accent-blue);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.logout-btn {
+    background-color: #dc3545;
+}
+
+.logout-btn:hover {
+    background-color: #c82333;
+}
+
+/* التنسيق الخاص بالصفحات */
+.auth-container, .form-container {
     max-width: 450px;
-    width: 90%;
     margin: 50px auto;
+    padding: 30px;
+    background-color: var(--secondary-dark);
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
 }
 
-/* تنسيق البطاقات (مثل ملفات المستخدمين) */
-.card {
-    background-color: #2a2a2a;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    border-left: 4px solid var(--accent-blue);
+/* --- تصميم إشعارات Toast (جديد) --- */
+.toast-notification-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px; 
+    z-index: 1000; 
+    display: flex;
+    flex-direction: column-reverse; 
+    pointer-events: none; /* يسمح بالنقر خلفه بشكل افتراضي */
 }
 
-/* تنسيق الملف الشخصي المصغر */
-.profile-card {
-    background-color: #2a2a2a;
-    padding: 15px;
-    border-radius: 10px;
-    text-align: center;
-    transition: transform 0.3s;
-    border-top: 4px solid var(--accent-green);
-}
-.profile-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
-}
-.profile-card img {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid var(--accent-blue);
-    margin-bottom: 10px;
-}
-.profile-card h3 {
+.toast-message {
+    background-color: #333;
     color: var(--text-light);
-    margin: 5px 0;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-top: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    opacity: 0; 
+    transition: opacity 0.5s, transform 0.5s;
+    transform: translateX(100%); 
+    display: flex;
+    flex-direction: column;
+    max-width: 350px;
+    border-right: 5px solid var(--accent-green);
+    cursor: pointer; /* جعلها قابلة للنقر */
+    pointer-events: auto; /* استعادة النقر للزر */
 }
-.profile-card p {
-    color: var(--text-muted);
+
+.toast-message.show {
+    opacity: 1;
+    transform: translateX(0); 
+}
+
+.toast-message strong {
+    color: var(--accent-green);
+    margin-bottom: 5px;
+    font-size: 1.1em;
+}
+
+.toast-message p {
+    margin: 0;
     font-size: 0.9em;
-}
-
-/* الأزرار في الـ Header */
-.header-buttons button {
-    margin-left: 10px; 
-    background-color: #4a4a4a;
-    color: var(--text-light);
-}
-.header-buttons button:hover {
-    background-color: #5a5a5a;
-}
-.header-buttons .logout-btn {
-    background-color: #e74c3c;
-}
-.header-buttons .logout-btn:hover {
-    background-color: #c0392b;
-}
-
-/* الـ Media Queries للتحسين على الشاشات الصغيرة */
-@media (max-width: 600px) {
-    header {
-        padding: 10px 15px;
-        flex-direction: column;
-        text-align: center;
-    }
-    header h1 {
-        margin-bottom: 10px;
-    }
-    .box-container {
-        padding: 20px;
-    }
 }
