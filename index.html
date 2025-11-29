@@ -6,7 +6,7 @@
     <title data-i18n="SIGN_IN">تسجيل الدخول</title> 
     <link rel="stylesheet" href="style.css">
     <style>
-        /* CSS خاص لصفحة تسجيل الدخول يمكن أن يكون هنا */
+        /* CSS خاص لصفحة تسجيل الدخول */
         body {
             display: flex;
             justify-content: center;
@@ -23,7 +23,7 @@
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
             max-width: 400px;
             width: 90%;
-            position: relative; /* لإحتواء زر اللغة بشكل أفضل */
+            position: relative;
         }
         h1 {
             color: var(--accent-yellow);
@@ -37,6 +37,7 @@
             border-radius: 5px;
             background-color: #3a3a3a;
             color: white;
+            text-align: center; /* لمشكلة ظهور النص بالإنجليزية في المنتصف */
         }
         button {
             padding: 10px 20px;
@@ -50,9 +51,6 @@
         .language-switcher {
             position: absolute;
             top: 15px;
-            /* الوضع التلقائي يعتمد على اتجاه النص (RTL/LTR) */
-            /* إذا كانت RTL (العربية)، سيكون الزر في اليسار (Left) */
-            /* إذا كانت LTR (الإنجليزية)، سيكون الزر في اليمين (Right) */
             left: 15px; 
             z-index: 100;
         }
@@ -68,13 +66,13 @@
     <div class="login-box">
         
         <div class="language-switcher">
-            <button onclick="switchLanguage('ar')">العربية</button>
-            <button onclick="switchLanguage('en')">English</button>
+            <button onclick="switchLanguage('ar')" data-i18n="ARABIC_BUTTON">العربية</button>
+            <button onclick="switchLanguage('en')" data-i18n="ENGLISH_BUTTON">English</button>
         </div>
 
         <h1>THRONES OF THE VOID</h1>
         
-        <p data-i18n="PHONE_LOGIN_TITLE">سجل برقم الجوال</p>
+        <p data-i18n="PHONE_LOGIN_TITLE">أو سجل برقم الجوال</p> 
         
         <div class="input-group">
             <input type="tel" id="phoneNumber" placeholder="+9665xxxxxxxx">
@@ -136,6 +134,7 @@
                 'expired-callback': () => {
                     // reCAPTCHA انتهت صلاحيته
                     console.warn("reCAPTCHA expired");
+                    // استخدام دالة الترجمة العالمية
                     alert(loadLanguage('LOGIN_ERROR_RECAPTCHA'));
                 }
             });
