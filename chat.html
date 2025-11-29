@@ -103,18 +103,18 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
-                // تحديث حالة الاتصال عند تسجيل الدخول
+                // 1. تحديث حالة الاتصال عند تسجيل الدخول
                 updateOnlineStatus(true);
-                // مراقبة حالة الاتصال للمستخدمين الآخرين
+                // 2. مراقبة حالة الاتصال للمستخدمين الآخرين
                 setupOnlineStatusListener();
-                // جلب قائمة المستخدمين
+                // 3. جلب قائمة المستخدمين
                 fetchUsers();
             } else {
                 window.location.href = "index.html";
             }
         });
         
-        // تحديث حالة الاتصال في قاعدة البيانات
+        // --- تحديث حالة الاتصال ---
         async function updateOnlineStatus(isOnline) {
             if (!currentUser) return;
             try {
@@ -127,21 +127,20 @@
             }
         }
         
-        // وظيفة المراقبة عند إغلاق أو مغادرة الصفحة
+        // --- وظيفة المراقبة عند إغلاق أو مغادرة الصفحة ---
         window.addEventListener('beforeunload', () => {
             if (currentUser) {
-                // يتم تجاهل هذا التحديث عادةً إذا كانت الصفحة تغلق فعلاً، ولكن نضعه احتياطياً
+                // تحديث الحالة إلى "غير متصل"
                 updateOnlineStatus(false);
             }
         });
 
 
-        // مراقبة حالة الاتصال للمستخدمين الآخرين
+        // --- مراقبة حالة الاتصال للمستخدمين الآخرين ---
         function setupOnlineStatusListener() {
             onSnapshot(collection(db, "users"), (snapshot) => {
                 snapshot.docChanges().forEach((change) => {
                     const data = change.doc.data();
-                    // تحديث فقط إذا كان المستخدم ليس أنا
                     if (data.email === currentUser.email) return;
 
                     const card = document.querySelector(`.user-card[data-email="${data.email}"]`);
@@ -149,18 +148,19 @@
                     if (card) {
                         const h3 = card.querySelector('h3');
                         if (h3) {
-                            // إزالة نقطة الاتصال القديمة (إن وجدت)
+                            // إزالة نقطة الاتصال القديمة
                             h3.innerHTML = h3.innerHTML.replace(/<span class="online-dot" title="متصل"><\/span>/g, '');
                             
                             // إضافة نقطة الاتصال الجديدة (إذا كان متصلاً)
                             const isOnlineDot = data.isOnline ? '<span class="online-dot" title="متصل"></span>' : '';
-                            h3.innerHTML = isOnlineDot + h3.textContent;
+                            h3.innerHTML = isOnlineDot + h3.textContent.trim(); // Trim لحل مشكلة تكرار النص
                         }
                     }
                 });
             });
         }
         
+        // --- جلب قائمة المستخدمين ---
         async function fetchUsers() {
             try {
                 // استعلام لجلب جميع المستخدمين باستثناء المستخدم الحالي
@@ -186,11 +186,13 @@
             }
         }
 
+        // --- بناء بطاقة المستخدم ---
         function displayUser(userData) {
             const card = document.createElement('div');
             card.className = 'user-card';
             card.dataset.email = userData.email;
             card.onclick = () => {
+                // الانتقال لصفحة الدردشة الخاصة
                 window.location.href = `private_chat.html?user=${userData.email}`;
             };
             
@@ -211,6 +213,7 @@
             userListContainer.appendChild(card);
         }
         
+        // --- تسجيل الخروج ---
         window.logoutUser = function() {
             // تحديث حالة الاتصال إلى "غير متصل" عند تسجيل الخروج
             updateOnlineStatus(false).then(() => {
