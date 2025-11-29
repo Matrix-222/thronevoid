@@ -15,7 +15,7 @@
             height: 80vh; 
             display: flex;
             flex-direction: column;
-            position: relative; /* مهم لوضع لوحة الإيموجي بداخله */
+            position: relative;
         }
         #messagesContainer {
             flex-grow: 1;
@@ -55,7 +55,7 @@
             padding: 15px;
             border-top: 1px solid var(--border-color);
             gap: 10px;
-            align-items: center; /* لمحاذاة زر الإيموجي */
+            align-items: center; 
         }
         .input-area input {
             flex-grow: 1;
@@ -76,13 +76,120 @@
         #emojiBtn:hover {
             color: var(--accent-blue);
         }
+        #gifBtn {
+            background: none;
+            border: none;
+            font-size: 1.8em;
+            cursor: pointer;
+            color: var(--text-light);
+            padding: 0 10px;
+            transition: color 0.3s;
+        }
+        #gifBtn:hover {
+            color: var(--accent-green);
+        }
+        .emoji-picker {
+            position: absolute;
+            bottom: 70px;
+            right: 15px;
+            width: 250px;
+            max-height: 200px;
+            background-color: #3a3a3a;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            overflow-y: auto;
+            display: none; 
+            z-index: 10;
+            border: 1px solid var(--border-color);
+        }
+
+        .emoji-picker.show {
+            display: block;
+        }
+
+        .emoji-item {
+            cursor: pointer;
+            font-size: 1.5em;
+            margin: 5px;
+            transition: transform 0.1s;
+            display: inline-block;
+        }
+
+        .emoji-item:hover {
+            transform: scale(1.1);
+        }
+        .gif-picker-container {
+            position: absolute;
+            bottom: 70px; 
+            left: 15px; 
+            width: 300px;
+            height: 250px;
+            background-color: #3a3a3a;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            z-index: 20;
+            display: none;
+            flex-direction: column;
+        }
+
+        .gif-picker-container.show {
+            display: flex;
+        }
+
+        #gifSearchInput {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: #444;
+            color: var(--text-light);
+        }
+
+        #gifResults {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .gif-item {
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: 4px;
+            transition: border-color 0.2s;
+            overflow: hidden;
+        }
+
+        .gif-item:hover {
+            border-color: var(--accent-blue);
+        }
+
+        .gif-item img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .message-body img.chat-gif {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+        }
     </style>
 </head>
 <body>
     <header>
         <h1>THRONES OF THE VOID - CHAT</h1>
         <div class="header-buttons">
-            <button onclick="window.location='chat.html'" data-i18n="BACK_TO_MATCHING" style="background-color: #4a4a4a;">العودة للملفات</button>
+            <button onclick="window.location='chat.html'" style="background-color: #4a4a4a;">
+                🏠 الصفحة الرئيسية
+            </button>
             <button onclick="logoutUser()" class="logout-btn" data-i18n="LOGOUT">تسجيل الخروج</button>
         </div>
     </header>
@@ -95,9 +202,16 @@
         </div>
         
         <div id="emojiPicker" class="emoji-picker">
-            </div>
+        </div>
+
+        <div id="gifPicker" class="gif-picker-container">
+            <input type="text" id="gifSearchInput" placeholder="ابحث عن GIF..." title="استخدم الإنجليزية للبحث">
+            <div id="gifResults">
+                </div>
+        </div>
 
         <div class="input-area">
+            <button id="gifBtn" title="إرسال GIF">🖼️</button>
             <button id="emojiBtn" title="إيموجي">😀</button> 
             <input type="text" id="messageInput" data-i18n="CHAT_MESSAGE_PLACEHOLDER" placeholder="اكتب رسالتك هنا..." maxlength="500">
             <button id="sendMessageBtn" data-i18n="SEND_MESSAGE">إرسال</button>
@@ -138,6 +252,10 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // 🔑 مفتاح GIPHY التجريبي (يجب استبداله بمفتاحك الخاص)
+        const GIPHY_API_KEY = "GIPHY_API_KEY_HERE"; 
+        const GIPHY_API_URL = "https://api.giphy.com/v1/gifs/search";
+
         let currentUser = null;
         let chatPartnerEmail = new URLSearchParams(window.location.search).get('user');
         let chatId = null;
@@ -148,10 +266,13 @@
         const messageInput = document.getElementById('messageInput');
         const chatPartnerNameEl = document.getElementById('chatPartnerName');
         const toastContainer = document.getElementById('toastContainer');
-        const emojiBtn = document.getElementById('emojiBtn'); // جديد
-        const emojiPicker = document.getElementById('emojiPicker'); // جديد
+        const emojiBtn = document.getElementById('emojiBtn');
+        const emojiPicker = document.getElementById('emojiPicker');
+        const gifBtn = document.getElementById('gifBtn'); 
+        const gifPicker = document.getElementById('gifPicker'); 
+        const gifSearchInput = document.getElementById('gifSearchInput'); 
+        const gifResults = document.getElementById('gifResults'); 
 
-        // مصفوفة الإيموجي التي ستعرض
         const EMOJIS = ['😀', '😂', '😍', '🤩', '😘', '😁', '😎', '👍', '👎', '❤️', '🔥', '🎉', '🌟', '🚀', '🌙', '🍔', '☕', '🐱', '🐶', '💸'];
 
         function getChatId(email1, email2) {
@@ -169,9 +290,11 @@
 
             const notificationText = loadLanguage('NEW_MESSAGE_NOTIFICATION');
 
+            const displayMessage = messageText.startsWith('https://media.giphy.com/') ? "أرسل لك صورة متحركة (GIF)" : messageText;
+
             toast.innerHTML = `
                 <strong>${notificationText} ${senderName}</strong> 
-                <p>${messageText.substring(0, 50)}${messageText.length > 50 ? '...' : ''}</p>
+                <p>${displayMessage.substring(0, 50)}${displayMessage.length > 50 ? '...' : ''}</p>
             `;
             
             toastContainer.prepend(toast); 
@@ -192,7 +315,6 @@
 
         onAuthStateChanged(auth, async (user) => {
             if (!user || !chatPartnerEmail) {
-                // قد يتم التوجيه هنا إذا كان المستخدم غير مصادق أو لم يتم تمرير شريك الدردشة
                 window.location.href = "chat.html";
                 return;
             }
@@ -203,7 +325,8 @@
             await fetchPartnerInfo(chatPartnerEmail);
             
             startChatListener();
-            setupEmojiPicker(); // جديد
+            setupEmojiPicker(); 
+            setupGifPicker(); 
         });
         
         async function fetchPartnerInfo(email) {
@@ -260,21 +383,36 @@
             const isSelf = currentUser && data.senderEmail === currentUser.email;
 
             div.className = `message-item ${isSelf ? 'self-msg' : 'other-msg'}`;
-            div.innerHTML = `
-                <div class="message-body">${data.text}</div>
-                <div class="message-timestamp">${timestampText}</div>
-            `;
+            
+            if (data.text && data.text.startsWith('https://media.giphy.com/')) {
+                 div.innerHTML = `
+                    <div class="message-body">
+                        <img src="${data.text}" class="chat-gif" alt="GIF Image">
+                    </div>
+                    <div class="message-timestamp">${timestampText}</div>
+                `;
+            } else {
+                div.innerHTML = `
+                    <div class="message-body">${data.text}</div>
+                    <div class="message-timestamp">${timestampText}</div>
+                `;
+            }
             return div;
         }
 
-        async function sendMessage() {
+        async function sendMessage(gifUrl = null) {
             const text = messageInput.value.trim();
-            if (!text || !chatId) return;
+            const messageContent = gifUrl || text; 
+
+            if (!messageContent || !chatId) return;
+            
+            gifPicker.classList.remove('show');
+            emojiPicker.classList.remove('show');
 
             try {
                 await addDoc(collection(db, "chats", chatId, "messages"), {
                     senderEmail: currentUser.email,
-                    text: text,
+                    text: messageContent, 
                     timestamp: serverTimestamp(),
                 });
 
@@ -286,7 +424,6 @@
             }
         }
         
-        // --- وظائف لوحة الإيموجي (جديدة) ---
         function setupEmojiPicker() {
             EMOJIS.forEach(emoji => {
                 const span = document.createElement('span');
@@ -297,11 +434,11 @@
             });
             
             emojiBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // منع إغلاقها فوراً
+                e.stopPropagation();
                 emojiPicker.classList.toggle('show');
+                gifPicker.classList.remove('show'); 
             });
 
-            // إغلاق لوحة الإيموجي عند النقر خارجها
             document.addEventListener('click', (e) => {
                 if (!emojiPicker.contains(e.target) && e.target !== emojiBtn) {
                     emojiPicker.classList.remove('show');
@@ -314,19 +451,87 @@
             const end = messageInput.selectionEnd;
             const text = messageInput.value;
             
-            // إدراج الإيموجي في موضع المؤشر
             messageInput.value = text.substring(0, start) + emoji + text.substring(end);
             
-            // إعادة وضع المؤشر بعد الإيموجي
             messageInput.focus();
             messageInput.setSelectionRange(start + emoji.length, start + emoji.length);
             
-            // إغلاق اللوحة بعد اختيار إيموجي
             emojiPicker.classList.remove('show'); 
         }
-        // ------------------------------------
+        
+        function setupGifPicker() {
+            gifBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                gifPicker.classList.toggle('show');
+                emojiPicker.classList.remove('show'); 
+                if (gifPicker.classList.contains('show')) {
+                    fetchGifs('trending'); 
+                }
+            });
 
-        document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
+            gifSearchInput.addEventListener('input', () => {
+                const query = gifSearchInput.value.trim();
+                if (query.length > 2) {
+                    fetchGifs(query);
+                } else if (query.length === 0) {
+                    fetchGifs('trending');
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!gifPicker.contains(e.target) && e.target !== gifBtn) {
+                    gifPicker.classList.remove('show');
+                }
+            });
+        }
+
+        async function fetchGifs(query) {
+            gifResults.innerHTML = `<p style="text-align: center; color: var(--text-muted);">... جاري البحث ...</p>`;
+            
+            let url;
+            if (query === 'trending') {
+                url = `https://api.giphy.com/v1/gifs/trending?api_key=${GIPHY_API_KEY}&limit=10&rating=g`;
+            } else {
+                url = `${GIPHY_API_URL}?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(query)}&limit=10&rating=g`; 
+            }
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                renderGifs(data.data);
+            } catch (error) {
+                console.error("Error fetching GIFs:", error);
+                gifResults.innerHTML = `<p style="text-align: center; color: #e74c3c;">فشل في جلب صور GIF.</p>`;
+            }
+        }
+
+        function renderGifs(gifs) {
+            gifResults.innerHTML = '';
+            if (gifs.length === 0) {
+                gifResults.innerHTML = `<p style="text-align: center; color: var(--text-muted);">لم يتم العثور على نتائج.</p>`;
+                return;
+            }
+
+            gifs.forEach(gif => {
+                const gifUrl = gif.images.fixed_height.url; 
+                const img = document.createElement('img');
+                img.src = gif.images.fixed_height_small_still.url; 
+                img.alt = gif.title;
+                
+                const item = document.createElement('div');
+                item.className = 'gif-item';
+                item.appendChild(img);
+
+                item.onclick = () => {
+                    sendMessage(gifUrl); 
+                };
+
+                gifResults.appendChild(item);
+            });
+        }
+
+        document.getElementById('sendMessageBtn').addEventListener('click', () => sendMessage());
         messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 sendMessage();
