@@ -95,50 +95,7 @@ button:hover {
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
 }
 
-/* --- تصميم إشعارات Toast --- */
-.toast-notification-container {
-    position: fixed;
-    bottom: 20px;
-    right: 20px; 
-    z-index: 1000; 
-    display: flex;
-    flex-direction: column-reverse; 
-    pointer-events: none;
-}
-
-.toast-message {
-    background-color: #333;
-    color: var(--text-light);
-    padding: 15px 20px;
-    border-radius: 8px;
-    margin-top: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    opacity: 0; 
-    transition: opacity 0.5s, transform 0.5s;
-    transform: translateX(100%); 
-    display: flex;
-    flex-direction: column;
-    max-width: 350px;
-    border-right: 5px solid var(--accent-green);
-    cursor: pointer; 
-    pointer-events: auto; 
-}
-
-.toast-message.show {
-    opacity: 1;
-    transform: translateX(0); 
-}
-
-.toast-message strong {
-    color: var(--accent-green);
-    margin-bottom: 5px;
-    font-size: 1.1em;
-}
-
-.toast-message p {
-    margin: 0;
-    font-size: 0.9em;
-}
+/* لا توجد تنسيقات لـ .toast-notification-container و .toast-message هنا */
 
 /* نقطة الاتصال (لـ chat.html) */
 .online-dot {
