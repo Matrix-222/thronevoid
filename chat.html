@@ -259,6 +259,7 @@
             const interestsList = (profile.interests || '').split(',').map(i => i.trim()).filter(i => i).slice(0, 3);
             const targetEmail = profile.id; 
 
+            // تم استبدال مستمع الحدث (addEventListener) في JS بالدالة المباشرة (onclick)
             card.innerHTML = `
                 <div class="profile-card-header">
                     <img src="https://i.pravatar.cc/150?u=${profile.id}" alt="Avatar">
@@ -268,29 +269,16 @@
                 <p style="margin-top: 10px;">
                     ${interestsList.map(i => `<span class="interests-tag">${i}</span>`).join(' ')}
                 </p>
-                <button class="start-chat-btn" 
+                <button onclick="redirectToChat(this)"
                         data-email="${targetEmail}" 
                         style="background-color: var(--accent-green); margin-top: 15px;" 
                         data-i18n="START_CHAT">ابدأ الدردشة</button>
             `;
             
-            // **الكود المُصحح والمُركز على النقر:**
-            const startChatBtn = card.querySelector('.start-chat-btn');
-            
-            startChatBtn.addEventListener('click', (e) => {
-                const emailToChatWith = e.currentTarget.getAttribute('data-email');
-                
-                if (emailToChatWith) {
-                    console.log(`✅ تم النقر. التوجيه إلى: private_chat.html?user=${emailToChatWith}`); 
-                    window.location.href = `private_chat.html?user=${emailToChatWith}`;
-                } else {
-                    console.error("❌ البريد الإلكتروني الهدف مفقود.");
-                }
-                e.stopPropagation(); 
-            });
-
+            // تحديث نص الزر إذا كانت الترجمة موجودة
             if (window.loadLanguage) { 
-                startChatBtn.textContent = loadLanguage('START_CHAT');
+                const button = card.querySelector('.start-chat-btn');
+                if (button) button.textContent = loadLanguage('START_CHAT');
             }
             return card;
         }
@@ -305,6 +293,19 @@
             }).catch((error) => {
                 console.error("Logout Error:", error);
             });
+        }
+    </script>
+    
+    <script>
+        function redirectToChat(buttonElement) {
+            const emailToChatWith = buttonElement.getAttribute('data-email');
+            
+            if (emailToChatWith) {
+                console.log(`✅ التوجيه الجبري إلى: private_chat.html?user=${emailToChatWith}`);
+                window.location.href = `private_chat.html?user=${emailToChatWith}`;
+            } else {
+                console.error("❌ البريد الإلكتروني الهدف مفقود في خاصية data-email.");
+            }
         }
     </script>
 </body>
