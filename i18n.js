@@ -3,7 +3,7 @@ const translations = {
     'en': {
         // General & Navigation
         'LOGOUT': 'Logout',
-        'DASHBOARD': 'Dashboard',
+        'DASHBOARD': 'Dashboard', // يمكن تغييرها لاحقًا إلى "الملف الشخصي"
         'SETTINGS': 'Admin',
         'PROFILE': 'Profile',
         'SIGN_IN': 'Sign In', 
@@ -13,22 +13,24 @@ const translations = {
         'ARABIC_BUTTON': 'العربية', 
         'ENGLISH_BUTTON': 'English',
         
-        // Chat - General
-        'GENERAL_CHAT': 'General Chat',
-        'GENERAL_CHAT_TITLE': 'General Chat (All)',
-        'CHAT_CHANNELS': 'Chat Channels',
+        // Chat - Matching & Private Chat (NEW)
+        'MATCHING_PROFILES': 'Matching Profiles',
+        'FIND_NEW_PEOPLE': 'Find New People to Chat With',
+        'SEARCH_PROFILES_PLACEHOLDER': 'Search by Name or Interests...',
+        'START_CHAT': 'Start Chat',
+        'NO_PROFILES_FOUND': 'No matching profiles found.',
+        'PRIVATE_CHAT_TITLE': 'Private Chat',
         'CHAT_MESSAGE_PLACEHOLDER': 'Type your message here...',
         'SEND_MESSAGE': 'Send',
-        'WELCOME_CHAT': 'Welcome! Exchange messages with other players.',
         
-        // Chat - Alliance
-        'ALLIANCES_CHAT': 'Alliance Chat (Private)',
-        'ALLIANCES_CHAT_TITLE': 'Alliance Chat (Private)',
-        'CHAT_NOTE': 'Alliance chat will be enabled after joining an alliance.',
-        'CLEAR_CHAT_HISTORY': 'Clear Chat History',
-        'WELCOME_ALLIANCE_CHAT': 'Welcome to your Alliance Chat!',
-        'ALLIANCE_ACCESS_DENIED': 'Access Denied',
-        'ALLIANCE_ACCESS_DENIED_MSG': 'You must be a member of an alliance to join this channel.',
+        // Login/Auth 
+        'SIGN_IN_EMAIL_TITLE': 'Sign In with Email',
+        'EMAIL_PLACEHOLDER': 'Email Address',
+        'PASSWORD_PLACEHOLDER': 'Password',
+        'FORGOT_PASSWORD': 'Forgot Password?',
+        'LOGIN_FIELDS_REQUIRED': 'Please enter both email and password.', 
+        'LOGIN_SUCCESS': 'Login successful!',
+        'LOGIN_FAIL': 'Login failed. Please check your credentials.',
 
         // Settings/User Data
         'SAVE_NAME': 'Save Name',
@@ -39,16 +41,9 @@ const translations = {
         'FEATURE_DISABLED': '(This feature is currently disabled)',
         'NAME_SAVE_SUCCESS': 'Username updated successfully.',
         'NAME_SAVE_FAIL': 'Failed to update username. Please check your connection or try again.',
-        
-        // Login/Auth (NEW Keys for Email/Password)
-        'SIGN_IN_EMAIL_TITLE': 'Sign In with Email',
-        'EMAIL_PLACEHOLDER': 'Email Address',
-        'PASSWORD_PLACEHOLDER': 'Password',
-        'FORGOT_PASSWORD': 'Forgot Password?',
-        'LOGIN_FIELDS_REQUIRED': 'Please enter both email and password.', 
-        'LOGIN_SUCCESS': 'Login successful!',
-        'LOGIN_FAIL': 'Login failed. Please check your credentials.',
 
+        // القديمة (تم حذفها من الاستخدام لكن تم الإبقاء على بعضها للوضوح)
+        'GENERAL_CHAT_TITLE': 'General Chat', 
     },
     
     // Arabic (ar) translations
@@ -65,23 +60,24 @@ const translations = {
         'ARABIC_BUTTON': 'العربية', 
         'ENGLISH_BUTTON': 'English',
         
-        // الدردشة - عام
-        'GENERAL_CHAT': 'الشات العام',
-        'GENERAL_CHAT_TITLE': 'الشات العام (الجميع)',
-        'CHAT_CHANNELS': 'قنوات الدردشة',
+        // Chat - Matching & Private Chat (جديد)
+        'MATCHING_PROFILES': 'ملفات التعارف',
+        'FIND_NEW_PEOPLE': 'ابحث عن أشخاص جدد للدردشة',
+        'SEARCH_PROFILES_PLACEHOLDER': 'ابحث بالاسم أو الاهتمامات...',
+        'START_CHAT': 'ابدأ الدردشة',
+        'NO_PROFILES_FOUND': 'لم يتم العثور على ملفات مطابقة.',
+        'PRIVATE_CHAT_TITLE': 'الدردشة الخاصة',
         'CHAT_MESSAGE_PLACEHOLDER': 'اكتب رسالتك هنا...',
         'SEND_MESSAGE': 'إرسال',
-        'WELCOME_CHAT': 'أهلاً بك! تبادل الرسائل مع اللاعبين الآخرين.',
 
-        // الدردشة - تحالفات
-        'ALLIANCES_CHAT': 'شات التحالفات (خاص)',
-        'ALLIANCES_CHAT_TITLE': 'شات التحالفات (الخاص)',
-        'CHAT_NOTE': 'سيتم تمكين شات التحالفات بعد انضمامك لتحالف.',
-        'CLEAR_CHAT_HISTORY': 'حذف تاريخ الدردشة',
-        'WELCOME_ALLIANCE_CHAT': 'أهلاً بك في شات تحالفك!',
-        'ALLIANCE_ACCESS_DENIED': 'غير مصرح بالدخول',
-        'ALLIANCE_ACCESS_DENIED_MSG': 'يجب أن تكون عضواً في تحالف للانضمام لهذه القناة.',
-
+        // تسجيل الدخول/المصادقة 
+        'SIGN_IN_EMAIL_TITLE': 'تسجيل الدخول بالبريد الإلكتروني',
+        'EMAIL_PLACEHOLDER': 'البريد الإلكتروني',
+        'PASSWORD_PLACEHOLDER': 'كلمة المرور',
+        'FORGOT_PASSWORD': 'نسيت كلمة المرور؟',
+        'LOGIN_FIELDS_REQUIRED': 'الرجاء إدخال البريد الإلكتروني وكلمة المرور.', 
+        'LOGIN_SUCCESS': 'تم تسجيل الدخول بنجاح!',
+        'LOGIN_FAIL': 'فشل تسجيل الدخول. يرجى التحقق من بياناتك.',
 
         // الإعدادات/بيانات المستخدم
         'SAVE_NAME': 'حفظ الاسم',
@@ -92,16 +88,9 @@ const translations = {
         'FEATURE_DISABLED': '(هذه الميزة غير مفعلة حالياً)',
         'NAME_SAVE_SUCCESS': 'تم تحديث اسم المستخدم بنجاح.',
         'NAME_SAVE_FAIL': '❌ فشل تحديث الاسم. يرجى التحقق من اتصالك بالإنترنت أو المحاولة مجدداً.',
-
-        // تسجيل الدخول/المصادقة (مفاتيح جديدة للإيميل/كلمة المرور)
-        'SIGN_IN_EMAIL_TITLE': 'تسجيل الدخول بالبريد الإلكتروني',
-        'EMAIL_PLACEHOLDER': 'البريد الإلكتروني',
-        'PASSWORD_PLACEHOLDER': 'كلمة المرور',
-        'FORGOT_PASSWORD': 'نسيت كلمة المرور؟',
-        'LOGIN_FIELDS_REQUIRED': 'الرجاء إدخال البريد الإلكتروني وكلمة المرور.', 
-        'LOGIN_SUCCESS': 'تم تسجيل الدخول بنجاح!',
-        'LOGIN_FAIL': 'فشل تسجيل الدخول. يرجى التحقق من بياناتك.',
-
+        
+        // القديمة (تم حذفها من الاستخدام لكن تم الإبقاء على بعضها للوضوح)
+        'GENERAL_CHAT_TITLE': 'الشات العام',
     }
 };
 
