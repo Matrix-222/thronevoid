@@ -6,72 +6,31 @@
     <title data-i18n="MATCHING_PROFILES">ملفات التعارف</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* CSS خاص لواجهة التعارف */
         .main-container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 40px auto;
-            background-color: var(--secondary-dark);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
-            min-height: 70vh;
+            padding: 0 20px;
         }
         #profiles-list {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
             margin-top: 20px;
-        }
-        .profile-card {
-            background-color: #333;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
-            border-top: 4px solid var(--accent-yellow);
-        }
-        .profile-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
-        }
-        .profile-card img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 10px;
-            border: 3px solid var(--accent-blue);
-        }
-        .profile-card h3 {
-            color: var(--accent-yellow);
-            margin: 5px 0;
-        }
-        .profile-card p {
-            color: #ccc;
-            font-size: 0.9em;
-        }
-        .start-chat-btn {
-            background-color: #27ae60;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <header>
         <h1>THRONES OF THE VOID - CHAT</h1>
-        <div>
-            <button onclick="logoutUser()" style="background-color: #e74c3c;" data-i18n="LOGOUT">تسجيل الخروج</button>
+        <div class="header-buttons">
+            <button onclick="window.location='dashboard.html'" data-i18n="PROFILE" style="background-color: var(--accent-blue);">ملفي الشخصي</button>
+            <button onclick="logoutUser()" class="logout-btn" data-i18n="LOGOUT">تسجيل الخروج</button>
         </div>
     </header>
 
     <main class="main-container">
-        <h2 data-i18n="FIND_NEW_PEOPLE">ابحث عن أشخاص جدد</h2>
-        <input type="text" id="searchBar" data-i18n="SEARCH_PROFILES_PLACEHOLDER" placeholder="ابحث بالاسم أو الاهتمامات..." style="width: 100%; padding: 10px; border-radius: 8px;">
+        <h2 data-i18n="FIND_NEW_PEOPLE" style="color: var(--accent-green);">ابحث عن أشخاص جدد</h2>
+        <input type="text" id="searchBar" data-i18n="SEARCH_PROFILES_PLACEHOLDER" placeholder="ابحث بالاسم أو الاهتمامات...">
 
         <div id="profiles-list">
             </div>
@@ -79,12 +38,31 @@
 
     <script src="i18n.js"></script>
     <script type="module">
-        // ... (كود Firebase الأساسي)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            query, 
+            where, 
+            getDocs
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // سنركز على وظيفة جلب وعرض الملفات
+        // *** مفاتيح مشروعك الفعلي (thronevoid) ***
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-bfHRJW3E8KW3-o-PkNW6xi5ytrTKMJE", 
+            authDomain: "thronevoid.firebaseapp.com",
+            projectId: "thronevoid",
+            storageBucket: "thronevoid.firebasestorage.app",
+            messagingSenderId: "958587822012",
+            appId: "1:958587822012:web:312cf3d9e7c87e1c6415b9",
+            measurementId: "G-N34T3VRGX0"
+        };
         
-        const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
+
         const profilesList = document.getElementById('profiles-list');
         const searchBar = document.getElementById('searchBar');
         let currentUserEmail = null;
@@ -99,33 +77,49 @@
         });
 
         async function fetchProfiles(searchTerm = '') {
-            profilesList.innerHTML = '<p>جار التحميل...</p>';
+            profilesList.innerHTML = `<p style="text-align: center; color: var(--text-muted);">جار التحميل...</p>`;
             
-            // جلب كل المستخدمين باستثناء المستخدم الحالي
             const usersRef = collection(db, "users");
-            const q = query(usersRef, where('email', '!=', currentUserEmail));
+            // جلب جميع المستخدمين
+            const q = query(usersRef); 
 
-            const snapshot = await getDocs(q);
-            profilesList.innerHTML = '';
+            try {
+                const snapshot = await getDocs(q);
+                profilesList.innerHTML = '';
+                let foundProfiles = 0;
 
-            snapshot.forEach(doc => {
-                const userData = doc.data();
-                const username = userData.username || doc.id.split('@')[0];
-                const interests = userData.interests || 'لا توجد اهتمامات محددة';
-                const profileId = doc.id;
+                snapshot.forEach(doc => {
+                    const userData = doc.data();
+                    const profileEmail = doc.id;
+                    
+                    // استثناء المستخدم الحالي
+                    if (profileEmail === currentUserEmail) return;
 
-                // تصفية بسيطة بناءً على الاسم أو الاهتمامات
-                if (searchTerm === '' || 
-                    username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    interests.toLowerCase().includes(searchTerm.toLowerCase())) 
-                {
-                    profilesList.appendChild(createProfileCard(username, interests, profileId));
+                    const username = userData.username || profileEmail.split('@')[0];
+                    const interests = userData.interests || loadLanguage('DEFAULT_INTERESTS');
+                    const bio = userData.bio || loadLanguage('DEFAULT_BIO');
+
+                    // تصفية بسيطة بناءً على الاسم أو الاهتمامات
+                    const searchLower = searchTerm.toLowerCase();
+                    if (searchTerm === '' || 
+                        username.toLowerCase().includes(searchLower) ||
+                        interests.toLowerCase().includes(searchLower) ||
+                        bio.toLowerCase().includes(searchLower)) 
+                    {
+                        profilesList.appendChild(createProfileCard(username, interests, profileEmail));
+                        foundProfiles++;
+                    }
+                });
+                
+                if (foundProfiles === 0) {
+                    profilesList.innerHTML = `<p style="text-align: center; color: var(--text-muted);" data-i18n="NO_PROFILES_FOUND">${loadLanguage('NO_PROFILES_FOUND')}</p>`;
                 }
-            });
-            if (profilesList.innerHTML === '') {
-                profilesList.innerHTML = '<p data-i18n="NO_PROFILES_FOUND">لم يتم العثور على ملفات مطابقة.</p>';
-                if (window.loadLanguage) window.loadLanguage();
+
+            } catch (error) {
+                console.error("Error fetching profiles:", error);
+                profilesList.innerHTML = `<p style="text-align: center; color: #e74c3c;">فشل تحميل الملفات.</p>`;
             }
+            
         }
         
         searchBar.addEventListener('input', (e) => {
@@ -136,25 +130,28 @@
             const card = document.createElement('div');
             card.className = 'profile-card';
             card.innerHTML = `
-                <img src="default_avatar.png" alt="Avatar">
+                <img src="https://i.pravatar.cc/150?u=${email}" alt="Avatar">
                 <h3>${username}</h3>
-                <p>${interests}</p>
-                <button class="start-chat-btn" data-email="${email}" data-i18n="START_CHAT">ابدأ الدردشة</button>
+                <p>الاهتمامات: ${interests}</p>
+                <button class="start-chat-btn" data-email="${email}" style="background-color: var(--accent-green);" data-i18n="START_CHAT">ابدأ الدردشة</button>
             `;
             
-            // إضافة مستمع لبدء الدردشة الخاصة
             card.querySelector('.start-chat-btn').addEventListener('click', (e) => {
                 const targetEmail = e.target.getAttribute('data-email');
-                // توجيه إلى صفحة المحادثة مع تحديد المستخدم المستهدف
+                // التوجيه إلى صفحة المحادثة مع تحديد المستخدم المستهدف
                 window.location.href = `private_chat.html?user=${targetEmail}`;
             });
 
-            if (window.loadLanguage) window.loadLanguage(); // لتطبيق الترجمة على زر الدردشة
             return card;
         }
-
-        // ... (بقية كود Firebase مثل onAuthStateChanged و logoutUser)
-        // يجب أن يتم إضافة كود Firebase الأساسي الذي استخدمناه في chat.html هنا.
+        
+        window.logoutUser = function() {
+            signOut(auth).then(() => { 
+                window.location.href = "index.html";
+            }).catch((error) => {
+                console.error("Logout Error:", error);
+            });
+        }
     </script>
 </body>
 </html>
