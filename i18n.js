@@ -22,6 +22,7 @@ const translations = {
         'CHAT_MESSAGE_PLACEHOLDER': 'Type your message here...',
         'SEND_MESSAGE': 'Send',
         'ADVANCED_FILTERS': 'Advanced Filters',
+        'NEW_MESSAGE_NOTIFICATION': 'New Message from', // جديد
         
         // Login/Auth 
         'SIGN_IN_EMAIL_TITLE': 'Sign In with Email',
@@ -66,7 +67,7 @@ const translations = {
         'ARABIC_BUTTON': 'العربية', 
         'ENGLISH_BUTTON': 'English',
         
-        // Chat - Matching & Private Chat (جديد)
+        // Chat - Matching & Private Chat 
         'MATCHING_PROFILES': 'ملفات التعارف',
         'FIND_NEW_PEOPLE': 'ابحث عن أشخاص جدد للدردشة',
         'SEARCH_PROFILES_PLACEHOLDER': 'ابحث بالاسم أو النبذة...',
@@ -76,6 +77,7 @@ const translations = {
         'CHAT_MESSAGE_PLACEHOLDER': 'اكتب رسالتك هنا...',
         'SEND_MESSAGE': 'إرسال',
         'ADVANCED_FILTERS': 'تصفية متقدمة',
+        'NEW_MESSAGE_NOTIFICATION': 'رسالة جديدة من', // جديد
 
         // تسجيل الدخول/المصادقة 
         'SIGN_IN_EMAIL_TITLE': 'تسجيل الدخول بالبريد الإلكتروني',
