@@ -202,12 +202,13 @@
         }
         
         // -------------------------------------------------------------
-        //             ✅ دالة حفظ اسم المستخدم الجديد (مُعدَّلة) ✅
+        //             ✅ دالة حفظ اسم المستخدم الجديد (مُصحَّحة) ✅
         // -------------------------------------------------------------
         async function saveUsername() {
             if (!currentUserEmail) return;
 
-            const newUsername = document.getElementById('usernameInput').value.trim();
+            // هنا يتم قراءة القيمة من حقل الإدخال HTML، وليس كمتغير جافاسكريبت
+            const newUsername = document.getElementById('usernameInput').value.trim(); 
             if (newUsername.length < 3 || newUsername.length > 15) {
                 alert("يجب أن يكون اسم المستخدم بين 3 و 15 حرفاً.");
                 return;
@@ -224,7 +225,6 @@
             } catch (error) {
                 console.error("Firebase Security Error:", error);
                 
-                // رسالة واضحة تركز على قواعد الأمان إذا كان الخطأ غير عام
                 if (error.code === 'permission-denied') {
                     alert("❌ فشل تحديث الاسم: خطأ أمان في Firebase. تأكد أن القاعدة تسمح للمالك فقط بالتعديل.");
                 } else {
