@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="MATCHING_PAGE_TITLE">البحث عن ملفات</title>
+    <title data-i18n="MATCHING_PAGE_TITLE">صفحة الدردشة</title>
     <link rel="stylesheet" href="style.css">
     <style>
         /* تنسيقات خاصة بصفحة chat.html */
@@ -99,7 +99,7 @@
 
     <main>
         <div class="filters-container">
-            <h2>ADVANCED_FILTERS</h2>
+            <h2 data-i18n="ADVANCED_FILTERS">مرشحات البحث المتقدمة</h2>
             
             <div class="filter-group">
                 <label data-i18n="SEARCH_BY_INTERESTS">ابحث بالاهتمامات المشتركة</label>
@@ -116,7 +116,7 @@
             <button id="applyFiltersBtn" data-i18n="APPLY_FILTERS">تطبيق التصفية</button>
         </div>
 
-        <h2 style="text-align: center;" data-i18n="AVAILABLE_USERS">ابحث عن أشخاص جدد للدردشة</h2>
+        <h2 style="text-align: center;" data-i18n="CHAT_LIST_HEADER">ابحث عن أشخاص جدد للدردشة</h2>
         <div id="userList" class="user-list">
             <p id="loadingMessage" style="color: var(--text-muted);">جاري تحميل الملفات...</p>
         </div>
@@ -165,18 +165,16 @@
                 currentUser = user;
                 updateOnlineStatus(true);
                 setupOnlineStatusListener();
-                // جلب المستخدمين بدون مرشحات عند التحميل الأولي
                 fetchUsers();
             } else {
                 window.location.href = "index.html";
             }
         });
         
-        // --- تحديث حالة الاتصال ---
+        // --- تحديث حالة الاتصال (نفس الكود) ---
         async function updateOnlineStatus(isOnline) {
             if (!currentUser) return;
             try {
-                // نستخدم currentUser.email كـ userId في Firestore
                 await updateDoc(doc(db, "users", currentUser.email), {
                     isOnline: isOnline,
                     lastSeen: new Date().toISOString()
@@ -186,7 +184,6 @@
             }
         }
         
-        // --- وظيفة المراقبة عند إغلاق أو مغادرة الصفحة ---
         window.addEventListener('beforeunload', () => {
             if (currentUser) {
                 updateOnlineStatus(false);
@@ -194,7 +191,7 @@
         });
 
 
-        // --- مراقبة حالة الاتصال للمستخدمين الآخرين ---
+        // --- مراقبة حالة الاتصال (نفس الكود) ---
         function setupOnlineStatusListener() {
             onSnapshot(collection(db, "users"), (snapshot) => {
                 snapshot.docChanges().forEach((change) => {
@@ -207,13 +204,8 @@
                         const h3 = card.querySelector('h3');
                         if (h3) {
                             h3.innerHTML = h3.innerHTML.replace(/<span class="online-dot" title="متصل"><\/span>/g, '');
-                            
                             const isOnlineDot = data.isOnline ? '<span class="online-dot" title="متصل"></span>' : '';
-                            
-                            // استخراج اسم المستخدم بدقة
                             const username = data.username || data.email.split('@')[0];
-                            
-                            // إعادة بناء الـ H3 مع النقطة الصحيحة واسم المستخدم
                             h3.innerHTML = `${isOnlineDot}${username}`;
                         }
                     }
@@ -221,27 +213,22 @@
             });
         }
         
-        // --- الدالة الرئيسية لجلب المستخدمين وتطبيق المرشحات ---
+        // --- الدالة الرئيسية لجلب المستخدمين (نفس الكود) ---
         async function fetchUsers() {
-            if (!currentUser) return; // تأكد من وجود مستخدم مسجل الدخول
+            if (!currentUser) return;
 
             try {
                 userListContainer.innerHTML = '';
                 loadingMessage.style.display = 'block';
 
-                // الاستعلام يجلب جميع المستخدمين
                 const q = query(collection(db, "users"));
-                
                 const querySnapshot = await getDocs(q);
                 let allUsers = [];
                 querySnapshot.forEach((doc) => {
                     allUsers.push(doc.data());
                 });
 
-                // تصفية المستخدم الحالي خارجياً
                 const usersExcludingMe = allUsers.filter(user => user.email !== currentUser.email);
-
-                // تطبيق المرشحات داخل JavaScript
                 const filteredUsers = getMatchingUsers(usersExcludingMe);
                 
                 loadingMessage.style.display = 'none';
@@ -261,18 +248,16 @@
             }
         }
         
-        // --- دالة منطق تصفية المستخدمين (الاهتمامات وحالة الاتصال) ---
+        // --- دالة منطق التصفية (نفس الكود) ---
         function getMatchingUsers(users) {
             const onlineOnly = onlineOnlyCheckbox.checked;
             const interestsQuery = interestsInput.value.trim().toLowerCase();
             let matchedUsers = users;
 
-            // 1. تصفية حسب حالة الاتصال (Online Only)
             if (onlineOnly) {
                 matchedUsers = matchedUsers.filter(user => user.isOnline === true);
             }
 
-            // 2. تصفية حسب الاهتمامات المشتركة
             if (interestsQuery) {
                 const searchInterests = interestsQuery.split(',').map(i => i.trim());
                 
@@ -281,7 +266,6 @@
 
                     const userInterests = user.interests.toLowerCase().split(',').map(i => i.trim());
                     
-                    // التحقق من وجود تطابق واحد على الأقل بين اهتمامات البحث واهتمامات المستخدم
                     return searchInterests.some(si => userInterests.includes(si));
                 });
             }
@@ -289,7 +273,7 @@
             return matchedUsers;
         }
 
-        // --- بناء بطاقة المستخدم ---
+        // --- بناء بطاقة المستخدم (نفس الكود) ---
         function displayUser(userData) {
             const card = document.createElement('div');
             card.className = 'user-card';
@@ -315,7 +299,7 @@
             userListContainer.appendChild(card);
         }
         
-        // --- تسجيل الخروج ---
+        // --- تسجيل الخروج (نفس الكود) ---
         window.logoutUser = function() {
             updateOnlineStatus(false).then(() => {
                 signOut(auth).then(() => { 
@@ -326,7 +310,6 @@
             });
         }
 
-        // --- ربط زر تطبيق التصفية بدالة الجلب ---
         applyFiltersBtn.addEventListener('click', fetchUsers);
     </script>
 </body>
