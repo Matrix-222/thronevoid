@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="ALLIANCES_CHAT">شات التحالفات - Throne Void</title>
+    <title data-i18n="ALLIANCES_CHAT">شات التحالفات (خاص) - Throne Void</title>
     <link rel="stylesheet" href="style.css"> 
     <style>
         .chat-container {
@@ -14,7 +14,7 @@
             box-shadow: 0 0 25px rgba(52, 152, 219, 0.5);
             display: flex;
             flex-direction: column;
-            height: 80vh; /* لارتفاع ثابت */
+            height: 80vh;
         }
         .chat-header {
             background-color: #3498db;
@@ -32,7 +32,7 @@
             overflow-y: auto;
             background-color: #1a1a2e;
             display: flex;
-            flex-direction: column-reverse; /* لعرض الرسائل من الأسفل */
+            flex-direction: column-reverse;
         }
         .message {
             margin-bottom: 10px;
@@ -79,8 +79,6 @@
             display: block;
             text-align: right;
         }
-
-        /* حقل الإدخال */
         .chat-input {
             padding: 15px;
             border-top: 1px solid #3c3c66;
@@ -110,7 +108,6 @@
         .chat-input button:hover {
             background-color: #27ae60;
         }
-        /* رسالة الكتم */
         #mutedMessage {
             text-align: center;
             padding: 15px;
@@ -128,13 +125,14 @@
         <h1>THRONES OF THE VOID</h1>
         <div>
             <button onclick="window.location='dashboard.html'" style="background-color: #2ecc71;" data-i18n="DASHBOARD">لوحة التحكم</button>
+            <button onclick="window.location='general_chat.html'" style="background-color: #3498db;" data-i18n="GENERAL_CHAT">الشات العام</button>
             <button id="logoutBtn" style="background-color: var(--accent-red);" data-i18n="LOGOUT">تسجيل الخروج</button>
         </div>
     </header>
 
     <main>
         <div class="chat-container">
-            <div class="chat-header" data-i18n="CHAT_TITLE">الشات العالمي للتحالف</div>
+            <div class="chat-header" data-i18n="CHAT_TITLE_ALLIANCE">شات التحالف (الخاص)</div>
             
             <div id="messagesBox">
                 </div>
@@ -189,7 +187,7 @@
         const mutedMessageDiv = document.getElementById('mutedMessage');
         
         // -------------------------------------------------------------
-        //                 دالة إرسال الرسالة
+        //                 دالة إرسال الرسالة (تستخدم "alliance_messages")
         // -------------------------------------------------------------
         async function sendMessage() {
             const messageText = messageInput.value.trim();
@@ -201,16 +199,16 @@
             }
 
             try {
-                // إضافة الرسالة إلى مجموعة "messages" في Firestore
-                await addDoc(collection(db, "messages"), {
+                // 🔥 استخدام مجموعة "alliance_messages" للشات الخاص 🔥
+                await addDoc(collection(db, "alliance_messages"), {
                     senderEmail: auth.currentUser.email,
                     senderUsername: currentUserData.username || 'Anonymous',
                     text: messageText,
                     timestamp: new Date(),
-                    isAdmin: auth.currentUser.email === ADMIN_EMAIL // لتسليط الضوء على رسائل المشرف
+                    isAdmin: auth.currentUser.email === ADMIN_EMAIL 
                 });
 
-                messageInput.value = ""; // مسح حقل الإدخال
+                messageInput.value = ""; 
             } catch (error) {
                 console.error("Error sending message:", error);
                 alert("فشل إرسال الرسالة.");
@@ -218,9 +216,10 @@
         }
 
         // -------------------------------------------------------------
-        //                 دالة عرض الرسائل
+        //                 دالة عرض الرسائل (لم تتغير)
         // -------------------------------------------------------------
         function displayMessage(msg, isMine) {
+            // ... (نفس الكود السابق) ...
             const time = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now';
             
             const messageDiv = document.createElement('div');
@@ -247,16 +246,13 @@
         }
 
         // -------------------------------------------------------------
-        //                 الاستماع لرسائل الشات (Real-time)
+        //                 الاستماع لرسائل الشات (Real-time) (تم التحديث)
         // -------------------------------------------------------------
         function setupChatListener(currentEmail) {
-            // استعلام للحصول على أحدث 50 رسالة، مرتبة حسب الأحدث أولاً
-            const q = query(collection(db, "messages"), orderBy("timestamp", "desc"), limit(50));
+            // 🔥 الاستماع إلى مجموعة "alliance_messages" للشات الخاص 🔥
+            const q = query(collection(db, "alliance_messages"), orderBy("timestamp", "desc"), limit(50));
             
-            // onSnapshot تستمع للتحديثات في الوقت الفعلي
             onSnapshot(q, (snapshot) => {
-                // مسح محتوى صندوق الرسائل قبل إعادة بناء القائمة
-                // (هذه طريقة بسيطة، يمكن تحسينها للاحتفاظ بموقع التمرير)
                 messagesBox.innerHTML = ''; 
 
                 const messages = [];
@@ -264,23 +260,20 @@
                     messages.push(doc.data());
                 });
 
-                // عرض الرسائل (في ترتيب زمني صحيح: الأقدم أولاً)
                 messages.reverse().forEach(msg => {
                     const isMine = msg.senderEmail === currentEmail;
                     displayMessage(msg, isMine);
                 });
 
-                // التمرير التلقائي إلى الأسفل
                 messagesBox.scrollTop = messagesBox.scrollHeight;
             });
         }
         
         // -------------------------------------------------------------
-        //                   التحقق من الدخول وحالة الكتم
+        //                   التحقق من الدخول وحالة الكتم (لم يتغير)
         // -------------------------------------------------------------
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // 1. تحميل بيانات المستخدم (للحصول على اسم المستخدم وحالة الكتم)
                 const userDocRef = doc(db, "users", user.email);
                 const userDoc = await getDoc(userDocRef);
                 
@@ -296,7 +289,6 @@
                     }
                 }
 
-                // 2. تفعيل مستمع الشات
                 setupChatListener(user.email);
             } else {
                 window.location.href = "login.html";
