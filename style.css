@@ -30,7 +30,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid var(--accent-red); /* خط أحمر فاصل */
+    border-bottom: 2px solid var(--accent-red); 
 }
 
 header h1 {
@@ -39,7 +39,7 @@ header h1 {
     text-transform: uppercase;
     font-size: 2.5em;
     letter-spacing: 2px;
-    text-shadow: 0 0 5px rgba(255, 199, 0, 0.5); /* تأثير توهج خفيف */
+    text-shadow: 0 0 5px rgba(255, 199, 0, 0.5);
 }
 
 /* ================================================= */
@@ -56,12 +56,12 @@ button {
     text-transform: uppercase;
     letter-spacing: 1px;
     transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
-    border-radius: 4px; /* زوايا مربعة */
+    border-radius: 4px;
 }
 
 button:hover {
-    background-color: #ff3838; /* أحمر أكثر لمعاناً عند التمرير */
-    box-shadow: 0 0 15px rgba(227, 27, 35, 0.8); /* توهج قوي */
+    background-color: #ff3838;
+    box-shadow: 0 0 15px rgba(227, 27, 35, 0.8);
     transform: translateY(-2px);
 }
 
@@ -146,7 +146,7 @@ a:hover {
     padding: 80px 20px;
     max-width: 900px;
     margin-top: 50px;
-    background-color: rgba(26, 26, 26, 0.4); /* خلفية شبه شفافة */
+    background-color: rgba(26, 26, 26, 0.4); 
     border: 1px solid rgba(255, 199, 0, 0.3);
     border-radius: 8px;
 }
@@ -158,7 +158,7 @@ a:hover {
     font-size: 3.5em;
     letter-spacing: 4px;
     margin-bottom: 10px;
-    text-shadow: 0 0 10px rgba(255, 199, 0, 0.8); /* توهج قوي */
+    text-shadow: 0 0 10px rgba(255, 199, 0, 0.8);
 }
 
 .hero-section p {
@@ -166,4 +166,94 @@ a:hover {
     color: #bbb;
     max-width: 600px;
     margin: 0 auto;
+}
+
+/* ================================================= */
+/* 6. تنسيقات اللعبة ولوحة المتصدرين (الخاصة) */
+/* ================================================= */
+
+/* تنسيق لوحة التحكم (Dashboard container) */
+.container { 
+    background: var(--secondary-dark); 
+    padding: 40px; 
+    border-radius: 12px; 
+    max-width: 800px; 
+    margin: 40px auto; 
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--accent-yellow);
+}
+#highScoreDisplay { 
+    color: var(--accent-yellow); 
+    margin-bottom: 15px; 
+} 
+
+/* تنسيق اللعبة (Canvas) */
+#gameArea {
+    border: 2px solid #3498db;
+    background-color: #121212;
+    margin: 20px auto;
+    display: block;
+    cursor: pointer;
+}
+
+/* تنسيق لوحة المتصدرين (Leaderboard) */
+.leaderboard-container {
+    margin: 40px auto;
+    max-width: 600px;
+    background-color: var(--secondary-dark);
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--accent-yellow);
+}
+.leaderboard-container h2 {
+    color: var(--accent-yellow);
+    text-align: center;
+    margin-bottom: 30px;
+    text-shadow: 0 0 5px rgba(255, 199, 0, 0.5);
+}
+#leaderboardTable {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+#leaderboardTable th, #leaderboardTable td {
+    padding: 12px;
+    border-bottom: 1px solid #333;
+}
+#leaderboardTable th {
+    background-color: #2a2a2a;
+    color: var(--accent-red);
+    text-transform: uppercase;
+}
+#leaderboardTable tr:nth-child(even) {
+    background-color: #161616;
+}
+#leaderboardTable tr:hover {
+    background-color: #333;
+}
+/* تمييز المراكز الثلاثة الأولى */
+.rank-1 { color: gold; font-weight: bold; }
+.rank-2 { color: silver; font-weight: bold; }
+.rank-3 { color: #cd7f32; font-weight: bold; }
+
+/* ================================================= */
+/* 7. خلفية الفيديو المتحركة (إضافة جديدة) */
+/* ================================================= */
+
+#background-video {
+    position: fixed; /* تثبيت الفيديو في الخلفية */
+    top: 0;
+    left: 0;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: -100; /* إرسال الفيديو إلى الخلف تماماً */
+    object-fit: cover; /* ضمان تغطية كل المساحة */
+}
+
+/* لضمان بقاء المحتوى (Header and Main) فوق الفيديو */
+main, header {
+    position: relative;
+    z-index: 10;
 }
