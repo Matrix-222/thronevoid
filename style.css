@@ -106,102 +106,67 @@ button:hover {
     margin-bottom: 2px;
 }
 
-/* --- تصميم لوحة الإيموجي (Emoji Picker) --- */
-.emoji-picker {
-    position: absolute;
-    bottom: 70px; /* فوق شريط الإدخال */
-    right: 15px;
-    width: 250px;
-    max-height: 200px;
-    background-color: #3a3a3a;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
-    padding: 10px;
-    overflow-y: auto;
-    display: none; /* مخفية بشكل افتراضي */
-    z-index: 10;
-    border: 1px solid var(--border-color);
+/* --- تنسيقات المرشحات المتقدمة المُعدلة --- */
+.filters-container {
+    /* تم تصغير الحجم الأقصى وتوسيطه */
+    max-width: 400px; 
+    margin: 20px auto; 
+    padding: 20px;
+    background-color: var(--secondary-dark);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
-.emoji-picker.show {
+.filters-container h2 {
+    color: var(--accent-blue);
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.filter-group {
+    margin-bottom: 15px;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.filter-group label {
     display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
 }
 
-.emoji-item {
-    cursor: pointer;
-    font-size: 1.5em;
-    margin: 5px;
-    transition: transform 0.1s;
-    display: inline-block;
+#applyFiltersBtn {
+    width: 100%;
+    margin-top: 15px;
+    background-color: var(--accent-green);
+}
+#applyFiltersBtn:hover {
+    background-color: #1e7e34;
 }
 
-.emoji-item:hover {
-    transform: scale(1.1);
-}
-
-
-/* --- تصميم لوحة بحث GIF (GIF Picker) --- */
-.gif-picker-container {
-    position: absolute;
-    bottom: 70px; /* فوق شريط الإدخال */
-    left: 15px; /* ضعها بجوار لوحة الإيموجي أو بدلاً منها */
-    width: 300px;
-    height: 250px;
-    background-color: #3a3a3a;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
-    padding: 10px;
-    z-index: 20;
-    display: none;
-    flex-direction: column;
-    border: 1px solid var(--border-color); /* إضافة حدود لتوحيد الشكل */
-}
-
-.gif-picker-container.show {
+/* --- تنسيقات الدردشة وقائمة المستخدمين (للتأكد من عدم وجود تعارض) --- */
+.user-list {
     display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 30px;
 }
 
-#gifSearchInput {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    background-color: #444;
-    color: var(--text-light);
-}
-
-#gifResults {
-    flex-grow: 1;
-    overflow-y: auto;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-}
-
-.gif-item {
+.user-card {
+    background-color: var(--secondary-dark);
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
     cursor: pointer;
-    border: 2px solid transparent;
-    border-radius: 4px;
-    transition: border-color 0.2s;
-    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative; 
 }
+/* ... باقي تنسيقات user-card و emoji/gif picker ... */
+/* في حال وجودها، تأكد من أنك نسختها أيضاً */
 
-.gif-item:hover {
-    border-color: var(--accent-blue);
-}
-
-.gif-item img {
-    width: 100%;
-    height: 100px;
-    object-fit: cover;
-    display: block;
-}
-
-/* تنسيق لعرض GIF داخل الرسائل */
-.message-body img.chat-gif {
-    max-width: 100%;
-    height: auto;
-    border-radius: 6px;
+.emoji-picker, .gif-picker-container {
+    position: absolute;
+    /* تأكد من أن تنسيقاتها موجودة إذا كنت تستخدمها في private_chat.html */
 }
