@@ -3,70 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="LOGIN">تسجيل الدخول - Throne Void</title>
+    <title data-i18n="LOGIN">تسجيل الدخول</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* إضافة تنسيقات بسيطة لصفحة الدخول */
         .auth-container {
             max-width: 400px;
-            margin: 100px auto;
+            margin: 80px auto;
             padding: 30px;
             background-color: var(--secondary-dark);
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(52, 152, 219, 0.4);
             text-align: center;
         }
         .auth-container h2 {
             color: var(--accent-yellow);
             margin-bottom: 25px;
         }
-        .auth-container input {
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group input {
             width: 100%;
             padding: 12px;
-            margin-bottom: 15px;
             border: 1px solid #555;
-            border-radius: 5px;
+            border-radius: 6px;
             background-color: #333;
             color: #fff;
             box-sizing: border-box;
         }
-        .auth-container button {
+        .auth-actions button {
             width: 100%;
             padding: 12px;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
+            font-size: 16px;
             font-weight: bold;
             transition: background-color 0.3s;
+            margin-top: 10px;
         }
         #authButton {
             background-color: var(--accent-blue);
             color: white;
-            margin-bottom: 15px;
         }
         #authButton:hover {
             background-color: #2980b9;
         }
-        #googleSignInBtn {
-            background-color: #e74c3c;
-            color: white;
-            margin-bottom: 15px;
-        }
-        #googleSignInBtn:hover {
-            background-color: #c0392b;
-        }
-        #toggleAuth, #forgotPasswordLink {
-            background: none;
-            color: var(--accent-yellow);
-            text-decoration: underline;
-            padding: 5px;
-            width: auto;
-            display: inline-block;
-        }
-        #forgotPasswordLink {
-            display: block;
+        .social-login button {
+            width: 100%;
+            padding: 12px;
             margin-top: 10px;
-            font-size: 0.9em;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: opacity 0.3s;
+        }
+        #googleLoginBtn {
+            background-color: #dd4b39; /* Google Red */
+            color: white;
+        }
+        #googleLoginBtn:hover {
+            opacity: 0.9;
+        }
+        #facebookLoginBtn {
+            background-color: #3b5998; /* Facebook Blue */
+            color: white;
+        }
+        #facebookLoginBtn:hover {
+            opacity: 0.9;
+        }
+
+        .toggle-mode {
+            margin-top: 20px;
+        }
+        .toggle-mode a {
+            color: var(--accent-yellow);
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -74,21 +90,47 @@
     <header>
         <h1>THRONES OF THE VOID</h1>
         <div>
-            <button onclick="window.location='index.html'" style="background-color: #e74c3c;" data-i18n="HOME">الرئيسية</button>
+            <button onclick="window.location='index.html'" style="background-color: #2ecc71;" data-i18n="HOME">الرئيسية</button>
         </div>
     </header>
 
     <main>
         <div class="auth-container">
-            <h2 data-i18n="LOG_IN_ACCOUNT">تسجيل الدخول / إنشاء حساب</h2>
-            <input type="email" id="emailInput" data-i18n="EMAIL_PLACEHOLDER" placeholder="البريد الإلكتروني" required>
-            <input type="password" id="passwordInput" data-i18n="PASSWORD_PLACEHOLDER" placeholder="كلمة المرور" required>
+            <h2 id="formTitle" data-i18n="LOG_IN_ACCOUNT">تسجيل الدخول / إنشاء حساب</h2>
             
-            <a href="#" id="forgotPasswordLink" data-i18n="FORGOT_PASSWORD">نسيت كلمة المرور؟</a>
+            <div class="input-group" id="usernameGroup" style="display: none;">
+                <input type="text" id="usernameInput" data-i18n="USERNAME_PLACEHOLDER" placeholder="اسم المستخدم" required minlength="3" maxlength="15">
+            </div>
+            
+            <div class="input-group">
+                <input type="email" id="emailInput" data-i18n="EMAIL_PLACEHOLDER" placeholder="البريد الإلكتروني" required>
+            </div>
+            
+            <div class="input-group">
+                <input type="password" id="passwordInput" data-i18n="PASSWORD_PLACEHOLDER" placeholder="كلمة المرور" required minlength="6">
+            </div>
+            
+            <div class="input-group" id="confirmPasswordGroup" style="display: none;">
+                <input type="password" id="confirmPasswordInput" data-i18n="CONFIRM_PASSWORD_PLACEHOLDER" placeholder="تأكيد كلمة المرور" required minlength="6">
+            </div>
 
-            <button id="authButton" data-i18n="AUTH_BUTTON_LOGIN">تسجيل الدخول</button>
-            <button id="googleSignInBtn" data-i18n="SIGN_IN_WITH_GOOGLE">تسجيل الدخول باستخدام جوجل</button>
-            <button id="toggleAuth" data-i18n="TOGGLE_TO_REGISTER">لا تملك حساباً؟ انقر للتسجيل</button>
+            <div class="auth-actions">
+                <button id="authButton" data-i18n="AUTH_BUTTON_LOGIN">تسجيل الدخول</button>
+                <div class="forgot-password" style="margin-top: 10px; text-align: right;">
+                    <a href="#" data-i18n="FORGOT_PASSWORD">نسيت كلمة المرور؟</a>
+                </div>
+            </div>
+
+            <hr style="margin: 25px 0; border-color: #555;">
+
+            <div class="social-login">
+                <button id="googleLoginBtn" data-i18n="SIGN_IN_WITH_GOOGLE">تسجيل الدخول باستخدام جوجل</button>
+                <button id="facebookLoginBtn" data-i18n="SIGN_IN_WITH_FACEBOOK" style="background-color: #1877f2; color: white;">تسجيل الدخول باستخدام فيسبوك</button>
+            </div>
+            
+            <div class="toggle-mode">
+                <a id="toggleModeLink" onclick="toggleMode()" data-i18n="TOGGLE_TO_REGISTER">لا تملك حساباً؟ انقر للتسجيل</a>
+            </div>
         </div>
     </main>
 
@@ -98,13 +140,13 @@
         import { 
             getAuth, 
             signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword,
-            GoogleAuthProvider,
+            createUserWithEmailAndPassword, 
+            GoogleAuthProvider, 
+            FacebookAuthProvider,
             signInWithPopup,
-            sendPasswordResetEmail
+            onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"; 
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // *** مفاتيح مشروعك الفعلي (thronevoid) ***
         const firebaseConfig = {
@@ -119,120 +161,152 @@
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app); 
+        const db = getFirestore(app);
         const googleProvider = new GoogleAuthProvider();
-        
-        // -------------------------------------------------------------
-        //                 دالة إنشاء ملف المستخدم في Firestore 
-        // -------------------------------------------------------------
-        async function createUserProfile(user) {
-            const userDocRef = doc(db, "users", user.email);
-            
-            const defaultUsername = user.email.split('@')[0];
+        const facebookProvider = new FacebookAuthProvider();
 
+        let isRegisterMode = false;
+
+        // التحقق من حالة الدخول
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // إذا كان المستخدم مسجلاً دخوله، انتقل مباشرة إلى لوحة التحكم
+                window.location.href = "dashboard.html";
+            }
+        });
+
+        // -------------------------------------------------------------
+        //                 دالة تبديل وضع التسجيل/الدخول
+        // -------------------------------------------------------------
+        window.toggleMode = function() {
+            isRegisterMode = !isRegisterMode;
+            const formTitle = document.getElementById('formTitle');
+            const authButton = document.getElementById('authButton');
+            const toggleLink = document.getElementById('toggleModeLink');
+            const usernameGroup = document.getElementById('usernameGroup');
+            const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
+
+            if (isRegisterMode) {
+                formTitle.setAttribute('data-i18n', 'REGISTER_ACCOUNT');
+                authButton.setAttribute('data-i18n', 'AUTH_BUTTON_REGISTER');
+                toggleLink.setAttribute('data-i18n', 'TOGGLE_TO_LOGIN');
+                usernameGroup.style.display = 'block';
+                confirmPasswordGroup.style.display = 'block';
+            } else {
+                formTitle.setAttribute('data-i18n', 'LOG_IN_ACCOUNT');
+                authButton.setAttribute('data-i18n', 'AUTH_BUTTON_LOGIN');
+                toggleLink.setAttribute('data-i18n', 'TOGGLE_TO_REGISTER');
+                usernameGroup.style.display = 'none';
+                confirmPasswordGroup.style.display = 'none';
+            }
+            // إعادة تطبيق الترجمة بعد تغيير المفاتيح
+            loadLanguage();
+        }
+
+        // -------------------------------------------------------------
+        //             دالة حفظ بيانات المستخدم في Firestore
+        // -------------------------------------------------------------
+        async function saveUserData(user, username, email) {
+            // استخدام البريد الإلكتروني كمعرف المستند (Document ID)
+            const userDocRef = doc(db, "users", email);
+            
             await setDoc(userDocRef, {
-                email: user.email,
-                username: defaultUsername, 
-                highScore: 0,
-                energy: 100,
-                lastEnergyUpdate: new Date(),
-                avatarUrl: user.photoURL || "https://via.placeholder.com/100/1e1e1e/ffffff?text=U",
-                isBanned: false,
-                isMuted: false,
-                language: localStorage.getItem('lang') || 'ar'
+                uid: user.uid,
+                email: email,
+                username: username || user.displayName || "Anonymous",
+                createdAt: new Date(),
+                allianceId: null, // لا يوجد تحالف مبدئياً
+                score: 0 // النتيجة الأولية
             }, { merge: true });
         }
-        
-        // -------------------------------------------------------------
-        //                 دوال الواجهة
-        // -------------------------------------------------------------
-        const emailInput = document.getElementById('emailInput');
-        const passwordInput = document.getElementById('passwordInput');
-        const authButton = document.getElementById('authButton');
-        const toggleButton = document.getElementById('toggleAuth');
-        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
 
-        let isLoginMode = true;
+        // -------------------------------------------------------------
+        //             دالة التعامل مع التسجيل/الدخول اليدوي
+        // -------------------------------------------------------------
+        async function handleAuth() {
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+            const username = document.getElementById('usernameInput').value;
+            const confirmPassword = document.getElementById('confirmPasswordInput').value;
 
-        function updateUI() {
-            if (isLoginMode) {
-                authButton.setAttribute('data-i18n', 'AUTH_BUTTON_LOGIN');
-                toggleButton.setAttribute('data-i18n', 'TOGGLE_TO_REGISTER');
-                forgotPasswordLink.style.display = 'block';
-            } else {
-                authButton.setAttribute('data-i18n', 'AUTH_BUTTON_REGISTER');
-                toggleButton.setAttribute('data-i18n', 'TOGGLE_TO_LOGIN');
-                forgotPasswordLink.style.display = 'none';
+            if (!email || !password) {
+                alert("يرجى إدخال البريد الإلكتروني وكلمة المرور.");
+                return;
             }
-            loadLanguage(); // إعادة تحميل اللغة لتحديث النصوص
+
+            try {
+                if (isRegisterMode) {
+                    if (password !== confirmPassword) {
+                        alert("كلمة المرور وتأكيدها غير متطابقين.");
+                        return;
+                    }
+                    if (!username || username.length < 3) {
+                         alert("اسم المستخدم مطلوب ويجب أن يكون 3 أحرف على الأقل.");
+                         return;
+                    }
+
+                    // 1. إنشاء المستخدم باستخدام الإيميل وكلمة المرور
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    
+                    // 2. حفظ بيانات المستخدم في Firestore (لتضمين اسم المستخدم)
+                    await saveUserData(userCredential.user, username, email);
+                    
+                    alert("✅ تم التسجيل بنجاح! سيتم توجيهك إلى لوحة التحكم.");
+                    window.location.href = "dashboard.html";
+
+                } else {
+                    // وضع تسجيل الدخول
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    alert("✅ تم تسجيل الدخول بنجاح! سيتم توجيهك.");
+                    window.location.href = "dashboard.html";
+                }
+            } catch (error) {
+                let message = "فشل عملية الدخول/التسجيل: خطأ غير معروف.";
+                if (error.code === 'auth/email-already-in-use') {
+                    message = "البريد الإلكتروني مُسجل بالفعل.";
+                } else if (error.code === 'auth/invalid-email' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+                    message = "خطأ في البريد الإلكتروني أو كلمة المرور.";
+                } else if (error.code === 'auth/weak-password') {
+                    message = "كلمة المرور ضعيفة جداً، يجب أن تكون 6 أحرف على الأقل.";
+                }
+                console.error("Authentication Error:", error);
+                alert(`❌ ${message}`);
+            }
         }
 
-        toggleButton.addEventListener('click', () => {
-            isLoginMode = !isLoginMode;
-            updateUI();
-        });
-        
         // -------------------------------------------------------------
-        //                 دالة تسجيل الدخول / التسجيل
+        //             دالة التسجيل/الدخول عبر موفري الهوية (Google/Facebook)
         // -------------------------------------------------------------
-        authButton.addEventListener('click', async () => {
-            const email = emailInput.value;
-            const password = passwordInput.value;
-            
-            if (!email || !password) {
-                alert("الرجاء إدخال البريد الإلكتروني وكلمة المرور.");
-                return;
-            }
-
+        async function signInWithProvider(provider) {
             try {
-                if (isLoginMode) {
-                    await signInWithEmailAndPassword(auth, email, password);
-                } else {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    await createUserProfile(userCredential.user);
-                }
-                window.location.href = "dashboard.html"; 
-            } catch (error) {
-                console.error("Firebase Auth Error:", error);
-                alert(`فشل المصادقة: ${error.message}`);
-            }
-        });
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                const email = user.email;
+                const username = user.displayName;
 
-        // -------------------------------------------------------------
-        //                 دالة تسجيل الدخول بجوجل
-        // -------------------------------------------------------------
-        document.getElementById('googleSignInBtn').addEventListener('click', async () => {
-            try {
-                const result = await signInWithPopup(auth, googleProvider);
-                await createUserProfile(result.user);
+                // حفظ بيانات المستخدم في Firestore. (merge: true يضمن عدم حذف البيانات الموجودة)
+                await saveUserData(user, username, email);
+
+                alert(`✅ تم تسجيل الدخول بنجاح كـ ${username}!`);
                 window.location.href = "dashboard.html";
-            } catch (error) {
-                console.error("Google Auth Error:", error);
-                alert("فشل تسجيل الدخول باستخدام جوجل.");
-            }
-        });
 
-        // -------------------------------------------------------------
-        //                 دالة نسيت كلمة المرور
-        // -------------------------------------------------------------
-        forgotPasswordLink.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const email = emailInput.value;
-            if (!email) {
-                alert("الرجاء إدخال البريد الإلكتروني أولاً لإرسال رابط إعادة تعيين كلمة المرور.");
-                return;
-            }
-            try {
-                await sendPasswordResetEmail(auth, email);
-                alert(`تم إرسال رابط إعادة تعيين كلمة المرور إلى ${email}.`);
             } catch (error) {
-                console.error("Password Reset Error:", error);
-                alert("فشل إرسال رابط إعادة التعيين. تأكد من صحة البريد الإلكتروني.");
+                console.error("Social Sign-In Error:", error);
+                // معالجة الأخطاء الخاصة بالتسجيل الاجتماعي (مثل إغلاق النافذة المنبثقة)
+                if (error.code === 'auth/popup-closed-by-user') {
+                    alert("❌ تم إغلاق نافذة الدخول.");
+                } else if (error.code === 'auth/account-exists-with-different-credential') {
+                    alert("❌ يوجد حساب بالفعل بهذا البريد الإلكتروني، ولكن تم التسجيل بطريقة مختلفة (مثل كلمة مرور).");
+                } else {
+                    alert("❌ فشل تسجيل الدخول الاجتماعي: " + error.message);
+                }
             }
-        });
+        }
 
-        loadLanguage();
-        updateUI(); 
+        // ربط الدوال بالأزرار
+        document.getElementById('authButton').addEventListener('click', handleAuth);
+        document.getElementById('googleLoginBtn').addEventListener('click', () => signInWithProvider(googleProvider));
+        document.getElementById('facebookLoginBtn').addEventListener('click', () => signInWithProvider(facebookProvider));
     </script>
 </body>
 </html>
