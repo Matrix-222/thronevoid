@@ -1,259 +1,71 @@
-/* ================================================= */
-/* 1. الإعدادات الأساسية والخلفية (Cinematic Dark Theme) */
-/* ================================================= */
 :root {
-    --primary-dark: #000000; /* أسود عميق */
-    --secondary-dark: #1a1a1a; /* أسود فاتح للخلفيات */
-    --text-light: #f0f0f0; /* نص أبيض ساطع */
-    --accent-red: #E31B23; /* أحمر داكن (مثل Sith) */
-    --accent-yellow: #FFC700; /* أصفر (مثل شعار Star Wars) */
-    --spacing: 20px;
+    --primary-dark: #1e1e1e; /* خلفية داكنة جداً */
+    --secondary-dark: #2c3e50; /* لون صندوق المحتوى (أزرق داكن) */
+    --accent-yellow: #f1c40f; /* لون التمييز الأصفر */
+    --accent-blue: #3498db; /* لون الأزرار الأساسي */
+    --text-light: #ecf0f1; /* لون النص الفاتح */
+    --error-red: #e74c3c; /* لون الأخطاء */
 }
 
 body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--primary-dark);
     color: var(--text-light);
-    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    line-height: 1.6;
-    min-height: 100vh;
+    direction: rtl; /* دعم اللغة العربية */
+    text-align: right; 
 }
 
-/* ================================================= */
-/* 2. شريط التنقل والرأس (Header) */
-/* ================================================= */
+/* الترويسة العلوية */
 header {
     background-color: var(--secondary-dark);
-    color: var(--text-light);
-    padding: var(--spacing) 5%;
+    padding: 15px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid var(--accent-red); 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
-
 header h1 {
-    font-family: Impact, "Arial Black", sans-serif;
     color: var(--accent-yellow);
-    text-transform: uppercase;
-    font-size: 2.5em;
-    letter-spacing: 2px;
-    text-shadow: 0 0 5px rgba(255, 199, 0, 0.5);
+    margin: 0;
+    font-size: 1.5em;
 }
 
-/* ================================================= */
-/* 3. الأزرار (Buttons) */
-/* ================================================= */
+/* الأزرار العامة */
 button {
-    background-color: var(--accent-red);
-    color: var(--text-light);
+    padding: 10px 15px;
     border: none;
-    padding: 10px 20px;
-    margin-left: 10px;
+    border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
-    border-radius: 4px;
+    transition: background-color 0.3s;
 }
 
 button:hover {
-    background-color: #ff3838;
-    box-shadow: 0 0 15px rgba(227, 27, 35, 0.8);
-    transform: translateY(-2px);
+    opacity: 0.9;
 }
 
-/* الأزرار الاجتماعية */
-.social-login button {
-    background-color: var(--secondary-dark);
-    border: 1px solid var(--accent-yellow);
-    color: var(--accent-yellow);
-    margin-bottom: 10px;
-}
-.social-login button:hover {
-    background-color: var(--accent-yellow);
-    color: var(--secondary-dark);
-    box-shadow: none;
-}
-
-/* ================================================= */
-/* 4. قسم المحتوى الرئيسي والنماذج (Main & Form) */
-/* ================================================= */
-main {
-    padding: 40px var(--spacing);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-form {
-    background-color: var(--secondary-dark);
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-    border: 1px solid var(--accent-red);
-}
-
-form h2 {
-    color: var(--accent-yellow);
-    text-transform: uppercase;
-    margin-bottom: 25px;
-}
-
+/* الحقول العامة */
+input[type="text"],
 input[type="email"],
 input[type="password"],
-input[type="text"] {
-    width: calc(100% - 20px);
+input[type="tel"] {
     padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #444;
-    background-color: #222;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #3a3a3a;
     color: var(--text-light);
-    border-radius: 4px;
-}
-input:focus {
-    border-color: var(--accent-yellow);
-    outline: none;
-}
-
-form button[type="submit"] {
-    width: 100%;
-    margin-left: 0;
-    margin-top: 10px;
+    box-sizing: border-box;
 }
 
 /* الروابط */
 a {
-    color: var(--accent-yellow);
+    color: var(--accent-blue);
     text-decoration: none;
     transition: color 0.3s;
 }
+
 a:hover {
-    color: var(--accent-red);
-}
-
-/* ================================================= */
-/* 5. قسم الترحيب الكبير (Hero Section) */
-/* ================================================= */
-
-.hero-section {
-    text-align: center;
-    padding: 80px 20px;
-    max-width: 900px;
-    margin-top: 50px;
-    background-color: rgba(26, 26, 26, 0.4); 
-    border: 1px solid rgba(255, 199, 0, 0.3);
-    border-radius: 8px;
-}
-
-.hero-section h2 {
-    font-family: Impact, "Arial Black", sans-serif;
-    color: var(--text-light);
-    text-transform: uppercase;
-    font-size: 3.5em;
-    letter-spacing: 4px;
-    margin-bottom: 10px;
-    text-shadow: 0 0 10px rgba(255, 199, 0, 0.8);
-}
-
-.hero-section p {
-    font-size: 1.2em;
-    color: #bbb;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-/* ================================================= */
-/* 6. تنسيقات اللعبة ولوحة المتصدرين (الخاصة) */
-/* ================================================= */
-
-/* تنسيق لوحة التحكم (Dashboard container) */
-.container { 
-    background: var(--secondary-dark); 
-    padding: 40px; 
-    border-radius: 12px; 
-    max-width: 800px; 
-    margin: 40px auto; 
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    border: 1px solid var(--accent-yellow);
-}
-#highScoreDisplay { 
-    color: var(--accent-yellow); 
-    margin-bottom: 15px; 
-} 
-
-/* تنسيق اللعبة (Canvas) */
-#gameArea {
-    border: 2px solid #3498db;
-    background-color: #121212;
-    margin: 20px auto;
-    display: block;
-    cursor: pointer;
-}
-
-/* تنسيق لوحة المتصدرين (Leaderboard) */
-.leaderboard-container {
-    margin: 40px auto;
-    max-width: 600px;
-    background-color: var(--secondary-dark);
-    padding: 30px;
-    border-radius: 8px;
-    border: 1px solid var(--accent-yellow);
-}
-.leaderboard-container h2 {
     color: var(--accent-yellow);
-    text-align: center;
-    margin-bottom: 30px;
-    text-shadow: 0 0 5px rgba(255, 199, 0, 0.5);
-}
-#leaderboardTable {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-}
-#leaderboardTable th, #leaderboardTable td {
-    padding: 12px;
-    border-bottom: 1px solid #333;
-}
-#leaderboardTable th {
-    background-color: #2a2a2a;
-    color: var(--accent-red);
-    text-transform: uppercase;
-}
-#leaderboardTable tr:nth-child(even) {
-    background-color: #161616;
-}
-#leaderboardTable tr:hover {
-    background-color: #333;
-}
-/* تمييز المراكز الثلاثة الأولى */
-.rank-1 { color: gold; font-weight: bold; }
-.rank-2 { color: silver; font-weight: bold; }
-.rank-3 { color: #cd7f32; font-weight: bold; }
-
-/* ================================================= */
-/* 7. خلفية الفيديو المتحركة (إضافة جديدة) */
-/* ================================================= */
-
-#background-video {
-    position: fixed; /* تثبيت الفيديو في الخلفية */
-    top: 0;
-    left: 0;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    z-index: -100; /* إرسال الفيديو إلى الخلف تماماً */
-    object-fit: cover; /* ضمان تغطية كل المساحة */
-}
-
-/* لضمان بقاء المحتوى (Header and Main) فوق الفيديو */
-main, header {
-    position: relative;
-    z-index: 10;
 }
