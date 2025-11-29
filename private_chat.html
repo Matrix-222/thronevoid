@@ -37,7 +37,7 @@
             padding: 15px;
             overflow-y: auto;
             display: flex;
-            /* ⭐️ التعديل الأول: لجعل الرسائل تظهر من الأعلى للأسفل */
+            /* الترتيب: القديم في الأعلى، الجديد في الأسفل */
             flex-direction: column; 
         }
 
@@ -48,12 +48,12 @@
 
         /* رسائل المرسل (أنا) */
         .message-row.sender {
-            justify-content: flex-end; /* رسائلي تذهب إلى اليمين في اللغة العربية */
+            justify-content: flex-end; 
         }
 
         /* رسائل المستلم (الطرف الآخر) */
         .message-row.receiver {
-            justify-content: flex-start; /* رسائل الطرف الآخر تذهب إلى اليسار */
+            justify-content: flex-start; 
         }
 
         .message-bubble {
@@ -93,7 +93,6 @@
              color: rgba(255, 255, 255, 0.7);
         }
 
-
         .chat-input {
             padding: 15px;
             background-color: var(--primary-dark);
@@ -123,8 +122,6 @@
             color: var(--accent-blue);
         }
         
-        /* تنسيقات الإيموجي و GIF (الموجودة في style.css) */
-
     </style>
 </head>
 <body>
@@ -209,7 +206,6 @@
         const gifSearchInput = document.getElementById('gifSearchInput');
         const gifResults = document.getElementById('gifResults');
 
-        // جلب الإيميل من الرابط (حل مشكلة undefined)
         const urlParams = new URLSearchParams(window.location.search);
         chatPartnerEmail = urlParams.get('user');
 
@@ -240,12 +236,12 @@
             }
         });
         
-        // --- دالة توليد ID المحادثة (نفس الكود) ---
+        // --- دالة توليد ID المحادثة ---
         function getChatId(email1, email2) {
             return email1 < email2 ? `${email1}_${email2}` : `${email2}_${email1}`;
         }
         
-        // --- جلب اسم شريك الدردشة (نفس الكود) ---
+        // --- جلب اسم شريك الدردشة ---
         async function fetchChatPartnerName(email) {
             try {
                 const docRef = doc(db, "users", email);
@@ -263,7 +259,7 @@
             }
         }
         
-        // --- إرسال رسالة نصية أو GIF (نفس الكود) ---
+        // --- إرسال رسالة نصية أو GIF ---
         async function sendMessage(type = 'text', content = messageInput.value.trim()) {
             if (content === '') return;
 
@@ -287,23 +283,26 @@
             }
         }
 
-        // --- مراقبة الرسائل الجديدة (تم تعديل الترتيب) ---
+        // --- مراقبة الرسائل الجديدة (تم تثبيت الإصلاح) ---
         function listenForMessages() {
             const messagesQuery = query(
                 collection(db, "chats", chatId, "messages"),
-                // ⭐️ التعديل الثاني: جلب الأقدم أولاً
+                // جلب الأقدم أولاً
                 orderBy("timestamp", "asc"), 
                 limit(50) 
             );
 
             onSnapshot(messagesQuery, (snapshot) => {
+                // حفظ حالة التمرير الحالية قبل مسح المحتوى
+                const shouldScroll = chatMessagesContainer.scrollTop + chatMessagesContainer.clientHeight >= chatMessagesContainer.scrollHeight;
+                
                 chatMessagesContainer.innerHTML = '';
                 const messages = [];
                 snapshot.forEach((doc) => {
                     messages.push(doc.data());
                 });
 
-                messages.forEach(msg => { // عرض الرسائل بترتيب الجلب (الأقدم ثم الأحدث)
+                messages.forEach(msg => { 
                     displayMessage(msg);
                 });
                 
@@ -311,12 +310,17 @@
                      chatMessagesContainer.innerHTML = '<p style="text-align: center; color: var(--text-muted);">ابدأ المحادثة!</p>';
                 }
                 
-                // قم بالتمرير للأسفل لرؤية أحدث الرسائل
-                chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+                // التمرير التلقائي: فقط إذا كنا بالفعل في الأسفل أو إذا كانت هذه أول رسالة
+                if (shouldScroll || snapshot.docChanges().length === messages.length) {
+                    // نستخدم setTimeout لضمان اكتمال العرض قبل التمرير
+                    setTimeout(() => {
+                        chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+                    }, 50); 
+                }
             });
         }
         
-        // --- عرض الرسالة في الواجهة (نفس الكود) ---
+        // --- عرض الرسالة في الواجهة ---
         function displayMessage(message) {
             const messageRow = document.createElement('div');
             messageRow.className = `message-row ${message.sender === currentUser.email ? 'sender' : 'receiver'}`;
@@ -329,3 +333,103 @@
             if (message.type === 'gif' && message.content) {
                 contentHTML = `<img src="${message.content}" alt="GIF" class="chat-gif">`;
             } else {
+                contentHTML = message.content || '...';
+            }
+
+            const time = message.timestamp ? new Date(message.timestamp.toDate()).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : 'جاري الإرسال..';
+            
+            bubble.innerHTML = `${contentHTML}<span class="message-time">${time}</span>`;
+            messageRow.appendChild(bubble);
+            
+            chatMessagesContainer.appendChild(messageRow);
+        }
+
+        // ------------------------------------
+        // منطق الإيموجي و GIF
+        // ------------------------------------
+        const emojis = ['😀', '😂', '😍', '👍', '🙏', '❤️', '🔥', '🎉', '🌟', '😊'];
+        
+        function setupEmojiPicker() {
+            emojis.forEach(emoji => {
+                const span = document.createElement('span');
+                span.textContent = emoji;
+                span.className = 'emoji-item';
+                span.onclick = () => {
+                    messageInput.value += emoji;
+                    messageInput.focus();
+                };
+                emojiPicker.appendChild(span);
+            });
+
+            emojiBtn.addEventListener('click', () => {
+                gifPickerContainer.classList.remove('show');
+                emojiPicker.classList.toggle('show');
+            });
+        }
+
+        let gifTimeout = null;
+        
+        function setupGifPicker() {
+            gifBtn.addEventListener('click', () => {
+                emojiPicker.classList.remove('show');
+                gifPickerContainer.classList.toggle('show');
+                if (gifPickerContainer.classList.contains('show')) {
+                    searchGifs('trending'); 
+                }
+            });
+
+            gifSearchInput.addEventListener('input', () => {
+                clearTimeout(gifTimeout);
+                gifTimeout = setTimeout(() => {
+                    const query = gifSearchInput.value.trim();
+                    searchGifs(query || 'trending');
+                }, 500);
+            });
+        }
+
+        async function searchGifs(query) {
+            const apiKey = window.GIPHY_API_KEY; 
+            if (!apiKey) {
+                gifResults.innerHTML = '<p style="color:red; text-align:center;">خطأ: GIPHY API Key مفقود في api.js</p>';
+                return;
+            }
+
+            let url = '';
+            if (query === 'trending') {
+                url = `https://api.giphy.com/v1/gifs/trending?api_key=${apiKey}&limit=10&rating=g`;
+            } else {
+                url = `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${encodeURIComponent(query)}&limit=10&rating=g`;
+            }
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                gifResults.innerHTML = ''; 
+                
+                if (data.data.length === 0) {
+                    gifResults.innerHTML = '<p style="text-align:center;">لا توجد نتائج مطابقة.</p>';
+                    return;
+                }
+                
+                data.data.forEach(gif => {
+                    const imgUrl = gif.images.fixed_height.url;
+                    const item = document.createElement('div');
+                    item.className = 'gif-item';
+                    item.innerHTML = `<img src="${imgUrl}" alt="GIF">`;
+                    item.onclick = () => {
+                        sendMessage('gif', imgUrl);
+                        gifPickerContainer.classList.remove('show');
+                    };
+                    gifResults.appendChild(item);
+                });
+
+            } catch (error) {
+                console.error("Error fetching GIFs:", error);
+                gifResults.innerHTML = '<p style="color:red; text-align:center;">فشل جلب صور GIF.</p>';
+            }
+        }
+
+    </script>
+</body>
+</html>
