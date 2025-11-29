@@ -83,6 +83,9 @@
             color: var(--text-light);
             margin: 10px 0 5px;
             font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .profile-card .interests-tag {
             background-color: #333;
@@ -92,6 +95,17 @@
             font-size: 0.8em;
             display: inline-block;
             margin-top: 5px;
+        }
+        
+        /* 💡 نقطة الاتصال الجديدة */
+        .online-dot {
+            height: 10px;
+            width: 10px;
+            background-color: var(--accent-green);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            margin-bottom: 2px;
         }
 
         /* الـ Media Queries للتجاوب على الأجهزة الصغيرة */
@@ -128,9 +142,9 @@
                 <input type="text" id="filterInterests" placeholder="مثل: قراءة, سفر">
             </div>
 
-            <div class="filter-group">
-                <label for="filterOnline">عرض المتصلين فقط</label>
-                <input type="checkbox" id="filterOnline" style="margin-right: 10px;">
+            <div class="filter-group" style="display: flex; align-items: center;">
+                <label for="filterOnline" style="margin-bottom: 0; flex-grow: 1;">عرض المتصلين فقط</label>
+                <input type="checkbox" id="filterOnline">
             </div>
 
             <button id="applyFiltersBtn" style="width: 100%; background-color: var(--accent-green);">تطبيق التصفية</button>
@@ -154,7 +168,10 @@
             getFirestore, 
             collection, 
             query, 
-            getDocs
+            getDocs,
+            doc, // جديد: لاستخدام وظائف الوثيقة
+            updateDoc, // جديد: لتحديث حالة المستخدم
+            serverTimestamp // جديد: لتسجيل آخر ظهور
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // *** مفاتيح مشروعك الفعلي (thronevoid) - تأكد من صحتها ***
@@ -181,9 +198,29 @@
         const filterOnline = document.getElementById('filterOnline');
         const applyFiltersBtn = document.getElementById('applyFiltersBtn');
 
+        // 💡 دالة جديدة لتحديث حالة الاتصال في Firestore
+        async function setUserOnlineStatus(isOnline) {
+            if (!currentUserEmail) return;
+            try {
+                // تحديث الوثيقة الخاصة بالمستخدم الحالي
+                await updateDoc(doc(db, "users", currentUserEmail), {
+                    isOnline: isOnline,
+                    lastSeen: isOnline ? null : serverTimestamp()
+                });
+            } catch (error) {
+                console.error("Failed to update user status:", error);
+            }
+        }
+        
+        // 💡 تحديث حالة الاتصال عند تحميل الصفحة أو تسجيل الخروج
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUserEmail = user.email;
+                setUserOnlineStatus(true); // تعيين الحالة إلى "متصل" عند الدخول
+                
+                // محاولة تعيين الحالة إلى "غير متصل" عند مغادرة الصفحة
+                window.addEventListener('beforeunload', () => setUserOnlineStatus(false));
+                
                 fetchAllProfiles();
             } else {
                 window.location.href = "index.html";
@@ -209,28 +246,32 @@
             applyFilters(); 
         }
 
+        // 💡 دالة التصفية المحدثة لتضمين شرط "عرض المتصلين فقط"
         function applyFilters() {
             const searchTerm = searchBar.value.trim().toLowerCase();
             const interestFilter = filterInterests.value.trim().toLowerCase().split(',').map(i => i.trim()).filter(i => i);
-            const showOnlineOnly = filterOnline.checked;
+            const showOnlineOnly = filterOnline.checked; // قراءة حالة مربع الاختيار
             
             let filteredProfiles = allProfiles.filter(profile => {
                 const username = (profile.username || profile.id.split('@')[0]).toLowerCase();
                 const bio = (profile.bio || '').toLowerCase();
                 const interests = (profile.interests || '').toLowerCase();
-                const isOnline = true; 
+                const isOnline = profile.isOnline === true; // قراءة حالة الاتصال من بيانات الملف
 
+                // 1. تصفية البحث بالاسم/النبذة
                 const matchesSearch = searchTerm === '' || 
                                       username.includes(searchTerm) ||
                                       bio.includes(searchTerm);
                 
                 if (!matchesSearch) return false;
 
+                // 2. تصفية الاهتمامات
                 const matchesInterests = interestFilter.length === 0 || 
                                          interestFilter.every(tag => interests.includes(tag));
                 
                 if (!matchesInterests) return false;
                 
+                // 3. تصفية المتصلين فقط (جديد)
                 const matchesOnline = !showOnlineOnly || isOnline; 
 
                 return matchesOnline;
@@ -251,6 +292,7 @@
             });
         }
         
+        // 💡 تحديث بطاقة الملف لإضافة نقطة الاتصال
         function createProfileCard(profile) {
             const card = document.createElement('div');
             card.className = 'profile-card';
@@ -258,12 +300,15 @@
             const username = profile.username || profile.id.split('@')[0];
             const interestsList = (profile.interests || '').split(',').map(i => i.trim()).filter(i => i).slice(0, 3);
             const targetEmail = profile.id; 
+            const isOnline = profile.isOnline === true; // قراءة الحالة
 
-            // تم استبدال مستمع الحدث (addEventListener) في JS بالدالة المباشرة (onclick)
             card.innerHTML = `
                 <div class="profile-card-header">
                     <img src="https://i.pravatar.cc/150?u=${profile.id}" alt="Avatar">
-                    <h3>${username}</h3>
+                    <h3>
+                        ${username} 
+                        ${isOnline ? '<span class="online-dot" title="متصل الآن"></span>' : ''}
+                    </h3>
                 </div>
                 <p style="color: var(--text-muted); font-style: italic;">${profile.bio || 'لا توجد نبذة.'}</p>
                 <p style="margin-top: 10px;">
@@ -275,7 +320,6 @@
                         data-i18n="START_CHAT">ابدأ الدردشة</button>
             `;
             
-            // تحديث نص الزر إذا كانت الترجمة موجودة
             if (window.loadLanguage) { 
                 const button = card.querySelector('.start-chat-btn');
                 if (button) button.textContent = loadLanguage('START_CHAT');
@@ -283,15 +327,20 @@
             return card;
         }
         
-        // ربط أزرار ووظائف البحث والتصفية
+        // 💡 ربط جميع مدخلات التصفية والبحث بدالة applyFilters
         searchBar.addEventListener('input', applyFilters);
-        applyFiltersBtn.addEventListener('click', applyFilters);
+        filterInterests.addEventListener('input', applyFilters); // التصفية أثناء الكتابة في الاهتمامات
+        filterOnline.addEventListener('change', applyFilters); // التصفية عند تغيير حالة مربع الاختيار
+        applyFiltersBtn.addEventListener('click', applyFilters); // التصفية عند الضغط على الزر
         
         window.logoutUser = function() {
-            signOut(auth).then(() => { 
-                window.location.href = "index.html";
-            }).catch((error) => {
-                console.error("Logout Error:", error);
+            // 💡 تعيين الحالة إلى "غير متصل" عند تسجيل الخروج
+            setUserOnlineStatus(false).finally(() => {
+                signOut(auth).then(() => { 
+                    window.location.href = "index.html";
+                }).catch((error) => {
+                    console.error("Logout Error:", error);
+                });
             });
         }
     </script>
