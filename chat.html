@@ -22,9 +22,8 @@
             width: 300px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s, border 0.2s;
-            position: relative; /* لتحديد موقع الشارة */
-            border: 2px solid transparent; 
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative; 
         }
 
         .user-card:hover {
@@ -32,32 +31,6 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.7);
         }
         
-        /* تنسيق الشارة الجديدة للرسائل */
-        .new-message-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background-color: #ffc107; /* لون أصفر لافت */
-            color: var(--primary-dark);
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: bold;
-            animation: pulse 1.5s infinite;
-        }
-
-        /* تأثير التوهج للبطاقة عند وجود رسالة جديدة */
-        .user-card.has-new-message {
-            border-color: #ffc107;
-            box-shadow: 0 0 15px rgba(255, 193, 7, 0.8);
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
-        }
-
         .user-card h3 {
             color: var(--accent-green);
             margin-top: 0;
@@ -105,8 +78,7 @@
             getDocs,
             doc,
             onSnapshot,
-            orderBy,
-            limit
+            updateDoc
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // *** مفاتيح مشروعك الفعلي (thronevoid) - تأكد من صحتها ***
@@ -128,23 +100,64 @@
         const userListContainer = document.getElementById('userList');
         const loadingMessage = document.getElementById('loadingMessage');
 
-        function getChatId(email1, email2) {
-            const sortedEmails = [email1, email2].sort();
-            return sortedEmails.join('_');
-        }
-
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
+                // تحديث حالة الاتصال عند تسجيل الدخول
+                updateOnlineStatus(true);
+                // مراقبة حالة الاتصال للمستخدمين الآخرين
+                setupOnlineStatusListener();
+                // جلب قائمة المستخدمين
                 fetchUsers();
             } else {
                 window.location.href = "index.html";
             }
         });
+        
+        // تحديث حالة الاتصال في قاعدة البيانات
+        async function updateOnlineStatus(isOnline) {
+            if (!currentUser) return;
+            try {
+                await updateDoc(doc(db, "users", currentUser.email), {
+                    isOnline: isOnline,
+                    lastSeen: new Date().toISOString()
+                });
+            } catch (error) {
+                console.error("Error updating online status:", error);
+            }
+        }
+        
+        // وظيفة المراقبة عند إغلاق أو مغادرة الصفحة
+        window.addEventListener('beforeunload', () => {
+            if (currentUser) {
+                // يتم تجاهل هذا التحديث عادةً إذا كانت الصفحة تغلق فعلاً، ولكن نضعه احتياطياً
+                updateOnlineStatus(false);
+            }
+        });
 
+
+        // مراقبة حالة الاتصال للمستخدمين الآخرين
+        function setupOnlineStatusListener() {
+            onSnapshot(collection(db, "users"), (snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    const data = change.doc.data();
+                    const card = document.querySelector(`.user-card[data-email="${data.email}"]`);
+                    
+                    if (card) {
+                        const h3 = card.querySelector('h3');
+                        if (h3) {
+                            // تحديث نقطة الاتصال فقط
+                            const isOnlineDot = data.isOnline ? '<span class="online-dot" title="متصل"></span>' : '';
+                            h3.innerHTML = isOnlineDot + h3.textContent.replace('<span class="online-dot" title="متصل"></span>', '');
+                        }
+                    }
+                });
+            });
+        }
+        
         async function fetchUsers() {
             try {
-                // استعلام لجلب جميع المستخدمين
+                // استعلام لجلب جميع المستخدمين باستثناء المستخدم الحالي
                 const usersQuery = query(collection(db, "users"), where("email", "!=", currentUser.email));
                 const querySnapshot = await getDocs(usersQuery);
                 
@@ -159,8 +172,6 @@
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     displayUser(data);
-                    // بدء مراقبة الرسائل لكل محادثة فور تحميل الملف
-                    startChatMonitoring(currentUser.email, data.email);
                 });
                 
             } catch (error) {
@@ -174,7 +185,6 @@
             card.className = 'user-card';
             card.dataset.email = userData.email;
             card.onclick = () => {
-                // عند النقر، انتقل إلى صفحة الدردشة مع إزالة أي شارة رسالة جديدة
                 window.location.href = `private_chat.html?user=${userData.email}`;
             };
             
@@ -190,50 +200,19 @@
                 </div>
                 <p class="bio">${userData.bio || 'لم يكتب نبذة بعد.'}</p>
                 <p><strong>الاهتمامات:</strong> ${interestsList}</p>
-                `;
+            `;
 
             userListContainer.appendChild(card);
         }
-
-        // --- وظيفة مراقبة الرسائل الجديدة ---
-        function startChatMonitoring(currentUserEmail, partnerEmail) {
-            const chatId = getChatId(currentUserEmail, partnerEmail);
-            const chatRef = collection(db, "chats", chatId, "messages");
-            
-            // الاستعلام عن آخر رسالة واحدة فقط مرتبة تنازليًا (أحدث رسالة)
-            const q = query(chatRef, orderBy('timestamp', 'desc'), limit(1)); 
-
-            onSnapshot(q, (snapshot) => {
-                const partnerCard = document.querySelector(`.user-card[data-email="${partnerEmail}"]`);
-                if (!partnerCard) return;
-
-                // إزالة الشارة والـ glow افتراضياً
-                partnerCard.classList.remove('has-new-message');
-                let badge = partnerCard.querySelector('.new-message-badge');
-                if (badge) badge.remove();
-
-                if (!snapshot.empty) {
-                    const latestMessage = snapshot.docs[0].data();
-                    
-                    // إذا كانت آخر رسالة من الطرف الآخر (وليس أنا)
-                    if (latestMessage.senderEmail === partnerEmail) {
-                        
-                        // إضافة الشارة والعلامة المرئية
-                        badge = document.createElement('span');
-                        badge.className = 'new-message-badge';
-                        badge.textContent = 'رسالة جديدة!';
-                        partnerCard.appendChild(badge);
-                        partnerCard.classList.add('has-new-message'); 
-                    }
-                }
-            });
-        }
         
         window.logoutUser = function() {
-            signOut(auth).then(() => { 
-                window.location.href = "index.html";
-            }).catch((error) => {
-                console.error("Logout Error:", error);
+            // تحديث حالة الاتصال إلى "غير متصل" عند تسجيل الخروج
+            updateOnlineStatus(false).then(() => {
+                signOut(auth).then(() => { 
+                    window.location.href = "index.html";
+                }).catch((error) => {
+                    console.error("Logout Error:", error);
+                });
             });
         }
     </script>
