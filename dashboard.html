@@ -16,20 +16,25 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
             border: 1px solid var(--accent-yellow);
         }
-        #highScoreDisplay { color: var(--accent-yellow); margin-bottom: 15px; } 
-        #gameArea {
-            border: 2px solid #3498db;
-            background-color: #121212;
+        /* سنستخدم هذا الـ ID لتحميل اللعبة داخله */
+        #game-container {
+            width: 100%;
+            height: 400px; /* يمكن تعديل الارتفاع حسب الرغبة */
             margin: 20px auto;
-            display: block;
-            cursor: pointer;
+            background-color: #121212;
+            border: 2px solid #3498db;
         }
+        #highScoreDisplay { color: var(--accent-yellow); margin-bottom: 15px; } 
     </style>
+    
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+
 </head>
 <body>
     <header>
         <h1>THRONES OF THE VOID</h1>
         <div>
+            <button onclick="window.location='settings.html'" style="background-color: #3498db;">SETTINGS</button>
             <button onclick="window.location='leaderboard.html'" style="background-color: var(--accent-yellow); color: var(--primary-dark);">LEADERBOARD</button>
             <button id="logoutBtn" style="background-color: var(--accent-red);">LOGOUT</button>
         </div>
@@ -37,21 +42,20 @@
 
     <main>
         <div class="container">
-            <h1>أهلاً بك في ساحة المجرة!</h1>
+            <h1>أهلاً بك أيها المحارب!</h1>
             <p>تم تسجيل دخولك باسم المستخدم: <span id="userEmailDisplay" style="color: #2ecc71;">جاري التحميل...</span></p>
             
             <p id="highScoreDisplay">أعلى نتيجة لديك: 0</p>
             
-            <p style="margin-top: 10px;">انقر في أي مكان داخل اللعبة للبدء!</p>
+            <p style="margin-top: 10px;">استخدم الأسهم للحركة والمسافة (Space) لإطلاق النار. اللعبة تستخدم محرك Phaser الاحترافي.</p>
 
-            <canvas id="gameArea" width="600" height="400"></canvas>
+            <div id="game-container"></div>
             
         </div>
     </main>
 
-    <audio id="gameMusic" src="survival_music.mp3" loop></audio>
-
     <script type="module">
+        // استيراد مكتبات Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -74,7 +78,7 @@
         let currentUserEmail = null;
         let currentHighScore = 0; 
         
-        // دالة تحميل أعلى نتيجة للمستخدم
+        // --- دوال Firebase (كما هي) ---
         async function loadHighScore(email) {
             const userDocRef = doc(db, "users", email);
             try {
@@ -90,7 +94,6 @@
             }
         }
 
-        // دالة حفظ أعلى نتيجة جديدة
         async function saveHighScore(newScore) {
             if (newScore > currentHighScore && currentUserEmail) {
                 const userDocRef = doc(db, "users", currentUserEmail);
@@ -104,21 +107,21 @@
                 }
             }
         }
-
-        // حماية الصفحة
+        
+        // التحقق من حالة الدخول عند تحميل الصفحة
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUserEmail = user.email;
                 document.getElementById('userEmailDisplay').innerText = currentUserEmail;
                 loadHighScore(currentUserEmail);
-                startGame();
+                // ** تشغيل لعبة Phaser فقط بعد التأكد من تسجيل الدخول **
+                initPhaserGame(); 
             } else {
                 alert("يجب عليك تسجيل الدخول أولاً للوصول إلى لوحة التحكم!");
-                window.location.href = "index.html"; 
+                window.location.href = "login.html"; 
             }
         });
 
-        // دالة تسجيل الخروج
         document.getElementById('logoutBtn').addEventListener('click', () => {
             signOut(auth).then(() => {
                 window.location.href = "index.html";
@@ -127,173 +130,145 @@
             });
         });
 
-        // --- كود لعبة VOID FIGHTER القتالية ---
-
-        function startGame() {
-            const canvas = document.getElementById('gameArea');
-            const ctx = canvas.getContext('2d');
-            const music = document.getElementById('gameMusic');
+        // --- كود لعبة قتال فضائي احترافية باستخدام Phaser 3 ---
+        
+        function initPhaserGame() {
+            // كود Phaser يتطلب تحميل مكتبته أولاً (في وسم <script> أعلى الصفحة)
             
-            let player = { x: canvas.width / 2, y: canvas.height / 2, size: 20, speed: 5, color: '#2ecc71', health: 100 };
-            let enemies = [];
-            let bullets = []; 
+            const config = {
+                type: Phaser.AUTO,
+                width: 600,
+                height: 400,
+                parent: 'game-container', // يجب أن يتطابق مع الـ ID في HTML
+                physics: {
+                    default: 'arcade',
+                    arcade: {
+                        debug: false
+                    }
+                },
+                scene: {
+                    preload: preload,
+                    create: create,
+                    update: update
+                }
+            };
+            
+            // إنشاء اللعبة
+            const game = new Phaser.Game(config);
+
+            let player;
+            let stars; // نجوم أو أعداء
+            let cursors;
             let score = 0;
-            let gameOver = true; 
-            let lastShotTime = 0;
-            const shotCooldown = 300; 
-            let enemySpawnInterval; 
+            let scoreText;
+            let gameOver = false;
 
-            function playMusic() {
-                music.volume = 0.4;
-                music.play().catch(error => { console.log("Audio playback blocked."); });
+            function preload ()
+            {
+                // لكي تعمل اللعبة بشكل صحيح، تحتاج إلى توفير صور للأصول (Assets)
+                // هنا نستخدم لون كبديل للصورة لتشغيل الكود.
+                this.load.image('starfield', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFXQAAAF0AQHwI3kAAAAOSURBVBhXY3R1/A8DCIAEAAIHAQfBvO9sAAAAAElFTkSuQmCC'); // خلفية سوداء كبديل
+                this.load.image('ship', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAAB3RJTUUH5QgVDA0gE6I+eAAAAMZJREFUSEvtljEOgDAIxP+v2Jt2t0l637gDBp2M5r4fCgLg/wEQpL3d40E8A8F9wD5tI8KqL9j+sNdw8t7W5g6gA8gB1+b205oEa9BqgRpoA9bAPF7o0k/oD703E6lVvVd3YmK036yF093L3L85oT8Y9K79hHwgR2wF5dE9/kGk/iP8y40wAGm+q888wB696zO96v6g/jMTRF4gQvYg0e9A7w3x5y/jM0l8QIvYN/34d9X7g99AAAAAElFTkSuQmCC'); // صورة سفينة افتراضية (مربع أخضر)
+                this.load.image('laser', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAACCAYAAAB7XA/XAAAABmJLR0QA/wD/AP+gvaeTAAAAB3RJTUUH5QgVDA0yD1n7zAAAADJJREFUCBNjYWBg2AYyJgYQkEAwMDIxMjMyBghA3AwM/k3YDAwMDYxM0gIMw9C1AwBN3QySgKkX5AAAAABJRU5ErkJggg=='); // ليزر افتراضي (خط أزرق)
             }
-            
-            function resetGame() {
+
+            function create ()
+            {
+                // إعداد خلفية اللعبة
+                this.add.tileSprite(0, 0, config.width, config.height, 'starfield').setOrigin(0, 0);
+
+                // اللاعب
+                player = this.physics.add.image(config.width / 2, config.height - 50, 'ship').setDepth(1);
+                player.setCollideWorldBounds(true);
+                player.setDrag(100);
+                player.setAngularDrag(100);
+                player.setMaxVelocity(200);
                 player.health = 100;
-                enemies = [];
-                bullets = [];
-                score = 0;
-                gameOver = false;
-                if (enemySpawnInterval) clearInterval(enemySpawnInterval);
-                enemySpawnInterval = setInterval(spawnEnemy, 1500);
-                update(); 
-                playMusic();
-            }
-
-            function spawnEnemy() {
-                if (gameOver) return;
-                let edge = Math.floor(Math.random() * 4);
-                let x, y;
-
-                if (edge === 0) { x = Math.random() * canvas.width; y = -10; }
-                else if (edge === 1) { x = Math.random() * canvas.width; y = canvas.height + 10; }
-                else if (edge === 2) { x = -10; y = Math.random() * canvas.height; }
-                else { x = canvas.width + 10; y = Math.random() * canvas.height; }
-
-                enemies.push({ x: x, y: y, size: 15, health: 30, color: '#e74c3c', speed: 1.5 + Math.random() * 1.5 });
-            }
-
-            function fireBullet() {
-                const currentTime = Date.now();
-                if (currentTime - lastShotTime < shotCooldown || gameOver) { return; }
-                lastShotTime = currentTime;
-                bullets.push({ x: player.x, y: player.y, size: 5, speed: 8, damage: 10, color: '#3498db' });
-            }
-
-            function draw() {
-                ctx.fillStyle = '#121212';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#3498db';
-                bullets.forEach(bullet => {
-                    ctx.beginPath();
-                    ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
-                    ctx.fill();
-                });
-                ctx.fillStyle = player.color;
-                ctx.fillRect(player.x - player.size / 2, player.y - player.size / 2, player.size, player.size);
-                enemies.forEach(enemy => {
-                    ctx.fillStyle = enemy.color;
-                    ctx.fillRect(enemy.x - enemy.size / 2, enemy.y - enemy.size / 2, enemy.size, enemy.size);
-                    ctx.fillStyle = 'lime';
-                    ctx.fillRect(enemy.x - enemy.size / 2, enemy.y - enemy.size / 2 - 5, enemy.size * (enemy.health / 30), 3);
-                });
-                ctx.fillStyle = 'white';
-                ctx.font = '16px Arial';
-                ctx.textAlign = 'left';
-                ctx.fillText(`Kills: ${score}`, 10, 25);
-                ctx.fillText(`Health: ${player.health}`, 10, 45);
-
-                if (gameOver) {
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = 'white';
-                    ctx.font = '40px Arial';
-                    ctx.textAlign = 'center';
-                    const message = score === 0 ? 'انقر للبدء' : 'انتهت اللعبة (GAME OVER)';
-                    ctx.fillText(message, canvas.width / 2, canvas.height / 2);
-                    if (score > 0) {
-                         ctx.font = '20px Arial';
-                         ctx.fillText(`النتيجة النهائية: ${score} عدو`, canvas.width / 2, canvas.height / 2 + 40);
-                         if (score > currentHighScore) {
-                             ctx.fillText(`تم تسجيل ${score} كأعلى نتيجة جديدة!`, canvas.width / 2, canvas.height / 2 + 70);
-                         } else {
-                             ctx.fillText(`أعلى نتيجة لديك: ${currentHighScore}`, canvas.width / 2, canvas.height / 2 + 70);
-                         }
-                         ctx.fillText(`انقر في أي مكان لإعادة التشغيل`, canvas.width / 2, canvas.height / 2 + 100);
-                    }
-                }
-            }
-
-            function update() {
-                if (gameOver) return;
-
-                bullets.forEach((bullet, bIndex) => {
-                    bullet.y -= bullet.speed;
-                    if (bullet.y < 0) { bullets.splice(bIndex, 1); }
-                });
-
-                enemies.forEach((enemy, eIndex) => {
-                    const dx = player.x - enemy.x;
-                    const dy = player.y - enemy.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-
-                    enemy.x += (dx / distance) * enemy.speed;
-                    enemy.y += (dy / distance) * enemy.speed;
-
-                    if (distance < (player.size / 2 + enemy.size / 2)) {
-                        player.health -= 10;
-                        enemies.splice(eIndex, 1);
-                    }
-                    
-                    bullets.forEach((bullet, bIndex) => {
-                        const bx = bullet.x - enemy.x;
-                        const by = bullet.y - enemy.y;
-                        const bDistance = Math.sqrt(bx * bx + by * by);
-
-                        if (bDistance < (bullet.size + enemy.size / 2)) {
-                            enemy.health -= bullet.damage;
-                            bullets.splice(bIndex, 1);
-
-                            if (enemy.health <= 0) {
-                                enemies.splice(eIndex, 1);
-                                score++;
-                            }
-                        }
-                    });
-                });
-
-                if (player.health <= 0) {
-                    gameOver = true;
-                    clearInterval(enemySpawnInterval);
-                    saveHighScore(score);
-                    music.pause();
-                    music.currentTime = 0;
-                }
-
-                draw();
-                requestAnimationFrame(update);
-            }
-            
-            document.addEventListener('keydown', (e) => {
-                if (gameOver) return;
-                if (e.key === 'ArrowUp' || e.key === 'w') { player.y -= player.speed; }
-                else if (e.key === 'ArrowDown' || e.key === 's') { player.y += player.speed; }
-                else if (e.key === 'ArrowLeft' || e.key === 'a') { player.x -= player.speed; }
-                else if (e.key === 'ArrowRight' || e.key === 'd') { player.x += player.speed; }
-                else if (e.key === ' ') { fireBullet(); } 
                 
-                player.x = Math.max(player.size / 2, Math.min(canvas.width - player.size / 2, player.x));
-                player.y = Math.max(player.size / 2, Math.min(canvas.height - player.size / 2, player.y));
-            });
+                // الأعداء (كمجموعة)
+                stars = this.physics.add.group({
+                    key: 'laser', // نستخدم الليزر كبديل مؤقت لظهور نقاط الأعداء
+                    repeat: 11,
+                    setXY: { x: 12, y: 0, stepX: 70 }
+                });
 
-            canvas.addEventListener('click', () => {
-                if (gameOver) {
-                    resetGame();
+                stars.children.iterate(function (child) {
+                    child.setTint(0xffc700); // لون أصفر للأعداء
+                    child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+                    child.setCollideWorldBounds(true);
+                    child.setVelocityY(Phaser.Math.Between(50, 100));
+                });
+                
+                // مدخلات التحكم
+                cursors = this.input.keyboard.createCursorKeys();
+                this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+
+                // عرض النتيجة
+                scoreText = this.add.text(16, 16, 'SCORE: 0\nHEALTH: 100', { fontSize: '18px', fill: '#FFC700' }).setDepth(2);
+
+                // إضافة تصادم بين اللاعب والأعداء (مؤقت)
+                this.physics.add.collider(player, stars, hitStar, null, this);
+            }
+
+            function update ()
+            {
+                if (gameOver)
+                {
+                    return;
                 }
-            });
-            
-            draw(); 
+
+                // تحريك اللاعب بالأسهم
+                if (cursors.left.isDown)
+                {
+                    player.setAngularVelocity(-150);
+                }
+                else if (cursors.right.isDown)
+                {
+                    player.setAngularVelocity(150);
+                }
+                else
+                {
+                    player.setAngularVelocity(0);
+                }
+
+                if (cursors.up.isDown)
+                {
+                    this.physics.velocityFromRotation(player.rotation, 200, player.body.acceleration);
+                }
+                else
+                {
+                    player.setAcceleration(0);
+                }
+                
+                // إطلاق النار بالمسافة (Space) - يمكنك تطوير هذه الدالة لتطلق ليزر
+                if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
+                   // يتم تطوير نظام إطلاق النار في إصدارات Phaser الأكثر تعقيدًا
+                   // هنا سنقوم فقط بزيادة النتيجة كبديل بسيط
+                   score += 5;
+                   scoreText.setText('SCORE: ' + score + '\nHEALTH: ' + player.health);
+                }
+            }
+
+            function hitStar (player, star)
+            {
+                // دالة عند اصطدام اللاعب بالعدو
+                star.disableBody(true, true);
+                player.health -= 20;
+
+                scoreText.setText('SCORE: ' + score + '\nHEALTH: ' + player.health);
+
+                if (player.health <= 0)
+                {
+                    this.physics.pause();
+                    player.setTint(0xff0000);
+                    gameOver = true;
+                    // حفظ أعلى نتيجة هنا
+                    saveHighScore(score); 
+                }
+            }
         }
+        
     </script>
 </body>
 </html>
