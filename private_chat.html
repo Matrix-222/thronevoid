@@ -6,7 +6,7 @@
     <title>الدردشة الخاصة</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* تنسيقات خاصة بالدردشة الخاصة (تم تركها كما هي لافتراض أنها صحيحة) */
+        /* تنسيقات خاصة بالدردشة الخاصة (تعديلات على تنسيق واجهة صندوق الدردشة) */
         .chat-container {
             max-width: 800px;
             height: 80vh; 
@@ -99,19 +99,20 @@
              color: rgba(255, 255, 255, 0.7);
         }
 
-
+        /* ⭐️ تنسيقات صندوق الإدخال الجديد */
         .chat-input {
             padding: 15px;
             background-color: var(--primary-dark);
             display: flex;
             align-items: center;
-            position: relative; 
+            position: relative; /* مهم لتحديد موضع منتقي الإيموجي */
         }
-
+        
         #messageInput {
             flex-grow: 1;
             margin-left: 10px;
             margin-bottom: 0;
+            /* للتأكد من أن حقل الإدخال يملأ المساحة المتبقية بشكل جيد */
         }
         
         .input-icon-btn {
@@ -128,7 +129,40 @@
         .input-icon-btn:hover {
             color: var(--accent-blue);
         }
+
+        /* ⭐️ تنسيقات منتقي الإيموجي الجديد */
+        .emoji-picker {
+            position: absolute;
+            bottom: 75px; /* يظهر فوق حقل الإدخال */
+            right: 15px; 
+            background-color: var(--secondary-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            max-width: 250px;
+            display: none; /* مخفي بشكل افتراضي */
+            flex-wrap: wrap;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            z-index: 20;
+            direction: ltr; /* لعرض الإيموجي بترتيب صحيح */
+            justify-content: flex-start;
+        }
+
+        .emoji-picker.show {
+            display: flex;
+        }
+
+        .emoji-item {
+            cursor: pointer;
+            font-size: 1.4em;
+            padding: 3px;
+            margin: 2px;
+            transition: transform 0.1s;
+        }
         
+        .emoji-item:hover {
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
@@ -152,16 +186,10 @@
                 <input type="text" id="messageInput" data-i18n="TYPE_MESSAGE_PLACEHOLDER" placeholder="اكتب رسالتك هنا...">
                 
                 <button id="emojiBtn" class="input-icon-btn">😀</button>
-                <button id="gifBtn" class="input-icon-btn">🖼️</button>
                 
                 <div id="emojiPicker" class="emoji-picker"></div>
                 
-                <div id="gifPickerContainer" class="gif-picker-container">
-                    <input type="text" id="gifSearchInput" placeholder="ابحث عن GIF..." data-i18n="SEARCH_GIF_PLACEHOLDER">
-                    <div id="gifResults"></div>
                 </div>
-
-            </div>
         </div>
     </main>
 
@@ -211,10 +239,8 @@
         
         const emojiBtn = document.getElementById('emojiBtn');
         const emojiPicker = document.getElementById('emojiPicker');
-        const gifBtn = document.getElementById('gifBtn');
-        const gifPickerContainer = document.getElementById('gifPickerContainer');
-        const gifSearchInput = document.getElementById('gifSearchInput');
-        const gifResults = document.getElementById('gifResults');
+        
+        // 🛑 تم حذف المتغيرات المتعلقة بالـ GIF
 
         const urlParams = new URLSearchParams(window.location.search);
         chatPartnerEmail = urlParams.get('user');
@@ -240,7 +266,7 @@
                 });
                 
                 setupEmojiPicker();
-                setupGifPicker();
+                // 🛑 تم حذف استدعاء setupGifPicker();
 
             } else {
                 window.location.href = "index.html";
@@ -286,7 +312,7 @@
             if (content === '') return;
             
             emojiPicker.classList.remove('show');
-            gifPickerContainer.classList.remove('show');
+            // 🛑 تم حذف إخفاء منتقي GIF
             
             try {
                 await addDoc(collection(db, "chats", chatId, "messages"), {
@@ -338,7 +364,7 @@
             });
         }
         
-        // --- عرض الرسالة في الواجهة (تم تثبيت منطق التعديل) ---
+        // --- عرض الرسالة في الواجهة ---
         function displayMessage(message) {
             const isSender = message.sender === currentUser.email;
             const senderGender = isSender ? currentUserGender : chatPartnerGender;
@@ -359,9 +385,7 @@
             
             let contentHTML = message.content || '...';
             
-            if (message.type === 'gif' && message.content) {
-                contentHTML = `<img src="${message.content}" alt="GIF" class="chat-gif">`;
-            } 
+            // 🛑 تم حذف منطق عرض GIF هنا
             
             // مؤشر التعديل
             const editedTag = message.edited ? `<span style="font-size:0.7em; color:var(--text-muted); margin-right: 5px;"> (مُعدّلة)</span>` : '';
@@ -385,7 +409,6 @@
                 editIcon.title = 'تعديل الرسالة';
                 
                 editIcon.onclick = (e) => {
-                    // منع بدء التعديل إذا كنا بالفعل في وضع التعديل
                     if (!bubble.classList.contains('edit-mode')) {
                         startEdit(e, message.content, message.id);
                     }
@@ -399,7 +422,7 @@
         }
 
         // ------------------------------------
-        // منطق تعديل الرسائل
+        // منطق تعديل الرسائل (لم يتغير)
         // ------------------------------------
         function startEdit(event, originalContent, messageId) {
             event.stopPropagation();
@@ -408,13 +431,11 @@
             
             if (bubble.classList.contains('edit-mode')) return;
 
-            // حفظ HTML الأصلي للاسترجاع عند الإلغاء
             bubble.dataset.originalHtml = bubble.innerHTML;
             
             bubble.innerHTML = ''; 
             bubble.classList.add('edit-mode');
 
-            // إنشاء حقل الإدخال
             const editInput = document.createElement('input');
             editInput.type = 'text';
             editInput.value = originalContent;
@@ -422,14 +443,12 @@
             editInput.style.textAlign = 'right';
             bubble.appendChild(editInput);
 
-            // زر الحفظ
             const saveBtn = document.createElement('button');
             saveBtn.textContent = 'حفظ';
             saveBtn.className = 'save-btn';
             saveBtn.onclick = () => saveEdit(messageId, editInput.value, bubble);
             bubble.appendChild(saveBtn);
 
-            // زر الإلغاء
             const cancelBtn = document.createElement('button');
             cancelBtn.textContent = 'إلغاء';
             cancelBtn.style.backgroundColor = '#6c757d'; 
@@ -477,9 +496,14 @@
         }
         
         // ------------------------------------
-        // منطق الإيموجي و GIF 
+        // منطق الإيموجي (تمت زيادة العدد)
         // ------------------------------------
-        const emojis = ['😀', '😂', '😍', '👍', '🙏', '❤️', '🔥', '🎉', '🌟', '😊'];
+        const emojis = [
+            '😀', '😂', '😍', '👍', '🙏', '❤️', '🔥', '🎉', '🌟', '😊',
+            '😭', '😎', '😇', '🤔', '👋', '✌️', '👌', '👏', '🥳', '💯',
+            '🤯', '😮', '😴', '😥', '😩', '💀', '👽', '🤖', '👾', '👻',
+            '👀', '🧠', '💡', '⏰', '👑', '💰', '💸', '☕', '🍕', '⚽'
+        ];
         
         function setupEmojiPicker() {
             emojis.forEach(emoji => {
@@ -489,78 +513,25 @@
                 span.onclick = () => {
                     messageInput.value += emoji;
                     messageInput.focus();
+                    emojiPicker.classList.remove('show'); // إخفاء المنتقي بعد الاختيار
                 };
                 emojiPicker.appendChild(span);
             });
 
-            emojiBtn.addEventListener('click', () => {
-                gifPickerContainer.classList.remove('show');
+            emojiBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // منع إغلاق المنتقي إذا كان مفتوحاً
                 emojiPicker.classList.toggle('show');
             });
+            
+            // إغلاق المنتقي عند النقر خارج صندوق الإدخال
+            document.addEventListener('click', (e) => {
+                if (!emojiPicker.contains(e.target) && e.target !== emojiBtn) {
+                    emojiPicker.classList.remove('show');
+                }
+            });
         }
-
-        let gifTimeout = null;
         
-        function setupGifPicker() {
-            gifBtn.addEventListener('click', () => {
-                emojiPicker.classList.remove('show');
-                gifPickerContainer.classList.toggle('show');
-                if (gifPickerContainer.classList.contains('show')) {
-                    searchGifs('trending'); 
-                }
-            });
-
-            gifSearchInput.addEventListener('input', () => {
-                clearTimeout(gifTimeout);
-                gifTimeout = setTimeout(() => {
-                    const query = gifSearchInput.value.trim();
-                    searchGifs(query || 'trending');
-                }, 500);
-            });
-        }
-
-        async function searchGifs(query) {
-            const apiKey = window.GIPHY_API_KEY; 
-            if (!apiKey) {
-                gifResults.innerHTML = '<p style="color:red; text-align:center;">خطأ: GIPHY API Key مفقود في api.js</p>';
-                return;
-            }
-
-            let url = '';
-            if (query === 'trending') {
-                url = `https://api.giphy.com/v1/gifs/trending?api_key=${apiKey}&limit=10&rating=g`;
-            } else {
-                url = `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${encodeURIComponent(query)}&limit=10&rating=g`;
-            }
-
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                gifResults.innerHTML = ''; 
-                
-                if (data.data.length === 0) {
-                    gifResults.innerHTML = '<p style="text-align:center;">لا توجد نتائج مطابقة.</p>';
-                    return;
-                }
-                
-                data.data.forEach(gif => {
-                    const imgUrl = gif.images.fixed_height.url;
-                    const item = document.createElement('div');
-                    item.className = 'gif-item';
-                    item.innerHTML = `<img src="${imgUrl}" alt="GIF">`;
-                    item.onclick = () => {
-                        sendMessage('gif', imgUrl);
-                        gifPickerContainer.classList.remove('show');
-                    };
-                    gifResults.appendChild(item);
-                });
-
-            } catch (error) {
-                console.error("Error fetching GIFs:", error);
-                gifResults.innerHTML = '<p style="color:red; text-align:center;">فشل جلب صور GIF.</p>';
-            }
-        }
+        // 🛑 تم حذف كل ما يتعلق بـ GIF
 
     </script>
 </body>
