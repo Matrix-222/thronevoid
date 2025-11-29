@@ -45,7 +45,7 @@ const translations = {
         'EMAIL_PLACEHOLDER': 'Email Address',
         'PASSWORD_PLACEHOLDER': 'Password',
         'FORGOT_PASSWORD': 'Forgot Password?',
-        'LOGIN_FIELDS_REQUIRED': 'Please enter both email and password.', // رسالة جديدة
+        'LOGIN_FIELDS_REQUIRED': 'Please enter both email and password.', 
         'LOGIN_SUCCESS': 'Login successful!',
         'LOGIN_FAIL': 'Login failed. Please check your credentials.',
 
@@ -98,7 +98,7 @@ const translations = {
         'EMAIL_PLACEHOLDER': 'البريد الإلكتروني',
         'PASSWORD_PLACEHOLDER': 'كلمة المرور',
         'FORGOT_PASSWORD': 'نسيت كلمة المرور؟',
-        'LOGIN_FIELDS_REQUIRED': 'الرجاء إدخال البريد الإلكتروني وكلمة المرور.', // رسالة جديدة
+        'LOGIN_FIELDS_REQUIRED': 'الرجاء إدخال البريد الإلكتروني وكلمة المرور.', 
         'LOGIN_SUCCESS': 'تم تسجيل الدخول بنجاح!',
         'LOGIN_FAIL': 'فشل تسجيل الدخول. يرجى التحقق من بياناتك.',
 
