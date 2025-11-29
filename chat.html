@@ -58,7 +58,7 @@
             border-radius: 12px;
             text-align: center;
             transition: all 0.3s ease;
-            cursor: pointer;
+            /* تم إزالة cursor: pointer; من البطاقة وإضافتها للزر */
             border-bottom: 5px solid var(--accent-green);
         }
         .profile-card:hover {
@@ -97,7 +97,7 @@
             margin-top: 5px;
         }
         
-        /* 💡 نقطة الاتصال الجديدة */
+        /* نقطة الاتصال */
         .online-dot {
             height: 10px;
             width: 10px;
@@ -147,7 +147,7 @@
                 <input type="checkbox" id="filterOnline">
             </div>
 
-            <button id="applyFiltersBtn" style="width: 100%; background-color: var(--accent-green);">تطبيق التصفية</button>
+            <button id="applyFiltersBtn" style="width: 100%; background-color: var(--accent-green);" data-i18n="APPLY_FILTERS">تطبيق التصفية</button>
         </div>
 
         <div class="profiles-content">
@@ -169,9 +169,9 @@
             collection, 
             query, 
             getDocs,
-            doc, // جديد: لاستخدام وظائف الوثيقة
-            updateDoc, // جديد: لتحديث حالة المستخدم
-            serverTimestamp // جديد: لتسجيل آخر ظهور
+            doc, 
+            updateDoc, 
+            serverTimestamp 
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // *** مفاتيح مشروعك الفعلي (thronevoid) - تأكد من صحتها ***
@@ -198,11 +198,11 @@
         const filterOnline = document.getElementById('filterOnline');
         const applyFiltersBtn = document.getElementById('applyFiltersBtn');
 
-        // 💡 دالة جديدة لتحديث حالة الاتصال في Firestore
+        // دالة لتحديث حالة الاتصال في Firestore
         async function setUserOnlineStatus(isOnline) {
             if (!currentUserEmail) return;
             try {
-                // تحديث الوثيقة الخاصة بالمستخدم الحالي
+                // نستخدم currentUserEmail كـ userId
                 await updateDoc(doc(db, "users", currentUserEmail), {
                     isOnline: isOnline,
                     lastSeen: isOnline ? null : serverTimestamp()
@@ -212,13 +212,13 @@
             }
         }
         
-        // 💡 تحديث حالة الاتصال عند تحميل الصفحة أو تسجيل الخروج
+        // التحقق من حالة المصادقة عند تحميل الصفحة
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                currentUserEmail = user.email;
-                setUserOnlineStatus(true); // تعيين الحالة إلى "متصل" عند الدخول
+                currentUserEmail = user.email; // تعيين الإيميل ليكون متاحاً عالمياً
+                setUserOnlineStatus(true); // تعيين الحالة إلى "متصل"
                 
-                // محاولة تعيين الحالة إلى "غير متصل" عند مغادرة الصفحة
+                // إضافة معالج لتعيين الحالة إلى "غير متصل" عند مغادرة الصفحة
                 window.addEventListener('beforeunload', () => setUserOnlineStatus(false));
                 
                 fetchAllProfiles();
@@ -230,33 +230,38 @@
         async function fetchAllProfiles() {
             profilesList.innerHTML = `<p style="text-align: center; color: var(--text-muted);">جار تحميل الملفات...</p>`;
             
-            const usersRef = collection(db, "users");
-            const snapshot = await getDocs(query(usersRef)); 
-            
-            allProfiles = [];
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const profileEmail = doc.id;
+            try {
+                const usersRef = collection(db, "users");
+                const snapshot = await getDocs(query(usersRef)); 
                 
-                if (profileEmail !== currentUserEmail) {
-                    allProfiles.push({ id: profileEmail, ...data });
-                }
-            });
-            
-            applyFilters(); 
+                allProfiles = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const profileEmail = doc.id;
+                    
+                    // استبعاد ملف المستخدم الحالي
+                    if (profileEmail !== currentUserEmail) {
+                        allProfiles.push({ id: profileEmail, ...data });
+                    }
+                });
+                
+                applyFilters(); 
+            } catch (error) {
+                console.error("Error fetching profiles:", error);
+                profilesList.innerHTML = `<p style="text-align: center; color: #e74c3c;">فشل في تحميل الملفات. يرجى التحقق من اتصالك وقواعد Firebase.</p>`;
+            }
         }
 
-        // 💡 دالة التصفية المحدثة لتضمين شرط "عرض المتصلين فقط"
         function applyFilters() {
             const searchTerm = searchBar.value.trim().toLowerCase();
             const interestFilter = filterInterests.value.trim().toLowerCase().split(',').map(i => i.trim()).filter(i => i);
-            const showOnlineOnly = filterOnline.checked; // قراءة حالة مربع الاختيار
+            const showOnlineOnly = filterOnline.checked; 
             
             let filteredProfiles = allProfiles.filter(profile => {
                 const username = (profile.username || profile.id.split('@')[0]).toLowerCase();
                 const bio = (profile.bio || '').toLowerCase();
                 const interests = (profile.interests || '').toLowerCase();
-                const isOnline = profile.isOnline === true; // قراءة حالة الاتصال من بيانات الملف
+                const isOnline = profile.isOnline === true; // قراءة حالة الاتصال
 
                 // 1. تصفية البحث بالاسم/النبذة
                 const matchesSearch = searchTerm === '' || 
@@ -271,7 +276,7 @@
                 
                 if (!matchesInterests) return false;
                 
-                // 3. تصفية المتصلين فقط (جديد)
+                // 3. تصفية المتصلين فقط
                 const matchesOnline = !showOnlineOnly || isOnline; 
 
                 return matchesOnline;
@@ -292,7 +297,6 @@
             });
         }
         
-        // 💡 تحديث بطاقة الملف لإضافة نقطة الاتصال
         function createProfileCard(profile) {
             const card = document.createElement('div');
             card.className = 'profile-card';
@@ -300,7 +304,7 @@
             const username = profile.username || profile.id.split('@')[0];
             const interestsList = (profile.interests || '').split(',').map(i => i.trim()).filter(i => i).slice(0, 3);
             const targetEmail = profile.id; 
-            const isOnline = profile.isOnline === true; // قراءة الحالة
+            const isOnline = profile.isOnline === true; 
 
             card.innerHTML = `
                 <div class="profile-card-header">
@@ -310,31 +314,27 @@
                         ${isOnline ? '<span class="online-dot" title="متصل الآن"></span>' : ''}
                     </h3>
                 </div>
-                <p style="color: var(--text-muted); font-style: italic;">${profile.bio || 'لا توجد نبذة.'}</p>
+                <p style="color: var(--text-muted); font-style: italic;">${profile.bio || loadLanguage('DEFAULT_BIO')}</p>
                 <p style="margin-top: 10px;">
                     ${interestsList.map(i => `<span class="interests-tag">${i}</span>`).join(' ')}
                 </p>
                 <button onclick="redirectToChat(this)"
                         data-email="${targetEmail}" 
                         style="background-color: var(--accent-green); margin-top: 15px;" 
-                        data-i18n="START_CHAT">ابدأ الدردشة</button>
+                        data-i18n="START_CHAT">${loadLanguage('START_CHAT')}</button>
             `;
             
-            if (window.loadLanguage) { 
-                const button = card.querySelector('.start-chat-btn');
-                if (button) button.textContent = loadLanguage('START_CHAT');
-            }
             return card;
         }
         
-        // 💡 ربط جميع مدخلات التصفية والبحث بدالة applyFilters
+        // ربط مدخلات التصفية والبحث
         searchBar.addEventListener('input', applyFilters);
-        filterInterests.addEventListener('input', applyFilters); // التصفية أثناء الكتابة في الاهتمامات
-        filterOnline.addEventListener('change', applyFilters); // التصفية عند تغيير حالة مربع الاختيار
-        applyFiltersBtn.addEventListener('click', applyFilters); // التصفية عند الضغط على الزر
+        filterInterests.addEventListener('input', applyFilters); 
+        filterOnline.addEventListener('change', applyFilters); 
+        applyFiltersBtn.addEventListener('click', applyFilters);
         
         window.logoutUser = function() {
-            // 💡 تعيين الحالة إلى "غير متصل" عند تسجيل الخروج
+            // تعيين الحالة إلى "غير متصل" عند تسجيل الخروج
             setUserOnlineStatus(false).finally(() => {
                 signOut(auth).then(() => { 
                     window.location.href = "index.html";
@@ -346,14 +346,16 @@
     </script>
     
     <script>
+        // يجب أن تكون هذه الدالة خارج الـ <script type="module"> لتكون متاحة للزر
         function redirectToChat(buttonElement) {
             const emailToChatWith = buttonElement.getAttribute('data-email');
             
             if (emailToChatWith) {
-                console.log(`✅ التوجيه الجبري إلى: private_chat.html?user=${emailToChatWith}`);
+                console.log(`✅ التوجيه إلى: private_chat.html?user=${emailToChatWith}`);
                 window.location.href = `private_chat.html?user=${emailToChatWith}`;
             } else {
                 console.error("❌ البريد الإلكتروني الهدف مفقود في خاصية data-email.");
+                alert("فشل في بدء الدردشة: البريد الإلكتروني للطرف الآخر غير موجود.");
             }
         }
     </script>
