@@ -12,18 +12,25 @@ const translations = {
         // صفحة login.html
         'LOGIN': 'تسجيل الدخول',
         'LOG_IN_ACCOUNT': 'تسجيل الدخول',
-        'REGISTER_ACCOUNT': 'إنشاء حساب جديد', // جديد
-        'USERNAME_PLACEHOLDER': 'اسم المستخدم', // جديد
+        'REGISTER_ACCOUNT': 'إنشاء حساب جديد', 
+        'USERNAME_PLACEHOLDER': 'اسم المستخدم', 
         'EMAIL_PLACEHOLDER': 'البريد الإلكتروني',
         'PASSWORD_PLACEHOLDER': 'كلمة المرور',
-        'CONFIRM_PASSWORD_PLACEHOLDER': 'تأكيد كلمة المرور', // جديد
+        'CONFIRM_PASSWORD_PLACEHOLDER': 'تأكيد كلمة المرور', 
         'FORGOT_PASSWORD': 'نسيت كلمة المرور؟',
         'AUTH_BUTTON_LOGIN': 'تسجيل الدخول',
         'AUTH_BUTTON_REGISTER': 'إنشاء حساب',
         'TOGGLE_TO_REGISTER': 'لا تملك حساباً؟ انقر للتسجيل',
         'TOGGLE_TO_LOGIN': 'لديك حساب بالفعل؟ انقر لتسجيل الدخول',
         'SIGN_IN_WITH_GOOGLE': 'تسجيل الدخول باستخدام جوجل',
-        'SIGN_IN_WITH_FACEBOOK': 'تسجيل الدخول باستخدام فيسبوك', // جديد
+        'SIGN_IN_WITH_FACEBOOK': 'تسجيل الدخول باستخدام فيسبوك', 
+        
+        // مفاتيح تسجيل الدخول برقم الجوال (جديدة)
+        'SIGN_IN_WITH_PHONE': 'أو سجل برقم الجوال', 
+        'PHONE_NUMBER_PLACEHOLDER': 'رقم الجوال (+966xxxxxxxx)', 
+        'SEND_VERIFICATION_CODE': 'إرسال رمز التحقق', 
+        'VERIFICATION_CODE_PLACEHOLDER': 'رمز التحقق المكون من 6 أرقام', 
+        'VERIFY_CODE': 'تأكيد الرمز', 
 
         // صفحة dashboard.html
         'WELCOME_WARLORD': 'أهلاً بك أيها المحارب!',
@@ -69,18 +76,25 @@ const translations = {
         // login.html page
         'LOGIN': 'Login',
         'LOG_IN_ACCOUNT': 'Login Account',
-        'REGISTER_ACCOUNT': 'Register New Account', // New
-        'USERNAME_PLACEHOLDER': 'Username', // New
+        'REGISTER_ACCOUNT': 'Register New Account', 
+        'USERNAME_PLACEHOLDER': 'Username', 
         'EMAIL_PLACEHOLDER': 'Email',
         'PASSWORD_PLACEHOLDER': 'Password',
-        'CONFIRM_PASSWORD_PLACEHOLDER': 'Confirm Password', // New
+        'CONFIRM_PASSWORD_PLACEHOLDER': 'Confirm Password', 
         'FORGOT_PASSWORD': 'Forgot Password?',
         'AUTH_BUTTON_LOGIN': 'Login',
         'AUTH_BUTTON_REGISTER': 'Register Account',
         'TOGGLE_TO_REGISTER': 'Don\'t have an account? Click to register',
         'TOGGLE_TO_LOGIN': 'Already have an account? Click to login',
         'SIGN_IN_WITH_GOOGLE': 'Sign in with Google',
-        'SIGN_IN_WITH_FACEBOOK': 'Sign in with Facebook', // New
+        'SIGN_IN_WITH_FACEBOOK': 'Sign in with Facebook', 
+        
+        // Phone Number Sign-in Keys (New)
+        'SIGN_IN_WITH_PHONE': 'Or sign in with Phone', 
+        'PHONE_NUMBER_PLACEHOLDER': 'Phone Number (+xxx...)', 
+        'SEND_VERIFICATION_CODE': 'Send Verification Code', 
+        'VERIFICATION_CODE_PLACEHOLDER': '6-digit Verification Code', 
+        'VERIFY_CODE': 'Verify Code', 
 
         // dashboard.html page
         'WELCOME_WARLORD': 'Welcome Warlord!',
