@@ -99,20 +99,23 @@
              color: rgba(255, 255, 255, 0.7);
         }
 
-        /* ⭐️ تنسيقات صندوق الإدخال الجديد */
+        /* ⭐️ تنسيقات صندوق الإدخال */
         .chat-input {
             padding: 15px;
             background-color: var(--primary-dark);
             display: flex;
             align-items: center;
-            position: relative; /* مهم لتحديد موضع منتقي الإيموجي */
+            position: relative; 
         }
         
         #messageInput {
             flex-grow: 1;
             margin-left: 10px;
             margin-bottom: 0;
-            /* للتأكد من أن حقل الإدخال يملأ المساحة المتبقية بشكل جيد */
+            
+            /* ⭐️ التعديل الذي يحل مشكلة المؤشر: */
+            direction: rtl; 
+            text-align: right;
         }
         
         .input-icon-btn {
@@ -130,21 +133,21 @@
             color: var(--accent-blue);
         }
 
-        /* ⭐️ تنسيقات منتقي الإيموجي الجديد */
+        /* ⭐️ تنسيقات منتقي الإيموجي */
         .emoji-picker {
             position: absolute;
-            bottom: 75px; /* يظهر فوق حقل الإدخال */
+            bottom: 75px; 
             right: 15px; 
             background-color: var(--secondary-dark);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 10px;
             max-width: 250px;
-            display: none; /* مخفي بشكل افتراضي */
+            display: none; 
             flex-wrap: wrap;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
             z-index: 20;
-            direction: ltr; /* لعرض الإيموجي بترتيب صحيح */
+            direction: ltr; 
             justify-content: flex-start;
         }
 
@@ -188,8 +191,7 @@
                 <button id="emojiBtn" class="input-icon-btn">😀</button>
                 
                 <div id="emojiPicker" class="emoji-picker"></div>
-                
-                </div>
+            </div>
         </div>
     </main>
 
@@ -240,8 +242,6 @@
         const emojiBtn = document.getElementById('emojiBtn');
         const emojiPicker = document.getElementById('emojiPicker');
         
-        // 🛑 تم حذف المتغيرات المتعلقة بالـ GIF
-
         const urlParams = new URLSearchParams(window.location.search);
         chatPartnerEmail = urlParams.get('user');
         
@@ -266,7 +266,6 @@
                 });
                 
                 setupEmojiPicker();
-                // 🛑 تم حذف استدعاء setupGifPicker();
 
             } else {
                 window.location.href = "index.html";
@@ -312,7 +311,6 @@
             if (content === '') return;
             
             emojiPicker.classList.remove('show');
-            // 🛑 تم حذف إخفاء منتقي GIF
             
             try {
                 await addDoc(collection(db, "chats", chatId, "messages"), {
@@ -385,8 +383,6 @@
             
             let contentHTML = message.content || '...';
             
-            // 🛑 تم حذف منطق عرض GIF هنا
-            
             // مؤشر التعديل
             const editedTag = message.edited ? `<span style="font-size:0.7em; color:var(--text-muted); margin-right: 5px;"> (مُعدّلة)</span>` : '';
 
@@ -422,7 +418,7 @@
         }
 
         // ------------------------------------
-        // منطق تعديل الرسائل (لم يتغير)
+        // منطق تعديل الرسائل 
         // ------------------------------------
         function startEdit(event, originalContent, messageId) {
             event.stopPropagation();
@@ -496,7 +492,7 @@
         }
         
         // ------------------------------------
-        // منطق الإيموجي (تمت زيادة العدد)
+        // منطق الإيموجي 
         // ------------------------------------
         const emojis = [
             '😀', '😂', '😍', '👍', '🙏', '❤️', '🔥', '🎉', '🌟', '😊',
@@ -513,26 +509,22 @@
                 span.onclick = () => {
                     messageInput.value += emoji;
                     messageInput.focus();
-                    emojiPicker.classList.remove('show'); // إخفاء المنتقي بعد الاختيار
+                    emojiPicker.classList.remove('show'); 
                 };
                 emojiPicker.appendChild(span);
             });
 
             emojiBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // منع إغلاق المنتقي إذا كان مفتوحاً
+                e.stopPropagation(); 
                 emojiPicker.classList.toggle('show');
             });
             
-            // إغلاق المنتقي عند النقر خارج صندوق الإدخال
             document.addEventListener('click', (e) => {
                 if (!emojiPicker.contains(e.target) && e.target !== emojiBtn) {
                     emojiPicker.classList.remove('show');
                 }
             });
         }
-        
-        // 🛑 تم حذف كل ما يتعلق بـ GIF
-
     </script>
 </body>
 </html>
