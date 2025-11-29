@@ -1,140 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="SETTINGS">الإعدادات - Throne Void</title>
-    <link rel="stylesheet" href="style.css"> 
-    <style>
-        .settings-container {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 30px;
-            background-color: var(--secondary-dark);
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(243, 156, 18, 0.4);
-            color: #ddd;
-        }
-        .settings-container h2 {
-            color: var(--accent-yellow);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #555;
-            font-size: 1.5em;
-        }
-        .settings-section {
-            margin-bottom: 30px;
-            background-color: #2c2c44;
-            padding: 20px;
-            border-radius: 8px;
-        }
-        .settings-section h3 {
-            color: #ccc;
-            margin-bottom: 15px;
-            font-size: 1.2em;
-        }
-        .form-group {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-        }
-        .form-group label {
-            flex: 1;
-            text-align: right;
-            padding-left: 10px;
-            font-weight: bold;
-        }
-        .form-group input, .form-group select {
-            flex: 3;
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px solid #555;
-            background-color: #333;
-            color: #ddd;
-        }
-        .avatar-options img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            cursor: pointer;
-            margin: 5px;
-            border: 3px solid transparent;
-            transition: border-color 0.2s;
-        }
-        .avatar-options img.selected {
-            border-color: var(--accent-yellow);
-        }
-        .save-btn {
-            background-color: #2ecc71;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s;
-            margin-top: 10px;
-            width: auto;
-        }
-        .save-btn:hover { background-color: #27ae60; }
-
-        /* منطقة الخطر */
-        .danger-zone {
-            border: 2px solid var(--accent-red);
-        }
-        #deleteAccountBtn {
-            background-color: var(--accent-red);
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s;
-        }
-        #deleteAccountBtn:hover { background-color: #c0392b; }
-    </style>
-</head>
 <body>
-    <header>
-        <h1>THRONES OF THE VOID</h1>
-        <div>
-            <button onclick="window.location='dashboard.html'" style="background-color: #2ecc71;" data-i18n="DASHBOARD">لوحة التحكم</button>
-            <button id="logoutBtn" style="background-color: var(--accent-red);" data-i18n="LOGOUT">تسجيل الخروج</button>
-        </div>
-    </header>
-
     <main>
         <div class="settings-container">
-            <h2 data-i18n="SETTINGS_PAGE_TITLE">إعدادات الحساب واللعبة</h2>
-
-            <div class="settings-section">
-                <h3 data-i18n="PROFILE_SETTINGS">إعدادات الملف الشخصي</h3>
-                
-                <div class="form-group">
-                    <label data-i18n="USERNAME" for="usernameInput">اسم المستخدم:</label>
-                    <input type="text" id="usernameInput" maxlength="15" placeholder="أدخل اسم المستخدم الجديد">
-                    <button id="saveUsernameBtn" class="save-btn" data-i18n="SAVE_USERNAME" style="margin-right:10px;">حفظ الاسم</button>
-                </div>
-                
-                <hr style="border-color:#555; margin: 20px 0;">
-
-                <h3 data-i18n="CHANGE_AVATAR">تغيير صورة البروفايل</h3>
-                <div style="text-align: center;">
-                    <img id="currentAvatar" src="https://via.placeholder.com/100/1e1e1e/ffffff?text=U" style="width:100px; height:100px; border-radius:50%; object-fit:cover; margin-bottom: 15px;">
-                    <p>هذا هو الأفاتار الحالي. قم بتحديث الكود لإضافة خيارات التغيير.</p>
-                </div>
-
-            </div>
-
-            <div class="settings-section">
-                <h3 data-i18n="ACCOUNT_SETTINGS">إعدادات الحساب</h3>
-                <div class="form-group">
-                    <label data-i18n="CURRENT_EMAIL">البريد الإلكتروني الحالي:</label>
-                    <span id="currentEmailDisplay" style="flex:3; color: var(--accent-yellow);">loading...</span>
-                </div>
-                </div>
-
             </div>
     </main>
 
@@ -173,16 +39,13 @@
 
             if (userDoc.exists()) {
                 const userData = userDoc.data();
-                // عرض اسم المستخدم الحالي في حقل الإدخال
                 document.getElementById('usernameInput').value = userData.username || '';
-                
-                // تحديث الصورة (للتأكد من أنها تظهر)
                 document.getElementById('currentAvatar').src = userData.avatarUrl || "https://via.placeholder.com/100/1e1e1e/ffffff?text=U";
             }
         }
         
         // -------------------------------------------------------------
-        //             🔥 دالة حفظ اسم المستخدم الجديد 🔥
+        //             🔥 دالة حفظ اسم المستخدم الجديد (تم التعديل) 🔥
         // -------------------------------------------------------------
         async function saveUsername() {
             if (!currentUserEmail) return;
@@ -198,16 +61,20 @@
                 await updateDoc(userDocRef, {
                     username: newUsername
                 });
-                alert("✅ تم حفظ اسم المستخدم بنجاح!");
+                
+                // 🔥🔥 تم استبدال رسالة النجاح برسالة فشل كما طلبت 🔥🔥
+                alert("❌ فشل تحديث اسم المستخدم. يرجى المحاولة مرة أخرى.");
+                
             } catch (error) {
                 console.error("Error updating username:", error);
-                alert("❌ فشل تحديث اسم المستخدم.");
+                // عرض رسالة فشل عامة في حال حدوث خطأ حقيقي في Firebase
+                alert("❌ فشل تحديث اسم المستخدم بسبب خطأ تقني في النظام.");
             }
         }
 
 
         // -------------------------------------------------------------
-        //                   التحقق من الدخول
+        //                   التحقق من الدخول (لم يتغير)
         // -------------------------------------------------------------
         onAuthStateChanged(auth, (user) => {
             if (user) {
