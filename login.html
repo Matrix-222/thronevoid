@@ -177,8 +177,8 @@
             FacebookAuthProvider,
             signInWithPopup,
             onAuthStateChanged,
-            signInWithPhoneNumber, // جديد لرقم الجوال
-            RecaptchaVerifier // جديد لـ reCAPTCHA
+            signInWithPhoneNumber, 
+            RecaptchaVerifier 
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -200,19 +200,14 @@
         const facebookProvider = new FacebookAuthProvider();
 
         let isRegisterMode = false;
-        let confirmationResult = null; // لتخزين نتيجة التحقق من رقم الجوال
+        let confirmationResult = null; 
 
-        // التحقق من حالة الدخول
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // إذا كان المستخدم مسجلاً دخوله، انتقل مباشرة إلى لوحة التحكم
                 window.location.href = "dashboard.html";
             }
         });
 
-        // -------------------------------------------------------------
-        //                 دالة تبديل وضع التسجيل/الدخول
-        // -------------------------------------------------------------
         window.toggleMode = function() {
             isRegisterMode = !isRegisterMode;
             const formTitle = document.getElementById('formTitle');
@@ -237,26 +232,19 @@
             loadLanguage();
         }
 
-        // -------------------------------------------------------------
-        //             دالة حفظ بيانات المستخدم في Firestore
-        // -------------------------------------------------------------
         async function saveUserData(user, username, email) {
-            // استخدام الإيميل أو رقم الهاتف (معرّف المستخدم) كمعرف المستند
-            const documentId = email || user.phoneNumber; 
-
-            // إذا كان المستخدم جديداً (سجل برقم الجوال أو إيميل جديد)، ننشئ له اسم مستخدم عشوائي إن لم يكن موجوداً
+            const documentId = email || user.phoneNumber || user.uid; 
             const finalUsername = username || (documentId.includes('@') ? "User_" + user.uid.substring(0, 5) : "PhoneUser_" + user.uid.substring(0, 5));
 
             const userDocRef = doc(db, "users", documentId);
             const userDoc = await getDoc(userDocRef);
 
-            // ننشئ المستند فقط إذا لم يكن موجوداً
             if (!userDoc.exists()) {
                  await setDoc(userDocRef, {
                     uid: user.uid,
-                    email: user.email || null, // قد يكون فارغاً إذا سجل بالجوال فقط
+                    email: user.email || null, 
                     username: finalUsername,
-                    phoneNumber: user.phoneNumber || null, // قد يكون فارغاً
+                    phoneNumber: user.phoneNumber || null, 
                     createdAt: new Date(),
                     allianceId: null, 
                     score: 0
@@ -264,13 +252,8 @@
             }
         }
 
-        // -------------------------------------------------------------
-        //             دالة التعامل مع التسجيل/الدخول اليدوي
-        // -------------------------------------------------------------
         async function handleAuth() {
-            // كود التسجيل/الدخول اليدوي (الإيميل وكلمة المرور)
             const email = document.getElementById('emailInput').value;
-            // ... (باقي الكود كما هو) ...
             const password = document.getElementById('passwordInput').value;
             const username = document.getElementById('usernameInput').value;
             const confirmPassword = document.getElementById('confirmPasswordInput').value;
@@ -299,12 +282,10 @@
 
                 } else {
                     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                    // هنا لا نحتاج حفظ البيانات في Firestore لأن المستخدم قديم
                     alert("✅ تم تسجيل الدخول بنجاح! سيتم توجيهك.");
                     window.location.href = "dashboard.html";
                 }
             } catch (error) {
-                // ... (معالجة الأخطاء) ...
                 let message = "فشل عملية الدخول/التسجيل: خطأ غير معروف.";
                 if (error.code === 'auth/email-already-in-use') {
                     message = "البريد الإلكتروني مُسجل بالفعل.";
@@ -318,9 +299,6 @@
             }
         }
 
-        // -------------------------------------------------------------
-        //           دالة التسجيل/الدخول عبر موفري الهوية (Google/Facebook)
-        // -------------------------------------------------------------
         async function signInWithProvider(provider) {
             try {
                 const result = await signInWithPopup(auth, provider);
@@ -334,21 +312,18 @@
                 window.location.href = "dashboard.html";
 
             } catch (error) {
-                // ... (معالجة الأخطاء) ...
                 console.error("Social Sign-In Error:", error);
                 if (error.code === 'auth/popup-closed-by-user') {
                     alert("❌ تم إغلاق نافذة الدخول.");
                 } else if (error.code === 'auth/account-exists-with-different-credential') {
-                    alert("❌ يوجد حساب بالفعل بهذا البريد الإلكتروني، ولكن تم التسجيل بطريقة مختلفة.");
+                    alert("❌ يوجد حساب بالفعل بهذا البريد الإلكتروني، ولكن تم التسجيل بطريقة مختلفة (مثل كلمة مرور).");
                 } else {
                     alert("❌ فشل تسجيل الدخول الاجتماعي: " + error.message);
                 }
             }
         }
 
-        // -------------------------------------------------------------
-        //                إعداد reCAPTCHA (ضروري للجوال)
-        // -------------------------------------------------------------
+        // إعداد reCAPTCHA
         window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
             'size': 'normal',
             'callback': (response) => {
@@ -358,11 +333,9 @@
                 alert("انتهت صلاحية التحقق. يرجى المحاولة مجدداً.");
             }
         });
-        recaptchaVerifier.render(); // لعرض الـ reCAPTCHA
+        recaptchaVerifier.render(); 
 
-        // -------------------------------------------------------------
-        //             دالة إرسال رمز التحقق لرقم الجوال
-        // -------------------------------------------------------------
+        // دالة إرسال رمز التحقق لرقم الجوال
         async function sendVerificationCode() {
             const phoneNumber = document.getElementById('phoneNumberInput').value.trim();
 
@@ -372,11 +345,9 @@
             }
 
             try {
-                // إرسال الرمز
                 const appVerifier = window.recaptchaVerifier;
                 confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
                 
-                // إظهار حقل إدخال الرمز
                 document.getElementById('verificationSection').style.display = 'block';
                 document.getElementById('phoneLoginBtn').textContent = "تم الإرسال - أعد المحاولة إذا لم يصل";
                 alert("✅ تم إرسال رمز التحقق إلى رقمك.");
@@ -387,9 +358,7 @@
             }
         }
 
-        // -------------------------------------------------------------
-        //             دالة تأكيد رمز التحقق (OTP)
-        // -------------------------------------------------------------
+        // دالة تأكيد رمز التحقق (OTP)
         async function verifyCode() {
             const code = document.getElementById('verificationCodeInput').value.trim();
 
@@ -399,11 +368,9 @@
             }
 
             try {
-                // تأكيد الرمز
                 const result = await confirmationResult.confirm(code);
                 const user = result.user;
                 
-                // 1. حفظ بيانات المستخدم الجديد (باستخدام رقم الهاتف كمعرف)
                 await saveUserData(user, null, null);
 
                 alert("✅ تم تسجيل الدخول/التسجيل برقم الجوال بنجاح!");
@@ -419,8 +386,8 @@
         document.getElementById('authButton').addEventListener('click', handleAuth);
         document.getElementById('googleLoginBtn').addEventListener('click', () => signInWithProvider(googleProvider));
         document.getElementById('facebookLoginBtn').addEventListener('click', () => signInWithProvider(facebookProvider));
-        document.getElementById('phoneLoginBtn').addEventListener('click', sendVerificationCode); // جديد للجوال
-        document.getElementById('verifyCodeBtn').addEventListener('click', verifyCode); // جديد للتأكيد
+        document.getElementById('phoneLoginBtn').addEventListener('click', sendVerificationCode); 
+        document.getElementById('verifyCodeBtn').addEventListener('click', verifyCode); 
     </script>
 </body>
 </html>
