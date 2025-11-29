@@ -1,0 +1,17 @@
+// يجب أن يكون هذا المنطق موجودًا في ملف private_chat.html
+
+function getChatId(userEmail1, userEmail2) {
+    // 1. ترتيب الإيميلات أبجديًا لإنشاء معرف فريد للمحادثة
+    const sortedEmails = [userEmail1, userEmail2].sort();
+    
+    // 2. دمج الإيميلات بالترتيب للحصول على chatId
+    return sortedEmails.join('_');
+}
+
+// مثال للاستخدام عند تحميل صفحة private_chat.html
+// افترض أن userEmail هو البريد الإلكتروني للمستخدم المسجل الدخول
+// وافترض أن targetEmail تم جلبه من URL عبر (URLSearchParams)
+const chatId = getChatId(userEmail, targetEmail);
+
+// ثم يتم استخدام هذا الـ chatId لتعريف مسار مجموعة الرسائل في Firestore:
+// const messagesRef = collection(db, "chats", chatId, "messages");
