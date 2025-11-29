@@ -6,7 +6,6 @@
     <title data-i18n="PRIVATE_CHAT_TITLE">الدردشة الخاصة</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* تصميم صندوق الدردشة */
         .chat-area {
             max-width: 800px;
             margin: 40px auto;
@@ -17,7 +16,6 @@
             display: flex;
             flex-direction: column;
         }
-        /* حاوية الرسائل */
         #messagesContainer {
             flex-grow: 1;
             overflow-y: auto;
@@ -26,7 +24,6 @@
             flex-direction: column;
             gap: 10px;
         }
-        /* تصميم الرسالة الفردية */
         .message-item {
             padding: 10px 15px;
             border-radius: 15px;
@@ -34,14 +31,12 @@
             word-wrap: break-word;
             font-size: 0.95em;
         }
-        /* رسائل المستخدم الحالي */
         .self-msg {
             background-color: var(--accent-blue);
             align-self: flex-start;
             margin-right: auto;
             border-top-right-radius: 0;
         }
-        /* رسائل الطرف الآخر */
         .other-msg {
             background-color: #3a3a3a; 
             align-self: flex-end;
@@ -54,7 +49,6 @@
             margin-top: 5px;
             text-align: left;
         }
-        /* منطقة إدخال الرسائل */
         .input-area {
             display: flex;
             padding: 15px;
@@ -92,6 +86,8 @@
         </div>
     </main>
 
+    <div id="toastContainer" class="toast-notification-container"></div>
+
     <script src="i18n.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -128,72 +124,113 @@
         let chatPartnerEmail = new URLSearchParams(window.location.search).get('user');
         let chatId = null;
         let unsubscribeListener = null; 
-        
+        let partnerName = 'الطرف الآخر'; // اسم شريك الدردشة
+
         const messagesContainer = document.getElementById('messagesContainer');
         const messageInput = document.getElementById('messageInput');
-        const chatPartnerName = document.getElementById('chatPartnerName');
+        const chatPartnerNameEl = document.getElementById('chatPartnerName');
+        const toastContainer = document.getElementById('toastContainer');
 
-        /**
-         * تحدد معرف الدردشة (chatId) بترتيب أبجدي لبريدي المستخدمين.
-         * مثال: a@mail_b@mail
-         */
         function getChatId(email1, email2) {
             const sortedEmails = [email1, email2].sort();
             return sortedEmails.join('_');
         }
+        
+        // --- دالة عرض الإشعار (Toast) ---
+        function showToast(senderName, messageText, senderEmail) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-message';
+            
+            // يتيح النقر على الإشعار للانتقال إلى المحادثة (على الرغم من أننا فيها، لكن لأغراض التنظيم)
+            toast.onclick = () => {
+                window.location.href = `private_chat.html?user=${senderEmail}`;
+            };
+
+            const notificationText = loadLanguage('NEW_MESSAGE_NOTIFICATION');
+
+            toast.innerHTML = `
+                <strong>${notificationText} ${senderName}</strong> 
+                <p>${messageText.substring(0, 50)}${messageText.length > 50 ? '...' : ''}</p>
+            `;
+            
+            toastContainer.prepend(toast); // إضافة الإشعار في الأعلى
+            
+            // إظهار الإشعار بانزلاق
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10); 
+
+            // إخفاء الإشعار بعد 5 ثوانٍ
+            setTimeout(() => {
+                toast.classList.remove('show');
+                // إزالته من DOM بعد الانتهاء من الحركة
+                setTimeout(() => {
+                    if (toastContainer.contains(toast)) {
+                        toastContainer.removeChild(toast);
+                    }
+                }, 500); 
+            }, 5000); 
+        }
 
         onAuthStateChanged(auth, async (user) => {
             if (!user || !chatPartnerEmail) {
-                // إذا لم يكن هناك مستخدم مسجل دخول أو إيميل للطرف الآخر، عد للصفحة الرئيسية
                 window.location.href = "chat.html";
                 return;
             }
             
             currentUser = user;
-            // 1. تحديد الـ chatId بناءً على إيميل المستخدم الحالي وإيميل الطرف الآخر
             chatId = getChatId(currentUser.email, chatPartnerEmail);
             
             await fetchPartnerInfo(chatPartnerEmail);
             
-            // 2. بدء الاستماع للرسائل الجديدة
             startChatListener();
         });
         
         async function fetchPartnerInfo(email) {
             const partnerDoc = await getDoc(doc(db, "users", email));
-            let partnerName = email.split('@')[0];
+            partnerName = email.split('@')[0]; // تعيين اسم مبدئي
             if (partnerDoc.exists()) {
                 partnerName = partnerDoc.data().username || partnerName;
             }
-            chatPartnerName.textContent = `محادثة مع: ${partnerName}`;
+            chatPartnerNameEl.textContent = `محادثة مع: ${partnerName}`;
             document.title = `${loadLanguage('PRIVATE_CHAT_TITLE')} - ${partnerName}`;
         }
 
-        /**
-         * تبدأ الاستماع للرسائل الجديدة في Firestore في الوقت الفعلي (Real-time).
-         */
         function startChatListener() {
             if (unsubscribeListener) {
-                unsubscribeListener(); // إيقاف الاستماع القديم إذا وجد
+                unsubscribeListener();
             }
             
             const chatRef = collection(db, "chats", chatId, "messages");
             const q = query(chatRef, orderBy('timestamp', 'asc'), limit(50)); 
 
             unsubscribeListener = onSnapshot(q, (snapshot) => {
-                // مسح محتوى الحاوية عند التحميل الأول
-                if (snapshot.docChanges().length > 0 && messagesContainer.querySelector('p')) {
-                    messagesContainer.innerHTML = '';
-                }
+                let isScrolledDown = messagesContainer.scrollHeight - messagesContainer.clientHeight <= messagesContainer.scrollTop + 1; // للتحقق مما إذا كان المستخدم في أسفل الدردشة
 
                 snapshot.docChanges().forEach((change) => {
+                    const messageData = change.doc.data();
+                    
                     if (change.type === "added") {
-                        const messageData = change.doc.data();
+                        // مسح رسالة "جار التحميل" عند وصول أول رسالة
+                        if (messagesContainer.querySelector('p')) {
+                            messagesContainer.innerHTML = '';
+                        }
+                        
                         messagesContainer.appendChild(createMessageElement(messageData)); 
-                        // التمرير إلى أسفل الرسائل تلقائياً
-                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+                        // إذا لم تكن الرسالة منك وأنت في محادثة، شغل إشعار
+                        if (messageData.senderEmail !== currentUser.email) {
+                            // نشغل الإشعار فقط إذا لم يكن المستخدم يركز على هذه الصفحة أو إذا كانت الصفحة نشطة (لأغراض الاختبار)
+                            // عند التطبيق الفعلي، ستكون هذه الوظيفة في chat.html
+                            showToast(partnerName, messageData.text, chatPartnerEmail);
+                        }
                     }
                 });
+
+                // التمرير إلى أسفل الرسائل تلقائياً إذا كان المستخدم قريباً من القاع
+                if (isScrolledDown) {
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
             }, (error) => {
                 console.error("Error listening to chat:", error);
                 messagesContainer.innerHTML = `<p style="text-align: center; color: #e74c3c;">فشل في تحميل الرسائل: ${error.message}</p>`;
@@ -202,7 +239,6 @@
         
         function createMessageElement(data) {
             const div = document.createElement('div');
-            // تحويل الطابع الزمني (Timestamp) إلى وقت محلي
             const date = data.timestamp && data.timestamp.toDate ? data.timestamp.toDate() : new Date();
             const timestampText = date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
             
@@ -216,22 +252,18 @@
             return div;
         }
 
-        /**
-         * ترسل الرسالة إلى Firestore.
-         */
         async function sendMessage() {
             const text = messageInput.value.trim();
             if (!text || !chatId) return;
 
             try {
-                // 3. إرسال الرسالة إلى مسار الدردشة الصحيح
                 await addDoc(collection(db, "chats", chatId, "messages"), {
                     senderEmail: currentUser.email,
                     text: text,
                     timestamp: serverTimestamp(),
                 });
 
-                messageInput.value = ''; // مسح حقل الإدخال
+                messageInput.value = ''; 
                 
             } catch (error) {
                 console.error("Error sending message:", error);
@@ -239,10 +271,7 @@
             }
         }
         
-        // ربط زر الإرسال بوظيفة sendMessage
         document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
-        
-        // دعم الإرسال عبر الضغط على مفتاح Enter
         messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 sendMessage();
