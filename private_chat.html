@@ -250,8 +250,8 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // 🔑 مفتاح GIPHY التجريبي (يجب استبداله بمفتاحك الخاص)
-        const GIPHY_API_KEY = "GIPHY_API_KEY_HERE"; 
+        // 🔑 مفتاح GIPHY المدمج الآن
+        const GIPHY_API_KEY = "GIPHY"; 
         const GIPHY_API_URL = "https://api.giphy.com/v1/gifs/search";
 
         let currentUser = null;
@@ -263,7 +263,6 @@
         const messagesContainer = document.getElementById('messagesContainer');
         const messageInput = document.getElementById('messageInput');
         const chatPartnerNameEl = document.getElementById('chatPartnerName');
-        // تم حذف toastContainer من تعريف الثوابت
         const emojiBtn = document.getElementById('emojiBtn');
         const emojiPicker = document.getElementById('emojiPicker');
         const gifBtn = document.getElementById('gifBtn'); 
@@ -278,8 +277,6 @@
             return sortedEmails.join('_');
         }
         
-        // تم حذف دالة showToast بالكامل
-
         onAuthStateChanged(auth, async (user) => {
             if (!user || !chatPartnerEmail) {
                 window.location.href = "chat.html";
@@ -326,8 +323,6 @@
                         }
                         
                         messagesContainer.appendChild(createMessageElement(messageData)); 
-
-                        // تم حذف استدعاء showToast من هنا
                     }
                 });
 
