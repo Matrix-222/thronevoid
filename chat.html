@@ -6,16 +6,107 @@
     <title data-i18n="MATCHING_PROFILES">ملفات التعارف</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        /* تخطيط الصفحة الرئيسية */
         .main-container {
-            max-width: 1200px;
+            max-width: 1300px;
             margin: 40px auto;
             padding: 0 20px;
+            display: flex; /* لتقسيم الصفحة إلى شريط جانبي ومحتوى */
+            gap: 30px;
+        }
+
+        /* الشريط الجانبي للتصفية */
+        .sidebar {
+            width: 280px;
+            background-color: var(--secondary-dark);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            height: fit-content;
+        }
+        .sidebar h3 {
+            color: var(--accent-blue);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-group {
+            margin-bottom: 20px;
+        }
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-light);
+            font-weight: bold;
+        }
+        
+        /* منطقة عرض الملفات */
+        .profiles-content {
+            flex-grow: 1;
         }
         #profiles-list {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
             margin-top: 20px;
+        }
+
+        /* بطاقة الملف الشخصي (Profile Card) */
+        .profile-card {
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-bottom: 5px solid var(--accent-green);
+        }
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
+        }
+        .profile-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        .profile-card img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--accent-blue);
+        }
+        .profile-card h3 {
+            color: var(--text-light);
+            margin: 10px 0 5px;
+            font-size: 1.4em;
+        }
+        .profile-card .interests-tag {
+            background-color: #333;
+            color: var(--accent-green);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        /* الـ Media Queries للتجاوب على الأجهزة الصغيرة */
+        @media (max-width: 900px) {
+            .main-container {
+                flex-direction: column;
+                padding: 0 10px;
+            }
+            .sidebar {
+                width: 100%; 
+                margin-bottom: 20px;
+            }
+            #profiles-list {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
         }
     </style>
 </head>
@@ -29,11 +120,30 @@
     </header>
 
     <main class="main-container">
-        <h2 data-i18n="FIND_NEW_PEOPLE" style="color: var(--accent-green);">ابحث عن أشخاص جدد</h2>
-        <input type="text" id="searchBar" data-i18n="SEARCH_PROFILES_PLACEHOLDER" placeholder="ابحث بالاسم أو الاهتمامات...">
-
-        <div id="profiles-list">
+        <div class="sidebar">
+            <h3 data-i18n="ADVANCED_FILTERS">تصفية متقدمة</h3>
+            
+            <div class="filter-group">
+                <label for="filterInterests">ابحث بالاهتمامات المشتركة</label>
+                <input type="text" id="filterInterests" placeholder="مثل: قراءة, سفر">
             </div>
+
+            <div class="filter-group">
+                <label for="filterOnline">عرض المتصلين فقط</label>
+                <input type="checkbox" id="filterOnline" style="margin-right: 10px;">
+            </div>
+
+            <button id="applyFiltersBtn" style="width: 100%; background-color: var(--accent-green);">تطبيق التصفية</button>
+        </div>
+
+        <div class="profiles-content">
+            <h2 data-i18n="FIND_NEW_PEOPLE" style="color: var(--accent-green);">ابحث عن أشخاص جدد</h2>
+            
+            <input type="text" id="searchBar" data-i18n="SEARCH_PROFILES_PLACEHOLDER" placeholder="ابحث بالاسم أو النبذة..." style="margin-bottom: 20px;">
+
+            <div id="profiles-list">
+                </div>
+        </div>
     </main>
 
     <script src="i18n.js"></script>
@@ -44,7 +154,6 @@
             getFirestore, 
             collection, 
             query, 
-            where, 
             getDocs
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -63,87 +172,127 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        let currentUserEmail = null;
+        let allProfiles = []; // لتخزين جميع الملفات وتطبيق التصفية محليًا
+
         const profilesList = document.getElementById('profiles-list');
         const searchBar = document.getElementById('searchBar');
-        let currentUserEmail = null;
+        const filterInterests = document.getElementById('filterInterests');
+        const filterOnline = document.getElementById('filterOnline');
+        const applyFiltersBtn = document.getElementById('applyFiltersBtn');
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUserEmail = user.email;
-                fetchProfiles();
+                fetchAllProfiles();
             } else {
                 window.location.href = "index.html";
             }
         });
 
-        async function fetchProfiles(searchTerm = '') {
-            profilesList.innerHTML = `<p style="text-align: center; color: var(--text-muted);">جار التحميل...</p>`;
+        // جلب جميع الملفات مرة واحدة
+        async function fetchAllProfiles() {
+            profilesList.innerHTML = `<p style="text-align: center; color: var(--text-muted);">جار تحميل الملفات...</p>`;
             
             const usersRef = collection(db, "users");
-            // جلب جميع المستخدمين
-            const q = query(usersRef); 
-
-            try {
-                const snapshot = await getDocs(q);
-                profilesList.innerHTML = '';
-                let foundProfiles = 0;
-
-                snapshot.forEach(doc => {
-                    const userData = doc.data();
-                    const profileEmail = doc.id;
-                    
-                    // استثناء المستخدم الحالي
-                    if (profileEmail === currentUserEmail) return;
-
-                    const username = userData.username || profileEmail.split('@')[0];
-                    const interests = userData.interests || loadLanguage('DEFAULT_INTERESTS');
-                    const bio = userData.bio || loadLanguage('DEFAULT_BIO');
-
-                    // تصفية بسيطة بناءً على الاسم أو الاهتمامات
-                    const searchLower = searchTerm.toLowerCase();
-                    if (searchTerm === '' || 
-                        username.toLowerCase().includes(searchLower) ||
-                        interests.toLowerCase().includes(searchLower) ||
-                        bio.toLowerCase().includes(searchLower)) 
-                    {
-                        profilesList.appendChild(createProfileCard(username, interests, profileEmail));
-                        foundProfiles++;
-                    }
-                });
-                
-                if (foundProfiles === 0) {
-                    profilesList.innerHTML = `<p style="text-align: center; color: var(--text-muted);" data-i18n="NO_PROFILES_FOUND">${loadLanguage('NO_PROFILES_FOUND')}</p>`;
-                }
-
-            } catch (error) {
-                console.error("Error fetching profiles:", error);
-                profilesList.innerHTML = `<p style="text-align: center; color: #e74c3c;">فشل تحميل الملفات.</p>`;
-            }
+            const snapshot = await getDocs(query(usersRef)); 
             
+            allProfiles = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const profileEmail = doc.id;
+                
+                if (profileEmail !== currentUserEmail) {
+                    allProfiles.push({ id: profileEmail, ...data });
+                }
+            });
+            
+            applyFilters(); 
+        }
+
+        // تطبيق التصفية والبحث وعرض الملفات
+        function applyFilters() {
+            const searchTerm = searchBar.value.trim().toLowerCase();
+            const interestFilter = filterInterests.value.trim().toLowerCase().split(',').map(i => i.trim()).filter(i => i);
+            const showOnlineOnly = filterOnline.checked;
+            
+            let filteredProfiles = allProfiles.filter(profile => {
+                const username = (profile.username || profile.id.split('@')[0]).toLowerCase();
+                const bio = (profile.bio || '').toLowerCase();
+                const interests = (profile.interests || '').toLowerCase();
+                // افتراض حالة الاتصال بـ True حاليًا
+                const isOnline = true; 
+
+                // 1. البحث السريع
+                const matchesSearch = searchTerm === '' || 
+                                      username.includes(searchTerm) ||
+                                      bio.includes(searchTerm);
+                
+                if (!matchesSearch) return false;
+
+                // 2. تصفية الاهتمامات
+                const matchesInterests = interestFilter.length === 0 || 
+                                         interestFilter.every(tag => interests.includes(tag));
+                
+                if (!matchesInterests) return false;
+                
+                // 3. تصفية الاتصال (ستحتاج لتطبيق نظام حالة الاتصال الحقيقي مستقبلاً)
+                const matchesOnline = !showOnlineOnly || isOnline; 
+
+                return matchesOnline;
+            });
+
+            renderProfiles(filteredProfiles);
+        }
+
+        function renderProfiles(profiles) {
+            profilesList.innerHTML = '';
+            if (profiles.length === 0) {
+                profilesList.innerHTML = `<p style="text-align: center; color: var(--text-muted);" data-i18n="NO_PROFILES_FOUND">${loadLanguage('NO_PROFILES_FOUND')}</p>`;
+                return;
+            }
+
+            profiles.forEach(profile => {
+                profilesList.appendChild(createProfileCard(profile));
+            });
         }
         
-        searchBar.addEventListener('input', (e) => {
-            fetchProfiles(e.target.value.trim());
-        });
-
-        function createProfileCard(username, interests, email) {
+        function createProfileCard(profile) {
             const card = document.createElement('div');
             card.className = 'profile-card';
+            
+            const username = profile.username || profile.id.split('@')[0];
+            const interestsList = (profile.interests || '').split(',').map(i => i.trim()).filter(i => i).slice(0, 3); // عرض أول 3 اهتمامات
+            
             card.innerHTML = `
-                <img src="https://i.pravatar.cc/150?u=${email}" alt="Avatar">
-                <h3>${username}</h3>
-                <p>الاهتمامات: ${interests}</p>
-                <button class="start-chat-btn" data-email="${email}" style="background-color: var(--accent-green);" data-i18n="START_CHAT">ابدأ الدردشة</button>
+                <div class="profile-card-header">
+                    <img src="https://i.pravatar.cc/150?u=${profile.id}" alt="Avatar">
+                    <h3>${username}</h3>
+                </div>
+                <p style="color: var(--text-muted); font-style: italic;">${profile.bio || 'لا توجد نبذة.'}</p>
+                <p style="margin-top: 10px;">
+                    ${interestsList.map(i => `<span class="interests-tag">${i}</span>`).join(' ')}
+                </p>
+                <button class="start-chat-btn" 
+                        data-email="${profile.id}" 
+                        style="background-color: var(--accent-green); margin-top: 15px;" 
+                        data-i18n="START_CHAT">ابدأ الدردشة</button>
             `;
             
             card.querySelector('.start-chat-btn').addEventListener('click', (e) => {
                 const targetEmail = e.target.getAttribute('data-email');
-                // التوجيه إلى صفحة المحادثة مع تحديد المستخدم المستهدف
                 window.location.href = `private_chat.html?user=${targetEmail}`;
             });
 
+            if (window.loadLanguage) { 
+                card.querySelector('.start-chat-btn').textContent = loadLanguage('START_CHAT');
+            }
             return card;
         }
+        
+        // ربط أزرار ووظائف البحث والتصفية
+        searchBar.addEventListener('input', applyFilters);
+        applyFiltersBtn.addEventListener('click', applyFilters);
         
         window.logoutUser = function() {
             signOut(auth).then(() => { 
