@@ -11,15 +11,19 @@ const translations = {
 
         // صفحة login.html
         'LOGIN': 'تسجيل الدخول',
-        'LOG_IN_ACCOUNT': 'تسجيل الدخول / إنشاء حساب',
+        'LOG_IN_ACCOUNT': 'تسجيل الدخول',
+        'REGISTER_ACCOUNT': 'إنشاء حساب جديد', // جديد
+        'USERNAME_PLACEHOLDER': 'اسم المستخدم', // جديد
         'EMAIL_PLACEHOLDER': 'البريد الإلكتروني',
         'PASSWORD_PLACEHOLDER': 'كلمة المرور',
+        'CONFIRM_PASSWORD_PLACEHOLDER': 'تأكيد كلمة المرور', // جديد
         'FORGOT_PASSWORD': 'نسيت كلمة المرور؟',
         'AUTH_BUTTON_LOGIN': 'تسجيل الدخول',
-        'AUTH_BUTTON_REGISTER': 'إنشاء حساب جديد',
+        'AUTH_BUTTON_REGISTER': 'إنشاء حساب',
         'TOGGLE_TO_REGISTER': 'لا تملك حساباً؟ انقر للتسجيل',
         'TOGGLE_TO_LOGIN': 'لديك حساب بالفعل؟ انقر لتسجيل الدخول',
         'SIGN_IN_WITH_GOOGLE': 'تسجيل الدخول باستخدام جوجل',
+        'SIGN_IN_WITH_FACEBOOK': 'تسجيل الدخول باستخدام فيسبوك', // جديد
 
         // صفحة dashboard.html
         'WELCOME_WARLORD': 'أهلاً بك أيها المحارب!',
@@ -64,15 +68,19 @@ const translations = {
 
         // login.html page
         'LOGIN': 'Login',
-        'LOG_IN_ACCOUNT': 'Login / Register Account',
+        'LOG_IN_ACCOUNT': 'Login Account',
+        'REGISTER_ACCOUNT': 'Register New Account', // New
+        'USERNAME_PLACEHOLDER': 'Username', // New
         'EMAIL_PLACEHOLDER': 'Email',
         'PASSWORD_PLACEHOLDER': 'Password',
+        'CONFIRM_PASSWORD_PLACEHOLDER': 'Confirm Password', // New
         'FORGOT_PASSWORD': 'Forgot Password?',
         'AUTH_BUTTON_LOGIN': 'Login',
-        'AUTH_BUTTON_REGISTER': 'Register New Account',
+        'AUTH_BUTTON_REGISTER': 'Register Account',
         'TOGGLE_TO_REGISTER': 'Don\'t have an account? Click to register',
         'TOGGLE_TO_LOGIN': 'Already have an account? Click to login',
         'SIGN_IN_WITH_GOOGLE': 'Sign in with Google',
+        'SIGN_IN_WITH_FACEBOOK': 'Sign in with Facebook', // New
 
         // dashboard.html page
         'WELCOME_WARLORD': 'Welcome Warlord!',
