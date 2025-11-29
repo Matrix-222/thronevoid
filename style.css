@@ -1,33 +1,39 @@
 :root {
-    --primary-dark: #1e1e1e; /* خلفية داكنة جداً */
-    --secondary-dark: #2c3e50; /* لون صندوق المحتوى (أزرق داكن) */
-    --accent-yellow: #f1c40f; /* لون التمييز الأصفر */
-    --accent-blue: #3498db; /* لون الأزرار الأساسي */
-    --text-light: #ecf0f1; /* لون النص الفاتح */
-    --error-red: #e74c3c; /* لون الأخطاء */
+    --primary-dark: #121212; /* خلفية التطبيق */
+    --secondary-dark: #1e1e1e; /* لون الخلفية الثانوية/البطاقات */
+    --accent-blue: #007bff; /* لون التمييز الأساسي (أزرق) */
+    --accent-green: #2ecc71; /* لون النجاح/الدردشة (أخضر) */
+    --text-light: #f5f5f5; /* لون النص الرئيسي */
+    --text-muted: #aaaaaa; /* لون النص الثانوي */
+    --border-color: #333333;
 }
 
+/* التنسيق الأساسي لجميع المتصفحات */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--primary-dark);
     color: var(--text-light);
     margin: 0;
     padding: 0;
-    direction: rtl; /* دعم اللغة العربية */
+    direction: rtl; 
     text-align: right; 
+    transition: background-color 0.3s;
 }
 
-/* الترويسة العلوية */
+/* الـ Header */
 header {
     background-color: var(--secondary-dark);
     padding: 15px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+    position: sticky;
+    top: 0;
 }
 header h1 {
-    color: var(--accent-yellow);
+    color: var(--accent-blue);
     margin: 0;
     font-size: 1.5em;
 }
@@ -36,27 +42,32 @@ header h1 {
 button {
     padding: 10px 15px;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
-    transition: background-color 0.3s;
+    transition: opacity 0.3s, background-color 0.3s;
+    background-color: var(--accent-blue);
+    color: white;
 }
-
 button:hover {
     opacity: 0.9;
 }
 
 /* الحقول العامة */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="tel"] {
-    padding: 10px;
-    border: 1px solid #555;
-    border-radius: 5px;
-    background-color: #3a3a3a;
+input:not([type="checkbox"]), textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: #2a2a2a;
     color: var(--text-light);
     box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+input:focus, textarea:focus {
+    border-color: var(--accent-blue);
+    outline: none;
 }
 
 /* الروابط */
@@ -65,7 +76,87 @@ a {
     text-decoration: none;
     transition: color 0.3s;
 }
-
 a:hover {
-    color: var(--accent-yellow);
+    color: #4da5ff;
+}
+
+/* الصندوق الرئيسي (Login Box) */
+.box-container {
+    background-color: var(--secondary-dark);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.7);
+    max-width: 450px;
+    width: 90%;
+    margin: 50px auto;
+}
+
+/* تنسيق البطاقات (مثل ملفات المستخدمين) */
+.card {
+    background-color: #2a2a2a;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    border-left: 4px solid var(--accent-blue);
+}
+
+/* تنسيق الملف الشخصي المصغر */
+.profile-card {
+    background-color: #2a2a2a;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    transition: transform 0.3s;
+    border-top: 4px solid var(--accent-green);
+}
+.profile-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+}
+.profile-card img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--accent-blue);
+    margin-bottom: 10px;
+}
+.profile-card h3 {
+    color: var(--text-light);
+    margin: 5px 0;
+}
+.profile-card p {
+    color: var(--text-muted);
+    font-size: 0.9em;
+}
+
+/* الأزرار في الـ Header */
+.header-buttons button {
+    margin-left: 10px; 
+    background-color: #4a4a4a;
+    color: var(--text-light);
+}
+.header-buttons button:hover {
+    background-color: #5a5a5a;
+}
+.header-buttons .logout-btn {
+    background-color: #e74c3c;
+}
+.header-buttons .logout-btn:hover {
+    background-color: #c0392b;
+}
+
+/* الـ Media Queries للتحسين على الشاشات الصغيرة */
+@media (max-width: 600px) {
+    header {
+        padding: 10px 15px;
+        flex-direction: column;
+        text-align: center;
+    }
+    header h1 {
+        margin-bottom: 10px;
+    }
+    .box-container {
+        padding: 20px;
+    }
 }
