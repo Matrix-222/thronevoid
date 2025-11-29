@@ -40,16 +40,12 @@ const translations = {
         'NAME_SAVE_SUCCESS': 'Username updated successfully.',
         'NAME_SAVE_FAIL': 'Failed to update username. Please check your connection or try again.',
         
-        // Login/Auth
-        'PHONE_LOGIN_TITLE': 'Sign in with Phone Number',
+        // Login/Auth (NEW Keys for Email/Password)
+        'SIGN_IN_EMAIL_TITLE': 'Sign In with Email',
+        'EMAIL_PLACEHOLDER': 'Email Address',
+        'PASSWORD_PLACEHOLDER': 'Password',
         'FORGOT_PASSWORD': 'Forgot Password?',
-        // **الإصلاح كان هنا: المفتاح يجب أن يكون بالحروف الصغيرة ليطابق استخدام HTML**
-        'SEND_VERIFICATION_CODE': 'Send Verification Code', 
-        'VERIFY_CODE_PLACEHOLDER': 'Enter verification code',
-        'VERIFY': 'Verify',
-        'NOT_A_ROBOT': 'I am not a robot',
-        'LOGIN_ERROR_PHONE_FORMAT': 'Failed to send verification code. Please make sure the correct phone number (+ country code) is provided.',
-        'LOGIN_ERROR_RECAPTCHA': 'reCAPTCHA setup is required or failed to verify. Try again.',
+        'LOGIN_FIELDS_REQUIRED': 'Please enter both email and password.', // رسالة جديدة
         'LOGIN_SUCCESS': 'Login successful!',
         'LOGIN_FAIL': 'Login failed. Please check your credentials.',
 
@@ -97,15 +93,12 @@ const translations = {
         'NAME_SAVE_SUCCESS': 'تم تحديث اسم المستخدم بنجاح.',
         'NAME_SAVE_FAIL': '❌ فشل تحديث الاسم. يرجى التحقق من اتصالك بالإنترنت أو المحاولة مجدداً.',
 
-        // تسجيل الدخول/المصادقة
-        'PHONE_LOGIN_TITLE': 'أو سجل برقم الجوال',
+        // تسجيل الدخول/المصادقة (مفاتيح جديدة للإيميل/كلمة المرور)
+        'SIGN_IN_EMAIL_TITLE': 'تسجيل الدخول بالبريد الإلكتروني',
+        'EMAIL_PLACEHOLDER': 'البريد الإلكتروني',
+        'PASSWORD_PLACEHOLDER': 'كلمة المرور',
         'FORGOT_PASSWORD': 'نسيت كلمة المرور؟',
-        'SEND_VERIFICATION_CODE': 'إرسال رمز التحقق',
-        'VERIFY_CODE_PLACEHOLDER': 'أدخل رمز التحقق',
-        'VERIFY': 'تحقق',
-        'NOT_A_ROBOT': 'أنا لست برنامج روبوت',
-        'LOGIN_ERROR_PHONE_FORMAT': '❌ فشل إرسال رمز التحقق. تأكد من تهيئة reCAPTCHA وتنسيق رقم الجوال الصحيح (+ رمز الدولة).',
-        'LOGIN_ERROR_RECAPTCHA': '❌ يتطلب إعداد reCAPTCHA أو فشل التحقق. حاول مرة أخرى.',
+        'LOGIN_FIELDS_REQUIRED': 'الرجاء إدخال البريد الإلكتروني وكلمة المرور.', // رسالة جديدة
         'LOGIN_SUCCESS': 'تم تسجيل الدخول بنجاح!',
         'LOGIN_FAIL': 'فشل تسجيل الدخول. يرجى التحقق من بياناتك.',
 
