@@ -15,6 +15,7 @@
             height: 80vh; 
             display: flex;
             flex-direction: column;
+            position: relative; /* مهم لوضع لوحة الإيموجي بداخله */
         }
         #messagesContainer {
             flex-grow: 1;
@@ -54,6 +55,7 @@
             padding: 15px;
             border-top: 1px solid var(--border-color);
             gap: 10px;
+            align-items: center; /* لمحاذاة زر الإيموجي */
         }
         .input-area input {
             flex-grow: 1;
@@ -61,6 +63,18 @@
         #sendMessageBtn {
             background-color: var(--accent-green);
             padding: 0 20px;
+        }
+        #emojiBtn {
+            background: none;
+            border: none;
+            font-size: 1.8em;
+            cursor: pointer;
+            color: var(--text-light);
+            padding: 0 10px;
+            transition: color 0.3s;
+        }
+        #emojiBtn:hover {
+            color: var(--accent-blue);
         }
     </style>
 </head>
@@ -79,8 +93,12 @@
         <div id="messagesContainer">
             <p style="text-align: center; color: var(--text-muted);">... يتم تحميل الرسائل ...</p>
         </div>
+        
+        <div id="emojiPicker" class="emoji-picker">
+            </div>
 
         <div class="input-area">
+            <button id="emojiBtn" title="إيموجي">😀</button> 
             <input type="text" id="messageInput" data-i18n="CHAT_MESSAGE_PLACEHOLDER" placeholder="اكتب رسالتك هنا..." maxlength="500">
             <button id="sendMessageBtn" data-i18n="SEND_MESSAGE">إرسال</button>
         </div>
@@ -124,24 +142,27 @@
         let chatPartnerEmail = new URLSearchParams(window.location.search).get('user');
         let chatId = null;
         let unsubscribeListener = null; 
-        let partnerName = 'الطرف الآخر'; // اسم شريك الدردشة
+        let partnerName = 'الطرف الآخر'; 
 
         const messagesContainer = document.getElementById('messagesContainer');
         const messageInput = document.getElementById('messageInput');
         const chatPartnerNameEl = document.getElementById('chatPartnerName');
         const toastContainer = document.getElementById('toastContainer');
+        const emojiBtn = document.getElementById('emojiBtn'); // جديد
+        const emojiPicker = document.getElementById('emojiPicker'); // جديد
+
+        // مصفوفة الإيموجي التي ستعرض
+        const EMOJIS = ['😀', '😂', '😍', '🤩', '😘', '😁', '😎', '👍', '👎', '❤️', '🔥', '🎉', '🌟', '🚀', '🌙', '🍔', '☕', '🐱', '🐶', '💸'];
 
         function getChatId(email1, email2) {
             const sortedEmails = [email1, email2].sort();
             return sortedEmails.join('_');
         }
         
-        // --- دالة عرض الإشعار (Toast) ---
         function showToast(senderName, messageText, senderEmail) {
             const toast = document.createElement('div');
             toast.className = 'toast-message';
             
-            // عند النقر على الإشعار، يتم الانتقال إلى المحادثة (على الرغم من أننا فيها)
             toast.onclick = () => {
                 window.location.href = `private_chat.html?user=${senderEmail}`;
             };
@@ -153,18 +174,14 @@
                 <p>${messageText.substring(0, 50)}${messageText.length > 50 ? '...' : ''}</p>
             `;
             
-            // prepend يضمن أن أحدث إشعار يظهر في الأعلى
             toastContainer.prepend(toast); 
             
-            // إظهار الإشعار بانزلاق
             setTimeout(() => {
                 toast.classList.add('show');
             }, 10); 
 
-            // إخفاء الإشعار بعد 5 ثوانٍ
             setTimeout(() => {
                 toast.classList.remove('show');
-                // إزالته من DOM بعد الانتهاء من الحركة
                 setTimeout(() => {
                     if (toastContainer.contains(toast)) {
                         toastContainer.removeChild(toast);
@@ -172,10 +189,10 @@
                 }, 500); 
             }, 5000); 
         }
-        // ---------------------------------
 
         onAuthStateChanged(auth, async (user) => {
             if (!user || !chatPartnerEmail) {
+                // قد يتم التوجيه هنا إذا كان المستخدم غير مصادق أو لم يتم تمرير شريك الدردشة
                 window.location.href = "chat.html";
                 return;
             }
@@ -186,11 +203,12 @@
             await fetchPartnerInfo(chatPartnerEmail);
             
             startChatListener();
+            setupEmojiPicker(); // جديد
         });
         
         async function fetchPartnerInfo(email) {
             const partnerDoc = await getDoc(doc(db, "users", email));
-            partnerName = email.split('@')[0];
+            partnerName = email.split('@')[0]; 
             if (partnerDoc.exists()) {
                 partnerName = partnerDoc.data().username || partnerName;
             }
@@ -207,27 +225,24 @@
             const q = query(chatRef, orderBy('timestamp', 'asc'), limit(50)); 
 
             unsubscribeListener = onSnapshot(q, (snapshot) => {
-                let isScrolledDown = messagesContainer.scrollHeight - messagesContainer.clientHeight <= messagesContainer.scrollTop + 1; // للتحقق مما إذا كان المستخدم في أسفل الدردشة
+                let isScrolledDown = messagesContainer.scrollHeight - messagesContainer.clientHeight <= messagesContainer.scrollTop + 1;
 
                 snapshot.docChanges().forEach((change) => {
                     const messageData = change.doc.data();
                     
                     if (change.type === "added") {
-                        // مسح رسالة "جار التحميل" عند وصول أول رسالة
                         if (messagesContainer.querySelector('p')) {
                             messagesContainer.innerHTML = '';
                         }
                         
                         messagesContainer.appendChild(createMessageElement(messageData)); 
 
-                        // 🔔 تفعيل الإشعار عند وصول رسالة من الطرف الآخر
                         if (messageData.senderEmail !== currentUser.email) {
                             showToast(partnerName, messageData.text, chatPartnerEmail);
                         }
                     }
                 });
 
-                // التمرير إلى أسفل الرسائل تلقائياً إذا كان المستخدم قريباً من القاع
                 if (isScrolledDown) {
                     messagesContainer.scrollTop = messagesContainer.scrollHeight;
                 }
@@ -271,6 +286,46 @@
             }
         }
         
+        // --- وظائف لوحة الإيموجي (جديدة) ---
+        function setupEmojiPicker() {
+            EMOJIS.forEach(emoji => {
+                const span = document.createElement('span');
+                span.className = 'emoji-item';
+                span.textContent = emoji;
+                span.onclick = () => insertEmoji(emoji);
+                emojiPicker.appendChild(span);
+            });
+            
+            emojiBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // منع إغلاقها فوراً
+                emojiPicker.classList.toggle('show');
+            });
+
+            // إغلاق لوحة الإيموجي عند النقر خارجها
+            document.addEventListener('click', (e) => {
+                if (!emojiPicker.contains(e.target) && e.target !== emojiBtn) {
+                    emojiPicker.classList.remove('show');
+                }
+            });
+        }
+
+        function insertEmoji(emoji) {
+            const start = messageInput.selectionStart;
+            const end = messageInput.selectionEnd;
+            const text = messageInput.value;
+            
+            // إدراج الإيموجي في موضع المؤشر
+            messageInput.value = text.substring(0, start) + emoji + text.substring(end);
+            
+            // إعادة وضع المؤشر بعد الإيموجي
+            messageInput.focus();
+            messageInput.setSelectionRange(start + emoji.length, start + emoji.length);
+            
+            // إغلاق اللوحة بعد اختيار إيموجي
+            emojiPicker.classList.remove('show'); 
+        }
+        // ------------------------------------
+
         document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
         messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
