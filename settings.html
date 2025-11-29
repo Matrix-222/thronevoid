@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="SETTINGS">الإعدادات - Throne Void</title>
+    <link rel="stylesheet" href="style.css"> 
+    <style>
+        .settings-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background-color: var(--secondary-dark);
+            border: 1px solid #3498db;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(52, 152, 219, 0.2);
+        }
+        .setting-group {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #444;
+        }
+        .setting-group h3 {
+            color: var(--accent-yellow);
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+        .setting-item label {
+            color: #ddd;
+            font-size: 1.1em;
+        }
+        /* تنسيق الصورة الشخصية */
+        #profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent-red);
+            margin: 0 auto 20px;
+            display: block;
+        }
+        /* تنسيق خيارات الأيقونات الجاهزة */
+        .avatar-selection {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .avatar-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .avatar-option:hover {
+            border-color: var(--accent-yellow);
+        }
+        .avatar-option.selected {
+            border-color: #2ecc71;
+            box-shadow: 0 0 10px #2ecc71;
+        }
+        /* تنسيق زر حفظ التغييرات */
+        #saveChangesBtn {
+            width: 100%;
+            margin-top: 30px;
+            background-color: #2ecc71;
+            padding: 15px;
+            font-size: 1.2em;
+        }
+        .input-file-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>THRONES OF THE VOID</h1>
+        <div>
+            <button onclick="window.location='dashboard.html'" style="background-color: #2ecc71;" data-i18n="DASHBOARD">لوحة التحكم</button>
+            <button id="langToggleBtn" style="background-color: #3498db;">🌐 English</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="settings-container">
+            <h2 style="color: var(--accent-red); text-align: center;" data-i18n="SETTINGS_PAGE_TITLE">إعدادات الحساب واللعبة</h2>
+
+            <div class="setting-group">
+                <h3 data-i18n="PROFILE_SETTINGS">إعدادات الملف الشخصي</h3>
+                
+                <img id="profile-avatar" src="https://via.placeholder.com/100/1e1e1e/ffffff?text=U" alt="Profile Avatar">
+                
+                <label data-i18n="CHOOSE_AVATAR" style="display: block; text-align: center; margin-bottom: 10px;">اختر من الأيقونات الجاهزة:</label>
+                
+                <div class="avatar-selection">
+                    <img class="avatar-option" src="https://i.imgur.com/gK2T3i8.png" data-url="https://i.imgur.com/gK2T3i8.png" alt="Avatar 1">
+                    <img class="avatar-option" src="https://i.imgur.com/vHqQ3gS.png" data-url="https://i.imgur.com/vHqQ3gS.png" alt="Avatar 2">
+                    <img class="avatar-option" src="https://i.imgur.com/7A2f3U3.png" data-url="https://i.imgur.com/7A2f3U3.png" alt="Avatar 3">
+                </div>
+
+                <div class="input-file-container">
+                    <label for="imageUpload" data-i18n="UPLOAD_IMAGE">رفع صورة جديدة:</label>
+                    <input type="file" id="imageUpload" accept="image/*" style="margin-right: 15px;">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3 data-i18n="LANGUAGE_SETTINGS">إعدادات اللغة</h3>
+                <div class="setting-item">
+                    <label for="langSelect" data-i18n="SELECT_LANGUAGE">اختر اللغة:</label>
+                    <select id="langSelect">
+                        <option value="ar" data-i18n="LANG_AR">العربية</option>
+                        <option value="en" data-i18n="LANG_EN">English</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3 data-i18n="ACCOUNT_SETTINGS">إعدادات الحساب</h3>
+                <div class="setting-item">
+                    <label data-i18n="CHANGE_PASSWORD">تغيير كلمة المرور</label>
+                    <button style="background-color: #3498db;" data-i18n="EDIT">تعديل</button>
+                </div>
+                <div class="setting-item">
+                    <label data-i18n="CURRENT_EMAIL">البريد الإلكتروني الحالي:</label>
+                    <span id="currentEmail" style="color: var(--accent-yellow);">جاري التحميل...</span>
+                </div>
+            </div>
+            
+            <button id="saveChangesBtn" data-i18n="SAVE_CHANGES">حفظ التغييرات</button>
+            
+        </div>
+    </main>
+
+    <script src="i18n.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+        // *** مفاتيح مشروعك الفعلي (thronevoid) ***
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-bfHRJW3E8KW3-o-PkNW6xi5ytrTKMJE", 
+            authDomain: "thronevoid.firebaseapp.com",
+            projectId: "thronevoid",
+            storageBucket: "thronevoid.firebasestorage.app", // تأكد من صحة هذا المفتاح
+            messagingSenderId: "958587822012",
+            appId: "1:958587822012:web:312cf3d9e7c87e1c6415b9",
+            measurementId: "G-N34T3VRGX0"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app); 
+
+        let currentUser = null;
+        let selectedAvatarUrl = null;
+        
+        const profileAvatar = document.getElementById('profile-avatar');
+        const langSelect = document.getElementById('langSelect');
+        const defaultAvatar = "https://via.placeholder.com/100/1e1e1e/ffffff?text=U"; // الصورة الافتراضية
+
+        // -------------------------------------------------------------
+        //                 دوال تحميل وحفظ البيانات
+        // -------------------------------------------------------------
+        
+        // تحميل بيانات المستخدم الحالية (الصورة واللغة)
+        async function loadUserSettings(email) {
+            const userDocRef = doc(db, "users", email);
+            const docSnap = await getDoc(userDocRef);
+            
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                
+                // تحميل صورة البروفايل
+                const avatarUrl = data.avatarUrl || defaultAvatar;
+                profileAvatar.src = avatarUrl;
+                selectedAvatarUrl = avatarUrl;
+                
+                // اختيار الأيقونة الجاهزة إذا كانت مطابقة
+                document.querySelectorAll('.avatar-option').forEach(img => {
+                    img.classList.remove('selected');
+                    if (img.getAttribute('data-url') === avatarUrl) {
+                        img.classList.add('selected');
+                    }
+                });
+                
+                // تحميل اللغة
+                const savedLang = data.language || loadLanguage();
+                langSelect.value = savedLang;
+                setLanguage(savedLang); 
+                updateLangButton(savedLang);
+            }
+        }
+        
+        // حفظ التغييرات في Firestore
+        async function saveSettings() {
+            if (!currentUser) return;
+
+            const userDocRef = doc(db, "users", currentUser.email);
+            const newLang = langSelect.value;
+
+            try {
+                await setDoc(userDocRef, {
+                    avatarUrl: selectedAvatarUrl,
+                    language: newLang
+                }, { merge: true });
+
+                alert("✅ تم حفظ الإعدادات بنجاح!");
+                setLanguage(newLang); // تطبيق اللغة الجديدة فوراً
+            } catch (error) {
+                console.error("Error saving settings:", error);
+                alert("فشل في حفظ الإعدادات!");
+            }
+        }
+        
+        // -------------------------------------------------------------
+        //                    معالجة رفع الصور
+        // -------------------------------------------------------------
+        
+        document.getElementById('imageUpload').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file || !currentUser) return;
+            
+            alert("جاري رفع الصورة... يرجى الانتظار.");
+
+            try {
+                // مسار التخزين: avatars/user_id/timestamp_filename
+                const storageRef = ref(storage, `avatars/${currentUser.uid}/${Date.now()}_${file.name}`);
+                
+                const snapshot = await uploadBytes(storageRef, file);
+                
+                const url = await getDownloadURL(snapshot.ref);
+                
+                profileAvatar.src = url;
+                selectedAvatarUrl = url;
+                
+                document.getElementById('imageUpload').value = ''; // مسح حقل الإدخال
+                document.querySelectorAll('.avatar-option').forEach(img => img.classList.remove('selected'));
+
+                alert("✅ تم رفع الصورة بنجاح! لا تنس النقر على 'حفظ التغييرات'.");
+
+            } catch (error) {
+                console.error("Image Upload Error:", error);
+                alert("❌ فشل رفع الصورة. تأكد من إعداد Firebase Storage.");
+            }
+        });
+        
+        // -------------------------------------------------------------
+        //                       معالجة اللغة والتحكم
+        // -------------------------------------------------------------
+
+        // اختيار أيقونة جاهزة
+        document.querySelectorAll('.avatar-option').forEach(img => {
+            img.addEventListener('click', function() {
+                document.querySelectorAll('.avatar-option').forEach(i => i.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                const url = this.getAttribute('data-url');
+                profileAvatar.src = url;
+                selectedAvatarUrl = url;
+                
+                document.getElementById('imageUpload').value = '';
+            });
+        });
+
+        // ربط حفظ الإعدادات بالزر
+        document.getElementById('saveChangesBtn').addEventListener('click', saveSettings);
+        
+        // كود اللغة (من ملف i18n.js)
+        let currentLang = loadLanguage();
+        const langToggleBtn = document.getElementById('langToggleBtn'); 
+        
+        function updateLangButton(lang) {
+            langToggleBtn.textContent = lang === 'ar' ? '🌐 English' : '🌐 العربية';
+        }
+
+        langToggleBtn.addEventListener('click', () => {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            setLanguage(currentLang);
+            updateLangButton(currentLang);
+            langSelect.value = currentLang; // تحديث قائمة الاختيار
+        });
+        
+        langSelect.addEventListener('change', (e) => {
+            currentLang = e.target.value;
+            setLanguage(currentLang);
+            updateLangButton(currentLang);
+        });
+
+        // التحقق من حالة الدخول
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('currentEmail').innerText = user.email;
+                loadUserSettings(user.email);
+            } else {
+                window.location.href = "login.html"; 
+            }
+        });
+    </script>
+</body>
+</html>
