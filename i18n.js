@@ -1,12 +1,17 @@
 const translations = {
     // English (en) translations
     'en': {
-        // General
+        // General & Navigation
         'LOGOUT': 'Logout',
         'DASHBOARD': 'Dashboard',
         'SETTINGS': 'Admin',
         'PROFILE': 'Profile',
-        'SIGN_IN': 'Sign In', // مفتاح لصفحة index/login
+        'SIGN_IN': 'Sign In', 
+        'REGISTER': 'Register Now', // إضافة مفتاح التسجيل
+        
+        // Language Buttons (New Keys for clear text on buttons)
+        'ARABIC_BUTTON': 'العربية', 
+        'ENGLISH_BUTTON': 'English',
         
         // Chat - General
         'GENERAL_CHAT': 'General Chat',
@@ -21,8 +26,6 @@ const translations = {
         'ALLIANCES_CHAT_TITLE': 'Alliance Chat (Private)',
         'CHAT_NOTE': 'Alliance chat will be enabled after joining an alliance.',
         'CLEAR_CHAT_HISTORY': 'Clear Chat History',
-        
-        // Alliance Keys
         'WELCOME_ALLIANCE_CHAT': 'Welcome to your Alliance Chat!',
         'ALLIANCE_ACCESS_DENIED': 'Access Denied',
         'ALLIANCE_ACCESS_DENIED_MSG': 'You must be a member of an alliance to join this channel.',
@@ -40,7 +43,7 @@ const translations = {
         // Login/Auth
         'PHONE_LOGIN_TITLE': 'Sign in with Phone Number',
         'FORGOT_PASSWORD': 'Forgot Password?',
-        'SEND_VERIFICATION_CODE': 'Send Verification Code',
+        'SEND_VERIFICATION_CODE': 'SEND_VERIFICATION_CODE', // يجب أن تكون بالإنجليزية هنا
         'VERIFY_CODE_PLACEHOLDER': 'Enter verification code',
         'VERIFY': 'Verify',
         'NOT_A_ROBOT': 'I am not a robot',
@@ -53,13 +56,18 @@ const translations = {
     
     // Arabic (ar) translations
     'ar': {
-        // عام
+        // عام وملاحة
         'LOGOUT': 'تسجيل الخروج',
         'DASHBOARD': 'لوحة التحكم',
         'SETTINGS': 'المدير',
         'PROFILE': 'الملف الشخصي',
-        'SIGN_IN': 'تسجيل الدخول', 
+        'SIGN_IN': 'تسجيل الدخول',
+        'REGISTER': 'سجل الآن',
 
+        // أزرار اللغة (مفاتيح جديدة)
+        'ARABIC_BUTTON': 'العربية', 
+        'ENGLISH_BUTTON': 'English',
+        
         // الدردشة - عام
         'GENERAL_CHAT': 'الشات العام',
         'GENERAL_CHAT_TITLE': 'الشات العام (الجميع)',
@@ -73,8 +81,6 @@ const translations = {
         'ALLIANCES_CHAT_TITLE': 'شات التحالفات (الخاص)',
         'CHAT_NOTE': 'سيتم تمكين شات التحالفات بعد انضمامك لتحالف.',
         'CLEAR_CHAT_HISTORY': 'حذف تاريخ الدردشة',
-
-        // مفاتيح التحالف
         'WELCOME_ALLIANCE_CHAT': 'أهلاً بك في شات تحالفك!',
         'ALLIANCE_ACCESS_DENIED': 'غير مصرح بالدخول',
         'ALLIANCE_ACCESS_DENIED_MSG': 'يجب أن تكون عضواً في تحالف للانضمام لهذه القناة.',
@@ -108,10 +114,12 @@ const translations = {
 let currentLang = localStorage.getItem('appLang') || 'ar'; 
 window.translations = translations; 
 
-// 1. الدالة الأساسية لتحميل الترجمة لمفتاح معين (يستخدمها كود HTML مباشرة)
+// 1. الدالة الأساسية لتحميل الترجمة لمفتاح معين
 function loadLanguage(key, lang = currentLang) {
     return translations[lang][key] || translations['en'][key] || key;
 }
+window.loadLanguage = loadLanguage; // جعل الدالة متاحة عالمياً (مهمة لـ chat.html و index.html)
+
 
 // 2. الدالة التي تقوم بتغيير اللغة وحفظها
 window.switchLanguage = function(newLang) {
