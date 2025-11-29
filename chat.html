@@ -51,15 +51,15 @@
 
         /* تنسيقات المرشحات المتقدمة */
         .filters-container {
-            max-width: 500px;
-            margin: 20px auto;
+            max-width: 400px; 
+            margin: 20px auto; 
             padding: 20px;
             background-color: var(--secondary-dark);
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
-        .filters-container h2, .filters-container h3 {
+        .filters-container h2 {
             color: var(--accent-blue);
             text-align: center;
             margin-bottom: 20px;
@@ -67,7 +67,7 @@
 
         .filter-group {
             margin-bottom: 15px;
-            padding: 10px;
+            padding: 10px 0;
             border-bottom: 1px dashed var(--border-color);
         }
 
@@ -176,6 +176,7 @@
         async function updateOnlineStatus(isOnline) {
             if (!currentUser) return;
             try {
+                // نستخدم currentUser.email كـ userId في Firestore
                 await updateDoc(doc(db, "users", currentUser.email), {
                     isOnline: isOnline,
                     lastSeen: new Date().toISOString()
@@ -209,12 +210,11 @@
                             
                             const isOnlineDot = data.isOnline ? '<span class="online-dot" title="متصل"></span>' : '';
                             
-                            // نستخدم h3.childNodes[1].textContent للوصول إلى اسم المستخدم وتجنب تكرار النقطة
-                            const usernameElement = h3.querySelector('span:not(.online-dot)') || h3; 
-                            const username = usernameElement.textContent.trim();
+                            // استخراج اسم المستخدم بدقة
+                            const username = data.username || data.email.split('@')[0];
                             
                             // إعادة بناء الـ H3 مع النقطة الصحيحة واسم المستخدم
-                            h3.innerHTML = isOnlineDot + username; 
+                            h3.innerHTML = `${isOnlineDot}${username}`;
                         }
                     }
                 });
@@ -223,11 +223,14 @@
         
         // --- الدالة الرئيسية لجلب المستخدمين وتطبيق المرشحات ---
         async function fetchUsers() {
+            if (!currentUser) return; // تأكد من وجود مستخدم مسجل الدخول
+
             try {
                 userListContainer.innerHTML = '';
                 loadingMessage.style.display = 'block';
 
-                let q = query(collection(db, "users"), where("email", "!=", currentUser.email));
+                // الاستعلام يجلب جميع المستخدمين
+                const q = query(collection(db, "users"));
                 
                 const querySnapshot = await getDocs(q);
                 let allUsers = [];
@@ -235,8 +238,11 @@
                     allUsers.push(doc.data());
                 });
 
+                // تصفية المستخدم الحالي خارجياً
+                const usersExcludingMe = allUsers.filter(user => user.email !== currentUser.email);
+
                 // تطبيق المرشحات داخل JavaScript
-                const filteredUsers = getMatchingUsers(allUsers);
+                const filteredUsers = getMatchingUsers(usersExcludingMe);
                 
                 loadingMessage.style.display = 'none';
 
