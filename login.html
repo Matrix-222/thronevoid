@@ -1,179 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Throne Void</title>
-    <link rel="stylesheet" href="style.css"> 
-    <style>
-        /* إضافة بعض التنسيقات لزر جوجل */
-        .social-btn {
-            background-color: #4285F4; /* لون جوجل الأزرق */
-            color: white;
-            padding: 12px;
-            margin-top: 15px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1em;
-            width: 100%;
-            transition: background-color 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .social-btn:hover {
-            background-color: #357ae8;
-        }
-        .social-icon {
-            margin-right: 10px;
-            font-size: 1.2em; /* استخدام رمز وهمي كبديل لصورة جوجل */
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <h1>THRONES OF THE VOID</h1>
-        <div>
-            <button onclick="window.location='index.html'" style="background-color: var(--accent-yellow); color: var(--primary-dark);">HOME</button>
-        </div>
-    </header>
-
-    <main>
-        <div class="auth-container">
-            <h2>تسجيل الدخول / إنشاء حساب</h2>
-            <form id="authForm">
-                <input type="email" id="email" placeholder="البريد الإلكتروني" required>
-                <input type="password" id="password" placeholder="كلمة المرور" required>
-                
-                <button type="submit" id="authButton" style="background-color: #2ecc71;">تسجيل الدخول</button>
-                
-                <p id="toggleText" onclick="toggleMode()">لا تملك حساباً؟ انقر للتسجيل</p>
-            </form>
-
-            <hr style="border-color: #3c4b5b; margin: 20px 0;">
+<main>
+    <div class="auth-container">
+        <h2 data-i18n="LOG_IN_ACCOUNT">تسجيل الدخول / إنشاء حساب</h2>
+        <form id="authForm">
+            <input type="email" id="email" data-i18n="EMAIL_PLACEHOLDER" placeholder="البريد الإلكتروني" required>
+            <input type="password" id="password" data-i18n="PASSWORD_PLACEHOLDER" placeholder="كلمة المرور" required>
             
-            <button id="googleSignInBtn" class="social-btn">
-                <span class="social-icon">G</span> تسجيل الدخول باستخدام جوجل
-            </button>
+            <button type="submit" id="authButton" style="background-color: #2ecc71;" data-i18n="AUTH_BUTTON_LOGIN">تسجيل الدخول</button>
             
-        </div>
-    </main>
+            <p id="toggleText" onclick="toggleMode()" data-i18n="TOGGLE_TO_REGISTER">لا تملك حساباً؟ انقر للتسجيل</p>
+        </form>
 
-    <footer>
-        <p>&copy; 2025 Throne Void</p>
-    </footer>
-
-    <script type="module">
-        // استيراد مكتبات Firebase الأساسية
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { 
-            getAuth, 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword,
-            // استيراد أدوات تسجيل الدخول عبر جوجل
-            GoogleAuthProvider, 
-            signInWithPopup 
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        // *** مفاتيح مشروعك الفعلي (thronevoid) ***
-        const firebaseConfig = {
-            apiKey: "AIzaSyB-bfHRJW3E8KW3-o-PkNW6xi5ytrTKMJE", 
-            authDomain: "thronevoid.firebaseapp.com",
-            projectId: "thronevoid",
-            storageBucket: "thronevoid.firebasestorage.app",
-            messagingSenderId: "958587822012",
-            appId: "1:958587822012:web:312cf3d9e7c87e1c6415b9",
-            measurementId: "G-N34T3VRGX0"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        let isLoginMode = true; // الحالة الافتراضية هي تسجيل الدخول
-
-        // دالة مساعدة لإنشاء مستند المستخدم الجديد في قاعدة البيانات
-        async function createUserDocument(user) {
-            const userDocRef = doc(db, "users", user.email);
-            await setDoc(userDocRef, {
-                email: user.email,
-                highScore: 0,
-                // يمكنك إضافة بيانات أخرى هنا مثل displayName: user.displayName
-            }, { merge: true }); // نستخدم merge: true للتأكد من عدم مسح أي بيانات سابقة
-        }
-
-        // --- دالة التبديل بين وضع الدخول والتسجيل (كما كانت) ---
-        function toggleMode() {
-            isLoginMode = !isLoginMode;
-            document.getElementById('authButton').innerText = isLoginMode ? 'تسجيل الدخول' : 'إنشاء حساب';
-            document.getElementById('toggleText').innerText = isLoginMode ? 'لا تملك حساباً؟ انقر للتسجيل' : 'لديك حساب؟ انقر للدخول';
-        }
-        window.toggleMode = toggleMode; // لجعلها متاحة من onclick في HTML
+        <button id="googleSignInBtn" class="social-btn">
+            <span class="social-icon">G</span> <span data-i18n="SIGN_IN_WITH_GOOGLE">تسجيل الدخول باستخدام جوجل</span>
+        </button>
         
-        // --- معالجة تسجيل الدخول/الخروج بالبريد وكلمة المرور (كما كانت) ---
-        document.getElementById('authForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            try {
-                let userCredential;
-                if (isLoginMode) {
-                    // تسجيل الدخول
-                    userCredential = await signInWithEmailAndPassword(auth, email, password);
-                } else {
-                    // إنشاء حساب
-                    userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    await createUserDocument(userCredential.user);
-                }
-                
-                alert(`مرحباً بك مجدداً في Throne Void!`);
-                window.location.href = "dashboard.html"; 
-
-            } catch (error) {
-                // عرض رسائل الأخطاء
-                console.error("Authentication Error:", error);
-                alert(`خطأ: ${error.message}`);
-            }
-        });
+    </div>
+</main>
+<script src="i18n.js"></script>
+<script type="module">
+    // ... (كود Firebase كما هو) ...
+    // ...
+    function toggleMode() {
+        isLoginMode = !isLoginMode;
         
-        // -----------------------------------------------------------------
-        //           🔥 كود تسجيل الدخول باستخدام جوجل (الاحترافي) 🔥
-        // -----------------------------------------------------------------
+        // تحديث النص باستخدام i18n
+        const authKey = isLoginMode ? 'AUTH_BUTTON_LOGIN' : 'AUTH_BUTTON_REGISTER';
+        const toggleKey = isLoginMode ? 'TOGGLE_TO_REGISTER' : 'TOGGLE_TO_LOGIN';
         
-        const googleProvider = new GoogleAuthProvider();
+        document.getElementById('authButton').innerText = translations[authKey][currentLang];
+        document.getElementById('toggleText').innerText = translations[toggleKey][currentLang];
+    }
+    window.toggleMode = toggleMode;
+    
+    // ... (بقية كود Firebase) ...
 
-        async function signInWithGoogle() {
-            try {
-                // فتح نافذة منبثقة لتسجيل الدخول عبر جوجل
-                const result = await signInWithPopup(auth, googleProvider);
-                
-                // الحصول على معلومات المستخدم
-                const user = result.user;
-                
-                // إنشاء مستند المستخدم في Firestore (لتخزين الـ High Score)
-                await createUserDocument(user);
+    // تحميل اللغة عند نهاية تشغيل الصفحة
+    let currentLang = loadLanguage();
 
-                alert(`مرحباً بك يا قائد! تم التسجيل عبر جوجل بنجاح.`);
-                window.location.href = "dashboard.html";
-
-            } catch (error) {
-                // معالجة الأخطاء (مثل إغلاق النافذة المنبثقة أو فشل الاتصال)
-                console.error("Google Sign-In Error:", error);
-                // يمكنك فحص error.code لمعرفة نوع الخطأ، مثل:
-                if (error.code === 'auth/popup-closed-by-user') {
-                    alert('تم إلغاء تسجيل الدخول من قبل المستخدم.');
-                } else {
-                    alert(`فشل تسجيل الدخول عبر جوجل: ${error.message}`);
-                }
-            }
-        }
-        
-        // ربط دالة تسجيل الدخول بالزر
-        document.getElementById('googleSignInBtn').addEventListener('click', signInWithGoogle);
-
-    </script>
-</body>
-</html>
+    // تحديث الأزرار بناءً على اللغة والحالة الافتراضية
+    toggleMode(); // لاستدعاء تحديث النصوص مرة واحدة
+</script>
