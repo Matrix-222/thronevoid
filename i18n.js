@@ -19,7 +19,7 @@ const translations = {
     'LOG_IN_ACCOUNT': { 'en': 'Login / Create Account', 'ar': 'تسجيل الدخول / إنشاء حساب' },
     'EMAIL_PLACEHOLDER': { 'en': 'Email', 'ar': 'البريد الإلكتروني' },
     'PASSWORD_PLACEHOLDER': { 'en': 'Password', 'ar': 'كلمة المرور' },
-    'FORGOT_PASSWORD': { 'en': 'Forgot Password?', 'ar': 'نسيت كلمة المرور؟' }, // المفتاح الجديد
+    'FORGOT_PASSWORD': { 'en': 'Forgot Password?', 'ar': 'نسيت كلمة المرور؟' },
     'AUTH_BUTTON_LOGIN': { 'en': 'Login', 'ar': 'تسجيل الدخول' },
     'AUTH_BUTTON_REGISTER': { 'en': 'Create Account', 'ar': 'إنشاء حساب' },
     'TOGGLE_TO_REGISTER': { 'en': "Don't have an account? Click to Register", 'ar': 'لا تملك حساباً؟ انقر للتسجيل' },
@@ -36,10 +36,17 @@ const translations = {
     // --- مفاتيح الخدمات الجديدة (store.html, chat.html) ---
     'STORE': { 'en': 'STORE', 'ar': 'المتجر' },
     'ALLIANCES_CHAT': { 'en': 'ALLIANCES CHAT', 'ar': 'شات التحالفات' },
+    'CHAT_TITLE': { 'en': 'Alliance Global Chat', 'ar': 'الشات العالمي للتحالف' }, // جديد
+    'CHAT_PLACEHOLDER': { 'en': 'Type your message...', 'ar': 'اكتب رسالتك...' }, // جديد
+    'SEND': { 'en': 'Send', 'ar': 'إرسال' }, // جديد
+    'USER_MUTED_MESSAGE': { 'en': 'You are currently muted and cannot send messages.', 'ar': 'أنت مكتوم حالياً ولا يمكنك إرسال الرسائل.' }, // جديد
 
     // --- مفاتيح صفحة الإعدادات (settings.html) ---
     'SETTINGS_PAGE_TITLE': { 'en': 'Account and Game Settings', 'ar': 'إعدادات الحساب واللعبة' },
     'PROFILE_SETTINGS': { 'en': 'Profile Settings', 'ar': 'إعدادات الملف الشخصي' },
+    'USERNAME': { 'en': 'Username:', 'ar': 'اسم المستخدم:' }, // جديد
+    'CHANGE_USERNAME': { 'en': 'Change Username', 'ar': 'تغيير اسم المستخدم' }, // جديد
+    'SAVE_USERNAME': { 'en': 'Save Username', 'ar': 'حفظ الاسم' }, // جديد
     'CHANGE_AVATAR': { 'en': 'Change Profile Picture', 'ar': 'تغيير صورة البروفايل' },
     'CHOOSE_AVATAR': { 'en': 'Choose from Avatars:', 'ar': 'اختر من الأيقونات الجاهزة:' },
     'UPLOAD_IMAGE': { 'en': 'Upload New Image', 'ar': 'رفع صورة جديدة' },
