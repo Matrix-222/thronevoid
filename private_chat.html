@@ -141,7 +141,7 @@
             const toast = document.createElement('div');
             toast.className = 'toast-message';
             
-            // يتيح النقر على الإشعار للانتقال إلى المحادثة (على الرغم من أننا فيها، لكن لأغراض التنظيم)
+            // عند النقر على الإشعار، يتم الانتقال إلى المحادثة (على الرغم من أننا فيها)
             toast.onclick = () => {
                 window.location.href = `private_chat.html?user=${senderEmail}`;
             };
@@ -153,7 +153,8 @@
                 <p>${messageText.substring(0, 50)}${messageText.length > 50 ? '...' : ''}</p>
             `;
             
-            toastContainer.prepend(toast); // إضافة الإشعار في الأعلى
+            // prepend يضمن أن أحدث إشعار يظهر في الأعلى
+            toastContainer.prepend(toast); 
             
             // إظهار الإشعار بانزلاق
             setTimeout(() => {
@@ -171,6 +172,7 @@
                 }, 500); 
             }, 5000); 
         }
+        // ---------------------------------
 
         onAuthStateChanged(auth, async (user) => {
             if (!user || !chatPartnerEmail) {
@@ -188,7 +190,7 @@
         
         async function fetchPartnerInfo(email) {
             const partnerDoc = await getDoc(doc(db, "users", email));
-            partnerName = email.split('@')[0]; // تعيين اسم مبدئي
+            partnerName = email.split('@')[0];
             if (partnerDoc.exists()) {
                 partnerName = partnerDoc.data().username || partnerName;
             }
@@ -218,10 +220,8 @@
                         
                         messagesContainer.appendChild(createMessageElement(messageData)); 
 
-                        // إذا لم تكن الرسالة منك وأنت في محادثة، شغل إشعار
+                        // 🔔 تفعيل الإشعار عند وصول رسالة من الطرف الآخر
                         if (messageData.senderEmail !== currentUser.email) {
-                            // نشغل الإشعار فقط إذا لم يكن المستخدم يركز على هذه الصفحة أو إذا كانت الصفحة نشطة (لأغراض الاختبار)
-                            // عند التطبيق الفعلي، ستكون هذه الوظيفة في chat.html
                             showToast(partnerName, messageData.text, chatPartnerEmail);
                         }
                     }
