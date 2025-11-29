@@ -248,7 +248,8 @@
             
             currentChatCollection = collectionName;
             channelTitle.setAttribute('data-i18n', titleKey);
-            loadLanguage(); 
+            // استخدام دالة تحميل اللغة العامة
+            if (window.loadLanguage) window.loadLanguage(); 
             messagesContainer.innerHTML = ''; 
 
             let targetPath = collectionName;
