@@ -237,7 +237,7 @@
                     logoutUser();
                 }
             } else {
-                window.location.href = "login.html";
+                window.location.href = "index.html"; // تم التحديث لـ index.html
             }
         });
 
@@ -248,7 +248,6 @@
             
             currentChatCollection = collectionName;
             channelTitle.setAttribute('data-i18n', titleKey);
-            // استخدام دالة تحميل اللغة العامة
             if (window.loadLanguage) window.loadLanguage(); 
             messagesContainer.innerHTML = ''; 
 
@@ -391,7 +390,7 @@
             
             clearChatHistory('general_messages').then(() => {
                 signOut(auth).then(() => { 
-                    window.location.href = "login.html"; 
+                    window.location.href = "index.html"; // تم التحديث لـ index.html
                 }).catch((error) => {
                     console.error("Logout Error:", error);
                 });
