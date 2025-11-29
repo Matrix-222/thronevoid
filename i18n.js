@@ -9,7 +9,7 @@ const translations = {
         'SAVE': 'حفظ',
         'DELETE': 'حذف',
 
-        // صفحة login.html
+        // صفحة login.html (المحدثة لتسجيل الدخول بالإيميل والجوجل)
         'LOGIN': 'تسجيل الدخول',
         'LOG_IN_ACCOUNT': 'تسجيل الدخول',
         'REGISTER_ACCOUNT': 'إنشاء حساب جديد', 
@@ -25,29 +25,14 @@ const translations = {
         'SIGN_IN_WITH_GOOGLE': 'تسجيل الدخول باستخدام جوجل',
         'SIGN_IN_WITH_FACEBOOK': 'تسجيل الدخول باستخدام فيسبوك', 
         
-        // مفاتيح تسجيل الدخول برقم الجوال (غير مستخدمة حالياً في login.html)
-        'SIGN_IN_WITH_PHONE': 'أو سجل برقم الجوال', 
-        'PHONE_NUMBER_PLACEHOLDER': 'رقم الجوال (+966xxxxxxxx)', 
-        'SEND_VERIFICATION_CODE': 'إرسال رمز التحقق', 
-        'VERIFICATION_CODE_PLACEHOLDER': 'رمز التحقق المكون من 6 أرقام', 
-        'VERIFY_CODE': 'تأكيد الرمز', 
-
-        // صفحة dashboard.html
+        // مفاتيح dashboard.html
         'WELCOME_WARLORD': 'أهلاً بك أيها المحارب!',
         'LOGGED_IN_AS': 'تم تسجيل دخولك باسم المستخدم:',
         'HIGH_SCORE_DISPLAY': 'أعلى نتيجة لديك',
         'START_CHALLENGE': 'ابدأ التحدي',
         'GAME_INSTRUCTIONS': 'استخدم الأسهم للحركة والمسافة (Space) لإطلاق النار. اللعبة تستخدم محرك Phaser الاحترافي.',
         
-        // صفحات الشات
-        'GENERAL_CHAT': 'الشات العام',
-        'ALLIANCES_CHAT': 'شات التحالفات (خاص)',
-        'SEND_MESSAGE': 'إرسال',
-        'CHAT_MESSAGE_PLACEHOLDER': 'اكتب رسالتك هنا...',
-        'GENERAL_CHAT_TITLE': 'الشات العام (الجميع)',
-        'ALLIANCES_CHAT_TITLE': 'شات التحالفات (الخاص)',
-
-        // صفحة settings.html
+        // مفاتيح settings.html
         'SETTINGS_PAGE_TITLE': 'إعدادات الحساب واللعبة',
         'PROFILE_SETTINGS': 'إعدادات الملف الشخصي',
         'CHANGE_AVATAR': 'تغيير صورة البروفايل',
@@ -64,7 +49,7 @@ const translations = {
         'DELETE_ACCOUNT': 'حذف الحساب نهائياً',
         
         // -------------------------------------------------------------
-        // مفاتيح لوحة تحكم المدير (admin.html) - الجديدة
+        // مفاتيح لوحة تحكم المدير (admin.html)
         // -------------------------------------------------------------
         'ADMIN_DASHBOARD_TITLE': 'لوحة تحكم المدير',
         'ADMIN_PANEL_WELCOME': 'أهلاً بك أيها المدير، تحكم في الإمبراطورية.',
@@ -73,7 +58,20 @@ const translations = {
         'USER_TABLE_EMAIL': 'البريد الإلكتروني',
         'USER_TABLE_ROLE': 'الصلاحية',
         'USER_TABLE_SCORE': 'النقاط',
-        'USER_TABLE_ACTIONS': 'الإجراءات'
+        'USER_TABLE_ACTIONS': 'الإجراءات',
+
+        // -------------------------------------------------------------
+        // مفاتيح صفحة الدردشة (chat.html)
+        // -------------------------------------------------------------
+        'CHAT_CHANNELS': 'قنوات الدردشة',
+        'GENERAL_CHAT': 'الشات العام',
+        'ALLIANCES_CHAT': 'شات التحالفات (خاص)',
+        'GENERAL_CHAT_TITLE': 'الشات العام (الجميع)',
+        'ALLIANCES_CHAT_TITLE': 'شات التحالفات (الخاص)',
+        'SEND_MESSAGE': 'إرسال',
+        'CHAT_MESSAGE_PLACEHOLDER': 'اكتب رسالتك هنا...',
+        'WELCOME_CHAT': 'أهلاً بك! تبادل الرسائل مع اللاعبين الآخرين.',
+        'CHAT_NOTE': 'سيتم تمكين شات التحالفات بعد انضمامك لتحالف.'
     },
     'en': {
         // General
@@ -101,13 +99,6 @@ const translations = {
         'SIGN_IN_WITH_GOOGLE': 'Sign in with Google',
         'SIGN_IN_WITH_FACEBOOK': 'Sign in with Facebook', 
         
-        // Phone Number Sign-in Keys
-        'SIGN_IN_WITH_PHONE': 'Or sign in with Phone', 
-        'PHONE_NUMBER_PLACEHOLDER': 'Phone Number (+xxx...)', 
-        'SEND_VERIFICATION_CODE': 'Send Verification Code', 
-        'VERIFICATION_CODE_PLACEHOLDER': '6-digit Verification Code', 
-        'VERIFY_CODE': 'Verify Code', 
-
         // dashboard.html page
         'WELCOME_WARLORD': 'Welcome Warlord!',
         'LOGGED_IN_AS': 'Logged in as:',
@@ -115,14 +106,6 @@ const translations = {
         'START_CHALLENGE': 'Start Challenge',
         'GAME_INSTRUCTIONS': 'Use the arrows to move and Space to shoot. Game powered by Phaser.',
         
-        // New Chat Pages
-        'GENERAL_CHAT': 'General Chat',
-        'ALLIANCES_CHAT': 'Alliances Chat (Private)',
-        'SEND_MESSAGE': 'Send',
-        'CHAT_MESSAGE_PLACEHOLDER': 'Type your message here...',
-        'GENERAL_CHAT_TITLE': 'General Chat (Everyone)',
-        'ALLIANCES_CHAT_TITLE': 'Alliances Chat (Private)',
-
         // settings.html page
         'SETTINGS_PAGE_TITLE': 'Account & Game Settings',
         'PROFILE_SETTINGS': 'Profile Settings',
@@ -140,7 +123,7 @@ const translations = {
         'DELETE_ACCOUNT': 'Permanently Delete Account',
         
         // -------------------------------------------------------------
-        // مفاتيح لوحة تحكم المدير (admin.html) - الجديدة
+        // مفاتيح لوحة تحكم المدير (admin.html)
         // -------------------------------------------------------------
         'ADMIN_DASHBOARD_TITLE': 'Admin Dashboard',
         'ADMIN_PANEL_WELCOME': 'Welcome Admin, control the Empire.',
@@ -149,7 +132,20 @@ const translations = {
         'USER_TABLE_EMAIL': 'Email',
         'USER_TABLE_ROLE': 'Role',
         'USER_TABLE_SCORE': 'Score',
-        'USER_TABLE_ACTIONS': 'Actions'
+        'USER_TABLE_ACTIONS': 'Actions',
+        
+        // -------------------------------------------------------------
+        // مفاتيح صفحة الدردشة (chat.html)
+        // -------------------------------------------------------------
+        'CHAT_CHANNELS': 'Chat Channels',
+        'GENERAL_CHAT': 'General Chat',
+        'ALLIANCES_CHAT': 'Alliances Chat (Private)',
+        'GENERAL_CHAT_TITLE': 'General Chat (Everyone)',
+        'ALLIANCES_CHAT_TITLE': 'Alliances Chat (Private)',
+        'SEND_MESSAGE': 'Send',
+        'CHAT_MESSAGE_PLACEHOLDER': 'Type your message here...',
+        'WELCOME_CHAT': 'Welcome! Exchange messages with other players.',
+        'CHAT_NOTE': 'Alliance chat will be enabled after you join an alliance.'
     }
 };
 
