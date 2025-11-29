@@ -11,7 +11,7 @@
             max-width: 1300px;
             margin: 40px auto;
             padding: 0 20px;
-            display: flex; /* لتقسيم الصفحة إلى شريط جانبي ومحتوى */
+            display: flex; 
             gap: 30px;
         }
 
@@ -157,7 +157,7 @@
             getDocs
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // *** مفاتيح مشروعك الفعلي (thronevoid) ***
+        // *** مفاتيح مشروعك الفعلي (thronevoid) - تأكد من صحتها ***
         const firebaseConfig = {
             apiKey: "AIzaSyB-bfHRJW3E8KW3-o-PkNW6xi5ytrTKMJE", 
             authDomain: "thronevoid.firebaseapp.com",
@@ -173,7 +173,7 @@
         const db = getFirestore(app);
 
         let currentUserEmail = null;
-        let allProfiles = []; // لتخزين جميع الملفات وتطبيق التصفية محليًا
+        let allProfiles = [];
 
         const profilesList = document.getElementById('profiles-list');
         const searchBar = document.getElementById('searchBar');
@@ -190,7 +190,6 @@
             }
         });
 
-        // جلب جميع الملفات مرة واحدة
         async function fetchAllProfiles() {
             profilesList.innerHTML = `<p style="text-align: center; color: var(--text-muted);">جار تحميل الملفات...</p>`;
             
@@ -210,7 +209,6 @@
             applyFilters(); 
         }
 
-        // تطبيق التصفية والبحث وعرض الملفات
         function applyFilters() {
             const searchTerm = searchBar.value.trim().toLowerCase();
             const interestFilter = filterInterests.value.trim().toLowerCase().split(',').map(i => i.trim()).filter(i => i);
@@ -220,23 +218,19 @@
                 const username = (profile.username || profile.id.split('@')[0]).toLowerCase();
                 const bio = (profile.bio || '').toLowerCase();
                 const interests = (profile.interests || '').toLowerCase();
-                // افتراض حالة الاتصال بـ True حاليًا
                 const isOnline = true; 
 
-                // 1. البحث السريع
                 const matchesSearch = searchTerm === '' || 
                                       username.includes(searchTerm) ||
                                       bio.includes(searchTerm);
                 
                 if (!matchesSearch) return false;
 
-                // 2. تصفية الاهتمامات
                 const matchesInterests = interestFilter.length === 0 || 
                                          interestFilter.every(tag => interests.includes(tag));
                 
                 if (!matchesInterests) return false;
                 
-                // 3. تصفية الاتصال (ستحتاج لتطبيق نظام حالة الاتصال الحقيقي مستقبلاً)
                 const matchesOnline = !showOnlineOnly || isOnline; 
 
                 return matchesOnline;
@@ -262,8 +256,9 @@
             card.className = 'profile-card';
             
             const username = profile.username || profile.id.split('@')[0];
-            const interestsList = (profile.interests || '').split(',').map(i => i.trim()).filter(i => i).slice(0, 3); // عرض أول 3 اهتمامات
-            
+            const interestsList = (profile.interests || '').split(',').map(i => i.trim()).filter(i => i).slice(0, 3);
+            const targetEmail = profile.id; 
+
             card.innerHTML = `
                 <div class="profile-card-header">
                     <img src="https://i.pravatar.cc/150?u=${profile.id}" alt="Avatar">
@@ -274,18 +269,28 @@
                     ${interestsList.map(i => `<span class="interests-tag">${i}</span>`).join(' ')}
                 </p>
                 <button class="start-chat-btn" 
-                        data-email="${profile.id}" 
+                        data-email="${targetEmail}" 
                         style="background-color: var(--accent-green); margin-top: 15px;" 
                         data-i18n="START_CHAT">ابدأ الدردشة</button>
             `;
             
-            card.querySelector('.start-chat-btn').addEventListener('click', (e) => {
-                const targetEmail = e.target.getAttribute('data-email');
-                window.location.href = `private_chat.html?user=${targetEmail}`;
+            // **الكود المُصحح والمُركز على النقر:**
+            const startChatBtn = card.querySelector('.start-chat-btn');
+            
+            startChatBtn.addEventListener('click', (e) => {
+                const emailToChatWith = e.currentTarget.getAttribute('data-email');
+                
+                if (emailToChatWith) {
+                    console.log(`✅ تم النقر. التوجيه إلى: private_chat.html?user=${emailToChatWith}`); 
+                    window.location.href = `private_chat.html?user=${emailToChatWith}`;
+                } else {
+                    console.error("❌ البريد الإلكتروني الهدف مفقود.");
+                }
+                e.stopPropagation(); 
             });
 
             if (window.loadLanguage) { 
-                card.querySelector('.start-chat-btn').textContent = loadLanguage('START_CHAT');
+                startChatBtn.textContent = loadLanguage('START_CHAT');
             }
             return card;
         }
