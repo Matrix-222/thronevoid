@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="style.css">
     <style>
         /* تنسيقات خاصة بقائمة المستخدمين */
-        /* تم دمج الأفاتار هنا */
         .user-card .avatar {
             font-size: 1.5em;
         }
@@ -145,7 +144,7 @@
             filteredUsers.forEach(displayUserCard);
         }
 
-        // --- دالة عرض بطاقة المستخدم (تم التعديل) ---
+        // --- دالة عرض بطاقة المستخدم (تم حذف عرض الإيميل) ---
         function displayUserCard(user) {
             const email = user.email;
             const username = user.username || email.split('@')[0];
@@ -154,17 +153,15 @@
             card.className = 'user-card';
             card.setAttribute('data-user-email', email);
             
-            // ⭐️ إضافة الأفاتار بناءً على الجنس
-            const gender = user.gender || 'male'; // قيمة افتراضية 'male'
+            const gender = user.gender || 'male'; 
             
+            // --- ADD AVATAR ---
             const avatar = document.createElement('div');
-            // نستخدم الفئة avatar.male أو avatar.female التي عرفناها في style.css
             avatar.className = `avatar ${gender}`;
-            // إضافة رمز M أو F للوضوح في حالة استخدام الألوان كأفاتار افتراضي
             avatar.textContent = gender === 'male' ? 'M' : 'F'; 
             card.appendChild(avatar);
             
-            // حاوية لمعلومات المستخدم
+            // --- USER INFO CONTAINER ---
             const infoContainer = document.createElement('div');
             infoContainer.style.flexGrow = 1;
 
@@ -172,10 +169,12 @@
             nameElement.innerHTML = `<span class="online-dot"></span>${username}`;
             infoContainer.appendChild(nameElement);
 
+            /* 🛑 تم حذف سطر عرض الإيميل التالي:
             const emailElement = document.createElement('p');
             emailElement.textContent = email;
             emailElement.style.color = 'var(--text-muted)';
             infoContainer.appendChild(emailElement);
+            */
 
             card.appendChild(infoContainer);
             
@@ -186,7 +185,6 @@
             userListContainer.appendChild(card);
         }
 
-        // ... (باقي الكود) ...
     </script>
 </body>
 </html>
