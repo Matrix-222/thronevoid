@@ -4,16 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="SIGN_IN">تسجيل الدخول</title> 
-    <link rel="stylesheet" href="style.css">
+    
     <style>
-        /* CSS خاص لصفحة تسجيل الدخول */
+        :root {
+            --primary-dark: #1e1e1e; /* خلفية داكنة جداً */
+            --secondary-dark: #2c3e50; /* لون صندوق المحتوى (أزرق داكن) */
+            --accent-yellow: #f1c40f; /* لون التمييز الأصفر */
+            --accent-blue: #3498db; /* لون الأزرار الأساسي */
+            --text-light: #ecf0f1; /* لون النص الفاتح */
+        }
+
         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: var(--primary-dark);
-            color: white;
             text-align: center;
         }
         .login-box {
@@ -28,25 +38,34 @@
         h1 {
             color: var(--accent-yellow);
             margin-bottom: 20px;
+            font-size: 1.8em;
         }
         .input-group input {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 10px 0;
             border: 1px solid #555;
-            border-radius: 5px;
+            border-radius: 8px;
             background-color: #3a3a3a;
-            color: white;
-            text-align: center; 
+            color: var(--text-light);
+            text-align: right; 
+            box-sizing: border-box;
         }
         button {
-            padding: 10px 20px;
+            width: 100%;
+            padding: 12px 20px;
             background-color: var(--accent-blue);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            margin-top: 15px;
+            margin-top: 20px;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
         }
         .language-switcher {
             position: absolute;
@@ -55,10 +74,21 @@
             z-index: 100;
         }
         .language-switcher button {
+            width: auto;
             padding: 5px 10px;
             margin: 0 5px;
             background-color: #555;
             font-size: 0.8em;
+            border-radius: 5px;
+            margin-top: 0;
+        }
+        a {
+            color: #9b59b6;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        a:hover {
+            color: var(--accent-yellow);
         }
     </style>
 </head>
@@ -72,7 +102,7 @@
 
         <h1>THRONES OF THE VOID</h1>
         
-        <p data-i18n="SIGN_IN_EMAIL_TITLE">تسجيل الدخول</p> 
+        <p data-i18n="SIGN_IN_EMAIL_TITLE">تسجيل الدخول بالبريد الإلكتروني</p> 
         
         <div class="input-group">
             <input type="email" id="emailInput" data-i18n="EMAIL_PLACEHOLDER" placeholder="البريد الإلكتروني">
@@ -84,9 +114,9 @@
         
         <button id="loginBtn" data-i18n="SIGN_IN">تسجيل الدخول</button>
         
-        <p style="margin-top: 10px;"><a href="#" style="color: #9b59b6;" data-i18n="FORGOT_PASSWORD">نسيت كلمة المرور؟</a></p>
+        <p style="margin-top: 15px; margin-bottom: 0;"><a href="#" id="forgotPasswordLink" data-i18n="FORGOT_PASSWORD">نسيت كلمة المرور؟</a></p>
 
-        <p style="margin-top: 20px;"><a href="register.html" style="color: var(--accent-yellow);" data-i18n="REGISTER">ليس لديك حساب؟ سجل الآن</a></p>
+        <p style="margin-top: 10px;"><a href="register.html" style="color: var(--accent-yellow);" data-i18n="REGISTER">ليس لديك حساب؟ سجل الآن</a></p>
         
     </div>
 
@@ -96,7 +126,8 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { 
             getAuth, 
-            signInWithEmailAndPassword, 
+            signInWithEmailAndPassword,
+            sendPasswordResetEmail, // <--- دالة استعادة كلمة المرور
             onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         
@@ -117,7 +148,14 @@
         const emailInput = document.getElementById('emailInput');
         const passwordInput = document.getElementById('passwordInput');
         const loginBtn = document.getElementById('loginBtn');
-        
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink'); 
+
+        // ربط دالة استعادة كلمة المرور
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault(); 
+            resetPassword();
+        });
+
         loginBtn.addEventListener('click', () => {
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
@@ -138,11 +176,27 @@
                 });
         });
 
+        // دالة استعادة كلمة المرور
+        async function resetPassword() {
+            const email = emailInput.value.trim();
 
-        // إذا كان المستخدم مسجلاً الدخول بالفعل، يُعاد توجيهه
+            if (!email) {
+                alert("الرجاء إدخال البريد الإلكتروني الذي تريد استعادة كلمة مروره في الحقل المخصص.");
+                return;
+            }
+
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert(`✅ تم إرسال رابط استعادة كلمة المرور إلى البريد الإلكتروني: ${email}. يرجى التحقق من صندوق الوارد والرسائل غير المرغوب فيها (Spam).`);
+            } catch (error) {
+                console.error("Password Reset Error:", error);
+                alert("❌ فشل إرسال رابط استعادة كلمة المرور. تأكد من صحة البريد الإلكتروني وأن الحساب موجود.");
+            }
+        }
+
         onAuthStateChanged(auth, user => {
             if (user) {
-                // window.location.href = "dashboard.html";
+                // ...
             }
         });
     </script>
