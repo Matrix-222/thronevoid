@@ -1,118 +1,138 @@
-// i18n.js
-// قاموس الترجمة: يجب أن يتضمن هذا القاموس جميع النصوص في صفحات HTML
 const translations = {
-    // --- المفاتيح الرئيسية ---
-    'HOME': { 'en': 'HOME', 'ar': 'الرئيسية' },
-    'LOGIN': { 'en': 'LOGIN', 'ar': 'تسجيل الدخول' },
-    'REGISTER': { 'en': 'REGISTER', 'ar': 'تسجيل جديد' },
-    'LEADERBOARD': { 'en': 'LEADERBOARD', 'ar': 'لوحة المتصدرين' },
-    'DASHBOARD': { 'en': 'DASHBOARD', 'ar': 'لوحة التحكم' },
-    'SETTINGS': { 'en': 'SETTINGS', 'ar': 'الإعدادات' },
-    'LOGOUT': { 'en': 'LOGOUT', 'ar': 'تسجيل الخروج' },
+    'ar': {
+        // عام
+        'HOME': 'الرئيسية',
+        'LOGOUT': 'تسجيل الخروج',
+        'DASHBOARD': 'لوحة التحكم',
+        'SETTINGS': 'الإعدادات',
+        'STORE': 'المتجر',
+        'SAVE': 'حفظ',
+        'DELETE': 'حذف',
 
-    // --- مفاتيح الصفحة الرئيسية (index.html) ---
-    'HERO_TITLE': { 'en': 'WELCOME, WARLORD', 'ar': 'مرحباً بك أيها المحارب' },
-    'HERO_SUBTITLE': { 'en': 'Enter the Galactic Arena, fight to survive, and assert your dominance over the Void Throne.', 'ar': 'ادخل إلى ساحة المجرة، قاتل للبقاء، وأثبت هيمنتك على العرش.' },
-    'START_CHALLENGE': { 'en': 'START THE CHALLENGE', 'ar': 'ابدأ التحدي' },
+        // صفحة login.html
+        'LOGIN': 'تسجيل الدخول',
+        'LOG_IN_ACCOUNT': 'تسجيل الدخول / إنشاء حساب',
+        'EMAIL_PLACEHOLDER': 'البريد الإلكتروني',
+        'PASSWORD_PLACEHOLDER': 'كلمة المرور',
+        'FORGOT_PASSWORD': 'نسيت كلمة المرور؟',
+        'AUTH_BUTTON_LOGIN': 'تسجيل الدخول',
+        'AUTH_BUTTON_REGISTER': 'إنشاء حساب جديد',
+        'TOGGLE_TO_REGISTER': 'لا تملك حساباً؟ انقر للتسجيل',
+        'TOGGLE_TO_LOGIN': 'لديك حساب بالفعل؟ انقر لتسجيل الدخول',
+        'SIGN_IN_WITH_GOOGLE': 'تسجيل الدخول باستخدام جوجل',
 
-    // --- مفاتيح الدخول/التسجيل (login.html) ---
-    'LOG_IN_ACCOUNT': { 'en': 'Login / Create Account', 'ar': 'تسجيل الدخول / إنشاء حساب' },
-    'EMAIL_PLACEHOLDER': { 'en': 'Email', 'ar': 'البريد الإلكتروني' },
-    'PASSWORD_PLACEHOLDER': { 'en': 'Password', 'ar': 'كلمة المرور' },
-    'FORGOT_PASSWORD': { 'en': 'Forgot Password?', 'ar': 'نسيت كلمة المرور؟' },
-    'AUTH_BUTTON_LOGIN': { 'en': 'Login', 'ar': 'تسجيل الدخول' },
-    'AUTH_BUTTON_REGISTER': { 'en': 'Create Account', 'ar': 'إنشاء حساب' },
-    'TOGGLE_TO_REGISTER': { 'en': "Don't have an account? Click to Register", 'ar': 'لا تملك حساباً؟ انقر للتسجيل' },
-    'TOGGLE_TO_LOGIN': { 'en': "Already have an account? Click to Login", 'ar': 'لديك حساب؟ انقر للدخول' },
-    'SIGN_IN_WITH_GOOGLE': { 'en': 'Sign in with Google', 'ar': 'تسجيل الدخول باستخدام جوجل' },
-    
-    // --- مفاتيح لوحة التحكم (dashboard.html) ---
-    'WELCOME_WARLORD': { 'en': 'Welcome, Warlord!', 'ar': 'أهلاً بك أيها المحارب!' },
-    'LOGGED_IN_AS': { 'en': 'Logged in as:', 'ar': 'تم تسجيل دخولك باسم المستخدم:' },
-    'HIGH_SCORE_DISPLAY': { 'en': 'Your Highest Score', 'ar': 'أعلى نتيجة لديك' },
-    'UPDATED_TEXT': { 'en': 'Updated', 'ar': 'تم التحديث' },
-    'GAME_INSTRUCTIONS': { 'en': 'Use arrows to move and Space to shoot. The game uses the professional Phaser engine.', 'ar': 'استخدم الأسهم للحركة والمسافة (Space) لإطلاق النار. اللعبة تستخدم محرك Phaser الاحترافي.' },
+        // صفحة dashboard.html
+        'WELCOME_WARLORD': 'أهلاً بك أيها المحارب!',
+        'LOGGED_IN_AS': 'تم تسجيل دخولك باسم المستخدم:',
+        'HIGH_SCORE_DISPLAY': 'أعلى نتيجة لديك',
+        'START_CHALLENGE': 'ابدأ التحدي',
+        'GAME_INSTRUCTIONS': 'استخدم الأسهم للحركة والمسافة (Space) لإطلاق النار. اللعبة تستخدم محرك Phaser الاحترافي.',
+        
+        // صفحات الشات الجديدة
+        'GENERAL_CHAT': 'الشات العام',
+        'ALLIANCES_CHAT': 'شات التحالفات (خاص)',
+        'SEND_MESSAGE': 'إرسال',
+        'CHAT_MESSAGE_PLACEHOLDER': 'اكتب رسالتك هنا...',
+        'GENERAL_CHAT_TITLE': 'الشات العام (الجميع)',
+        'ALLIANCES_CHAT_TITLE': 'شات التحالفات (الخاص)',
 
-    // --- مفاتيح الخدمات الجديدة (store.html, chat.html) ---
-    'STORE': { 'en': 'STORE', 'ar': 'المتجر' },
-    'GENERAL_CHAT': { 'en': 'GENERAL CHAT', 'ar': 'الشات العام' }, // جديد
-    'ALLIANCES_CHAT': { 'en': 'ALLIANCES CHAT', 'ar': 'شات التحالفات (خاص)' }, // تحديث
-    'CHAT_TITLE_GENERAL': { 'en': 'Global Public Chat', 'ar': 'الشات العام لجميع المحاربين' }, // جديد
-    'CHAT_TITLE_ALLIANCE': { 'en': 'Alliance Private Chat', 'ar': 'شات التحالف (الخاص)' }, // جديد
-    'CHAT_PLACEHOLDER': { 'en': 'Type your message...', 'ar': 'اكتب رسالتك...' },
-    'SEND': { 'en': 'Send', 'ar': 'إرسال' },
-    'USER_MUTED_MESSAGE': { 'en': 'You are currently muted and cannot send messages.', 'ar': 'أنت مكتوم حالياً ولا يمكنك إرسال الرسائل.' },
+        // صفحة settings.html
+        'SETTINGS_PAGE_TITLE': 'إعدادات الحساب واللعبة',
+        'PROFILE_SETTINGS': 'إعدادات الملف الشخصي',
+        'CHANGE_AVATAR': 'تغيير صورة البروفايل',
+        'USERNAME': 'اسم المستخدم:',
+        'CHANGE_USERNAME': 'تغيير اسم المستخدم',
+        'SAVE_USERNAME': 'حفظ الاسم',
+        'ACCOUNT_SETTINGS': 'إعدادات الحساب',
+        'CURRENT_EMAIL': 'البريد الإلكتروني الحالي:',
+        'LANGUAGE_SETTINGS': 'إعدادات اللغة',
+        'SELECT_LANGUAGE': 'اختر اللغة:',
+        'LANG_AR': 'العربية',
+        'LANG_EN': 'English',
+        'DANGER_ZONE': 'منطقة الخطر',
+        'DELETE_ACCOUNT': 'حذف الحساب نهائياً'
+    },
+    'en': {
+        // General
+        'HOME': 'Home',
+        'LOGOUT': 'Logout',
+        'DASHBOARD': 'Dashboard',
+        'SETTINGS': 'Settings',
+        'STORE': 'Store',
+        'SAVE': 'Save',
+        'DELETE': 'Delete',
 
-    // --- مفاتيح صفحة الإعدادات (settings.html) ---
-    'SETTINGS_PAGE_TITLE': { 'en': 'Account and Game Settings', 'ar': 'إعدادات الحساب واللعبة' },
-    'PROFILE_SETTINGS': { 'en': 'Profile Settings', 'ar': 'إعدادات الملف الشخصي' },
-    'USERNAME': { 'en': 'Username:', 'ar': 'اسم المستخدم:' }, 
-    'CHANGE_USERNAME': { 'en': 'Change Username', 'ar': 'تغيير اسم المستخدم' }, 
-    'SAVE_USERNAME': { 'en': 'Save Username', 'ar': 'حفظ الاسم' },
-    'CHANGE_AVATAR': { 'en': 'Change Profile Picture', 'ar': 'تغيير صورة البروفايل' },
-    'CHOOSE_AVATAR': { 'en': 'Choose from Avatars:', 'ar': 'اختر من الأيقونات الجاهزة:' },
-    'UPLOAD_IMAGE': { 'en': 'Upload New Image', 'ar': 'رفع صورة جديدة' },
-    'SAVE_CHANGES': { 'en': 'Save Changes', 'ar': 'حفظ التغييرات' },
-    'LANGUAGE_SETTINGS': { 'en': 'Language Settings', 'ar': 'إعدادات اللغة' },
-    'SELECT_LANGUAGE': { 'en': 'Select Language:', 'ar': 'اختر اللغة:' },
-    'LANG_AR': { 'en': 'Arabic', 'ar': 'العربية' },
-    'LANG_EN': { 'en': 'English', 'ar': 'English' },
-    'ACCOUNT_SETTINGS': { 'en': 'Account Settings', 'ar': 'إعدادات الحساب' },
-    'CHANGE_PASSWORD': { 'en': 'Change Password', 'ar': 'تغيير كلمة المرور' },
-    'CURRENT_EMAIL': { 'en': 'Current Email:', 'ar': 'البريد الإلكتروني الحالي:' },
-    'EDIT': { 'en': 'Edit', 'ar': 'تعديل' },
-    'DANGER_ZONE': { 'en': 'DANGER ZONE', 'ar': 'منطقة الخطر' },
-    'DELETE_ACCOUNT': { 'en': 'Delete Account Permanently', 'ar': 'حذف الحساب نهائياً' },
-    'DELETE': { 'en': 'Delete', 'ar': 'حذف' },
-    'GAME_SETTINGS': { 'en': 'Game Settings', 'ar': 'إعدادات اللعبة' },
-    'SOUND_VOLUME': { 'en': 'Sound Volume', 'ar': 'مستوى الصوت' },
-    'GRAPHICS_QUALITY': { 'en': 'Graphics Quality', 'ar': 'جودة الرسوميات' },
-    'HIGH': { 'en': 'High', 'ar': 'عالية' },
-    'MEDIUM': { 'en': 'Medium', 'ar': 'متوسطة' },
-    'LOW': { 'en': 'Low', 'ar': 'منخفضة' },
+        // login.html page
+        'LOGIN': 'Login',
+        'LOG_IN_ACCOUNT': 'Login / Register Account',
+        'EMAIL_PLACEHOLDER': 'Email',
+        'PASSWORD_PLACEHOLDER': 'Password',
+        'FORGOT_PASSWORD': 'Forgot Password?',
+        'AUTH_BUTTON_LOGIN': 'Login',
+        'AUTH_BUTTON_REGISTER': 'Register New Account',
+        'TOGGLE_TO_REGISTER': 'Don\'t have an account? Click to register',
+        'TOGGLE_TO_LOGIN': 'Already have an account? Click to login',
+        'SIGN_IN_WITH_GOOGLE': 'Sign in with Google',
 
-    // --- مفاتيح لوحة تحكم المشرف (Admin Panel) ---
-    'ADMIN_PANEL': { 'en': 'ADMIN PANEL', 'ar': 'لوحة تحكم المشرف' },
-    'MANAGE_USERS': { 'en': 'MANAGE USERS', 'ar': 'إدارة المستخدمين' },
-    'USER_EMAIL': { 'en': 'USER EMAIL', 'ar': 'البريد الإلكتروني' },
-    'AVATAR_URL': { 'en': 'AVATAR', 'ar': 'صورة البروفايل' },
-    'HIGH_SCORE': { 'en': 'HIGH SCORE', 'ar': 'أعلى نتيجة' },
-    'ENERGY': { 'en': 'ENERGY', 'ar': 'الطاقة' },
-    'STATUS': { 'en': 'STATUS', 'ar': 'الحالة' },
-    'ACTIONS': { 'en': 'ACTIONS', 'ar': 'الإجراءات' },
-    'ACCESS_DENIED': { 'en': '⛔️ Access Denied. You do not have administrator privileges.', 'ar': '⛔️ لا تملك صلاحية الوصول إلى لوحة المشرف.' },
+        // dashboard.html page
+        'WELCOME_WARLORD': 'Welcome Warlord!',
+        'LOGGED_IN_AS': 'Logged in as:',
+        'HIGH_SCORE_DISPLAY': 'Your High Score',
+        'START_CHALLENGE': 'Start Challenge',
+        'GAME_INSTRUCTIONS': 'Use the arrows to move and Space to shoot. Game powered by Phaser.',
+        
+        // New Chat Pages
+        'GENERAL_CHAT': 'General Chat',
+        'ALLIANCES_CHAT': 'Alliances Chat (Private)',
+        'SEND_MESSAGE': 'Send',
+        'CHAT_MESSAGE_PLACEHOLDER': 'Type your message here...',
+        'GENERAL_CHAT_TITLE': 'General Chat (Everyone)',
+        'ALLIANCES_CHAT_TITLE': 'Alliances Chat (Private)',
+
+        // settings.html page
+        'SETTINGS_PAGE_TITLE': 'Account & Game Settings',
+        'PROFILE_SETTINGS': 'Profile Settings',
+        'CHANGE_AVATAR': 'Change Profile Avatar',
+        'USERNAME': 'Username:',
+        'CHANGE_USERNAME': 'Change Username',
+        'SAVE_USERNAME': 'Save Username',
+        'ACCOUNT_SETTINGS': 'Account Settings',
+        'CURRENT_EMAIL': 'Current Email:',
+        'LANGUAGE_SETTINGS': 'Language Settings',
+        'SELECT_LANGUAGE': 'Select Language:',
+        'LANG_AR': 'العربية',
+        'LANG_EN': 'English',
+        'DANGER_ZONE': 'Danger Zone',
+        'DELETE_ACCOUNT': 'Permanently Delete Account'
+    }
 };
 
-// الدالة الرئيسية للترجمة
 function setLanguage(lang) {
     localStorage.setItem('lang', lang);
+    loadLanguage();
+}
 
-    document.body.style.direction = (lang === 'ar' ? 'rtl' : 'ltr');
+function loadLanguage() {
+    const lang = localStorage.getItem('lang') || 'ar';
+    document.documentElement.lang = lang; 
 
+    // تطبيق الترجمة على جميع العناصر التي تحمل خاصية data-i18n
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
-        
-        if (translations[key] && translations[key][lang]) {
-            if (element.tagName === 'INPUT' && element.hasAttribute('placeholder')) {
-                element.placeholder = translations[key][lang];
-            } else if (element.tagName === 'TITLE') {
-                document.title = translations[key][lang];
-            } else {
-                element.textContent = translations[key][lang];
+        if (translations[lang] && translations[lang][key]) {
+            // للعناصر التي لها placeholder (مثل حقول الإدخال)
+            if (element.placeholder) {
+                element.placeholder = translations[lang][key];
+            } 
+            // لباقي العناصر (نصوص)
+            else {
+                element.textContent = translations[lang][key];
             }
         }
     });
-}
 
-// دالة التحقق من اللغة المحفوظة وتحميلها
-function loadLanguage() {
-    const defaultLang = 'ar';
-    const lang = localStorage.getItem('lang') || defaultLang;
-    setLanguage(lang);
     return lang;
 }
 
-// تصدير الدوال لاستخدامها في ملفات HTML الأخرى
-window.setLanguage = setLanguage;
-window.loadLanguage = loadLanguage;
-window.translations = translations;
+// تشغيل دالة loadLanguage عند تحميل الصفحة
+loadLanguage();
