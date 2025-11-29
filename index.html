@@ -1,58 +1,200 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Throne Void - The Galactic Arena</title>
-    <link rel="stylesheet" href="style.css"> 
+    <title data-i18n="SIGN_IN">تسجيل الدخول</title> 
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* CSS خاص لصفحة تسجيل الدخول يمكن أن يكون هنا */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--primary-dark);
+            color: white;
+            text-align: center;
+        }
+        .login-box {
+            background-color: var(--secondary-dark);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            max-width: 400px;
+            width: 90%;
+            position: relative; /* لإحتواء زر اللغة بشكل أفضل */
+        }
+        h1 {
+            color: var(--accent-yellow);
+            margin-bottom: 20px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background-color: #3a3a3a;
+            color: white;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        .language-switcher {
+            position: absolute;
+            top: 15px;
+            /* الوضع التلقائي يعتمد على اتجاه النص (RTL/LTR) */
+            /* إذا كانت RTL (العربية)، سيكون الزر في اليسار (Left) */
+            /* إذا كانت LTR (الإنجليزية)، سيكون الزر في اليمين (Right) */
+            left: 15px; 
+            z-index: 100;
+        }
+        .language-switcher button {
+            padding: 5px 10px;
+            margin: 0 5px;
+            background-color: #555;
+            font-size: 0.8em;
+        }
+    </style>
 </head>
 <body>
-    
-    <video autoplay muted loop id="background-video">
-        <source src="background_void.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
+    <div class="login-box">
+        
+        <div class="language-switcher">
+            <button onclick="switchLanguage('ar')">العربية</button>
+            <button onclick="switchLanguage('en')">English</button>
+        </div>
 
-    <header>
         <h1>THRONES OF THE VOID</h1>
-        <div>
-            <button id="langToggleBtn" style="background-color: #3498db;">🌐 English</button>
-            
-            <button onclick="window.location='login.html'" data-i18n="LOGIN">تسجيل الدخول</button>
-            <button onclick="window.location='register.html'" data-i18n="REGISTER">تسجيل جديد</button>
-            <button onclick="window.location='leaderboard.html'" data-i18n="LEADERBOARD">لوحة المتصدرين</button> 
+        
+        <p data-i18n="PHONE_LOGIN_TITLE">سجل برقم الجوال</p>
+        
+        <div class="input-group">
+            <input type="tel" id="phoneNumber" placeholder="+9665xxxxxxxx">
         </div>
-    </header>
+        
+        <div id="recaptcha-container"></div>
 
-    <main>
-        <div class="hero-section">
-            <h2 data-i18n="HERO_TITLE">مرحباً بك أيها المحارب</h2>
-            <p data-i18n="HERO_SUBTITLE">ادخل إلى ساحة المجرة، قاتل للبقاء، وأثبت هيمنتك على العرش.</p>
-            <div style="margin-top: 30px;">
-                <button onclick="window.location='login.html'" style="background-color: var(--accent-red); padding: 15px 35px; font-size: 1.1em;" data-i18n="START_CHALLENGE">
-                    ابدأ التحدي
-                </button>
-            </div>
+        <button id="sendCodeBtn" data-i18n="SEND_VERIFICATION_CODE">إرسال رمز التحقق</button>
+        
+        <div class="input-group" style="margin-top: 20px;">
+            <input type="text" id="verificationCode" data-i18n="VERIFY_CODE_PLACEHOLDER" placeholder="أدخل رمز التحقق" style="display: none;">
+            <button id="verifyBtn" data-i18n="VERIFY" style="display: none;">تحقق</button>
         </div>
-    </main>
+
+        <p style="margin-top: 20px;"><a href="register.html" style="color: var(--accent-yellow);" data-i18n="REGISTER">ليس لديك حساب؟ سجل الآن</a></p>
+        
+    </div>
+
+    <script src="i18n.js"></script> 
     
-    <script src="i18n.js"></script>
-    <script>
-        // تحميل اللغة عند بداية تشغيل الصفحة
-        let currentLang = loadLanguage();
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithPhoneNumber, 
+            RecaptchaVerifier 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         
-        // تحديث زر التبديل بناءً على اللغة الحالية
-        const langBtn = document.getElementById('langToggleBtn');
-        function updateLangButton(lang) {
-            langBtn.textContent = lang === 'ar' ? '🌐 English' : '🌐 العربية';
-        }
-        updateLangButton(currentLang);
+        // *** مفاتيح مشروعك الفعلي (thronevoid) - تأكد من صحتها ***
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-bfHRJW3E8KW3-o-PkNW6xi5ytrTKMJE", 
+            authDomain: "thronevoid.firebaseapp.com",
+            projectId: "thronevoid",
+            storageBucket: "thronevoid.firebasestorage.app",
+            messagingSenderId: "958587822012",
+            appId: "1:958587822012:web:312cf3d9e7c87e1c6415b9",
+            measurementId: "G-N34T3VRGX0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         
-        // دالة التبديل عند الضغط على الزر
-        langBtn.addEventListener('click', () => {
-            currentLang = currentLang === 'ar' ? 'en' : 'ar';
-            setLanguage(currentLang);
-            updateLangButton(currentLang);
+        // تعريف العناصر
+        const phoneNumberInput = document.getElementById('phoneNumber');
+        const sendCodeBtn = document.getElementById('sendCodeBtn');
+        const verificationCodeInput = document.getElementById('verificationCode');
+        const verifyBtn = document.getElementById('verifyBtn');
+        
+        let confirmationResult;
+
+        window.onload = function() {
+            // إعداد RecaptchaVerifier
+            window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                'size': 'normal',
+                'callback': (response) => {
+                    // reCAPTCHA تم التحقق بنجاح
+                    console.log("reCAPTCHA verified");
+                },
+                'expired-callback': () => {
+                    // reCAPTCHA انتهت صلاحيته
+                    console.warn("reCAPTCHA expired");
+                    alert(loadLanguage('LOGIN_ERROR_RECAPTCHA'));
+                }
+            });
+        };
+
+        sendCodeBtn.addEventListener('click', () => {
+            const phoneNumber = phoneNumberInput.value.trim();
+            if (!phoneNumber) return;
+            
+            // تحقق من وجود reCAPTCHA
+            if (!window.recaptchaVerifier) {
+                alert(loadLanguage('LOGIN_ERROR_RECAPTCHA'));
+                return;
+            }
+
+            signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier)
+                .then((result) => {
+                    confirmationResult = result;
+                    alert("✅ تم إرسال رمز التحقق بنجاح!");
+                    
+                    // إخفاء زر الإرسال وإظهار حقول التحقق
+                    sendCodeBtn.style.display = 'none';
+                    phoneNumberInput.disabled = true;
+                    verificationCodeInput.style.display = 'block';
+                    verifyBtn.style.display = 'block';
+                })
+                .catch((error) => {
+                    console.error("Error sending code:", error);
+                    // عرض رسالة خطأ حسب نوع الخطأ
+                    alert(loadLanguage('LOGIN_ERROR_PHONE_FORMAT'));
+                    // إعادة ضبط reCAPTCHA للسماح بالمحاولة مرة أخرى
+                    window.recaptchaVerifier.render().then(function(widgetId) {
+                        grecaptcha.reset(widgetId);
+                    });
+                });
+        });
+
+        verifyBtn.addEventListener('click', () => {
+            const code = verificationCodeInput.value.trim();
+            if (!code || !confirmationResult) return;
+
+            confirmationResult.confirm(code)
+                .then((result) => {
+                    const user = result.user;
+                    console.log("User signed in:", user);
+                    alert(loadLanguage('LOGIN_SUCCESS'));
+                    window.location.href = "dashboard.html"; 
+                })
+                .catch((error) => {
+                    console.error("Error verifying code:", error);
+                    alert(loadLanguage('LOGIN_FAIL'));
+                });
+        });
+
+        // إذا كان المستخدم مسجلاً الدخول بالفعل، يُعاد توجيهه
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // window.location.href = "dashboard.html";
+            }
         });
     </script>
 </body>
