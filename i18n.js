@@ -25,7 +25,7 @@ const translations = {
         'SIGN_IN_WITH_GOOGLE': 'تسجيل الدخول باستخدام جوجل',
         'SIGN_IN_WITH_FACEBOOK': 'تسجيل الدخول باستخدام فيسبوك', 
         
-        // مفاتيح تسجيل الدخول برقم الجوال
+        // مفاتيح تسجيل الدخول برقم الجوال (تمت إزالتها من login.html، لكن تُركت هنا للتوثيق)
         'SIGN_IN_WITH_PHONE': 'أو سجل برقم الجوال', 
         'PHONE_NUMBER_PLACEHOLDER': 'رقم الجوال (+966xxxxxxxx)', 
         'SEND_VERIFICATION_CODE': 'إرسال رمز التحقق', 
