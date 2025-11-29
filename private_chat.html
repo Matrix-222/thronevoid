@@ -99,7 +99,7 @@
              color: rgba(255, 255, 255, 0.7);
         }
 
-        /* ⭐️ تنسيقات صندوق الإدخال */
+        /* ⭐️ تنسيقات صندوق الإدخال (تم إصلاح مشكلة المؤشر هنا) */
         .chat-input {
             padding: 15px;
             background-color: var(--primary-dark);
@@ -113,7 +113,6 @@
             margin-left: 10px;
             margin-bottom: 0;
             
-            /* ⭐️ التعديل الذي يحل مشكلة المؤشر: */
             direction: rtl; 
             text-align: right;
         }
@@ -234,6 +233,11 @@
         let chatPartnerGender = null; 
         let chatPartnerEmail = null;
         let chatId = null;
+        
+        // ⭐️ متغيرات الأفاتار الجديدة
+        let currentUserAvatarUrl = null; 
+        let chatPartnerAvatarUrl = null; 
+        
         const chatMessagesContainer = document.getElementById('chatMessages');
         const messageInput = document.getElementById('messageInput');
         const sendMessageBtn = document.getElementById('sendMessageBtn');
@@ -276,6 +280,7 @@
             return email1 < email2 ? `${email1}_${email2}` : `${email2}_${email1}`;
         }
         
+        // ⭐️ دالة جلب معلومات المستخدم الحالي (محدثة لدعم الأفاتار)
         async function fetchCurrentUserInfo(email) {
             try {
                 const docRef = doc(db, "users", email);
@@ -283,12 +288,14 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     currentUserGender = data.gender;
+                    currentUserAvatarUrl = data.avatarUrl; 
                 }
             } catch (error) {
                 console.error("Error fetching current user info:", error);
             }
         }
         
+        // ⭐️ دالة جلب بيانات المستخدم الشريك (محدثة لدعم الأفاتار)
         async function fetchChatPartnerName(email) {
             try {
                 const docRef = doc(db, "users", email);
@@ -297,6 +304,7 @@
                     const data = docSnap.data();
                     const name = data.username || email.split('@')[0];
                     chatPartnerGender = data.gender;
+                    chatPartnerAvatarUrl = data.avatarUrl; 
                     chatPartnerNameElement.textContent = `محادثة مع: ${name}`;
                 } else {
                     chatPartnerNameElement.textContent = `محادثة مع: ${email.split('@')[0]}`; 
@@ -362,10 +370,11 @@
             });
         }
         
-        // --- عرض الرسالة في الواجهة ---
+        // --- عرض الرسالة في الواجهة (محدثة لدعم الأفاتار) ---
         function displayMessage(message) {
             const isSender = message.sender === currentUser.email;
             const senderGender = isSender ? currentUserGender : chatPartnerGender;
+            const senderAvatarUrl = isSender ? currentUserAvatarUrl : chatPartnerAvatarUrl; 
 
             const messageRow = document.createElement('div');
             messageRow.className = `message-row ${isSender ? 'sender' : 'receiver'}`;
@@ -374,30 +383,35 @@
             // منطق الأفاتار
             const avatar = document.createElement('div');
             avatar.className = `avatar ${senderGender || 'male'}`; 
-            avatar.textContent = (senderGender || 'male') === 'male' ? 'M' : 'F';
+            
+            // ⭐️ عرض الصورة أو الحرف الافتراضي
+            if (senderAvatarUrl) {
+                avatar.innerHTML = `<img src="${senderAvatarUrl}" alt="Avatar" style="width:100%; height:100%; object-fit:cover;">`;
+                avatar.classList.remove('male', 'female');
+            } else {
+                avatar.textContent = (senderGender || 'male') === 'male' ? 'M' : 'F';
+            }
+            
             messageRow.appendChild(avatar); 
             
-            // --- فقاعة الرسالة والمحتوى ---
+            // ... (باقي الكود) ...
+            
             const bubble = document.createElement('div');
             bubble.className = 'message-bubble';
             
             let contentHTML = message.content || '...';
             
-            // مؤشر التعديل
             const editedTag = message.edited ? `<span style="font-size:0.7em; color:var(--text-muted); margin-right: 5px;"> (مُعدّلة)</span>` : '';
 
-            // وضع المحتوى أولاً
             bubble.innerHTML = contentHTML + editedTag;
 
             const time = message.timestamp ? new Date(message.timestamp.toDate()).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : 'جاري الإرسال..';
             
-            // إضافة الوقت
             const timeSpan = document.createElement('span');
             timeSpan.className = 'message-time';
             timeSpan.textContent = time;
             bubble.appendChild(timeSpan);
             
-            // زر التعديل (فقط للمرسل والرسائل النصية)
             if (isSender && message.type === 'text') {
                 const editIcon = document.createElement('span');
                 editIcon.className = 'edit-icon';
@@ -418,7 +432,7 @@
         }
 
         // ------------------------------------
-        // منطق تعديل الرسائل 
+        // منطق تعديل الرسائل (لم يتغير)
         // ------------------------------------
         function startEdit(event, originalContent, messageId) {
             event.stopPropagation();
@@ -492,7 +506,7 @@
         }
         
         // ------------------------------------
-        // منطق الإيموجي 
+        // منطق الإيموجي (لم يتغير)
         // ------------------------------------
         const emojis = [
             '😀', '😂', '😍', '👍', '🙏', '❤️', '🔥', '🎉', '🌟', '😊',
