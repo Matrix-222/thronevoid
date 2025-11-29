@@ -28,18 +28,16 @@
         const db = getFirestore(app); 
         
         // -------------------------------------------------------------
-        //                 دالة إنشاء ملف المستخدم في Firestore (محدثة)
+        //                 دالة إنشاء ملف المستخدم في Firestore 
         // -------------------------------------------------------------
         async function createUserProfile(user) {
             const userDocRef = doc(db, "users", user.email);
             
-            // 🔥🔥 إضافة اسم مستخدم افتراضي (جزء الإيميل قبل @) 🔥🔥
             const defaultUsername = user.email.split('@')[0];
 
-            // إنشاء ملف المستخدم بنقاط وطاقة واسم مستخدم افتراضي
             await setDoc(userDocRef, {
                 email: user.email,
-                username: defaultUsername, // تم إضافته
+                username: defaultUsername, 
                 highScore: 0,
                 energy: 100,
                 lastEnergyUpdate: new Date(),
@@ -50,6 +48,76 @@
             }, { merge: true });
         }
         
+        // -------------------------------------------------------------
+        //                 دوال الواجهة
+        // -------------------------------------------------------------
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const authButton = document.getElementById('authButton');
+        const toggleButton = document.getElementById('toggleAuth');
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+
+        let isLoginMode = true;
+
+        function updateUI() {
+            // ... (نفس دالة تحديث الواجهة) ...
+        }
+
+        // -------------------------------------------------------------
+        //                 🔥 دالة تسجيل الدخول (مُحدَّثة بمعالجة الأخطاء) 🔥
+        // -------------------------------------------------------------
+        async function handleLogin() {
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            
+            if (!email || !password) {
+                alert("الرجاء إدخال البريد الإلكتروني وكلمة المرور.");
+                return;
+            }
+
+            try {
+                if (isLoginMode) {
+                    // محاولة تسجيل الدخول
+                    await signInWithEmailAndPassword(auth, email, password);
+                    // في حالة النجاح، يتم التوجيه بواسطة onAuthStateChanged
+                } else {
+                    // محاولة التسجيل الجديد
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    await createUserProfile(userCredential.user);
+                }
+                window.location.href = "dashboard.html"; // توجيه بعد نجاح العملية
+            } catch (error) {
+                console.error("Firebase Auth Error:", error);
+                
+                // تحديد نوع الخطأ وعرض رسالة واضحة للمستخدم
+                let errorMessage = "حدث خطأ غير معروف أثناء المصادقة.";
+
+                switch (error.code) {
+                    case 'auth/invalid-email':
+                        errorMessage = "صيغة البريد الإلكتروني غير صحيحة.";
+                        break;
+                    case 'auth/user-disabled':
+                        errorMessage = "تم إيقاف حسابك من قبل الإدارة.";
+                        break;
+                    case 'auth/user-not-found':
+                    case 'auth/wrong-password':
+                        errorMessage = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+                        break;
+                    case 'auth/email-already-in-use':
+                        errorMessage = "هذا البريد الإلكتروني مستخدم بالفعل. حاول تسجيل الدخول.";
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = "كلمة المرور ضعيفة جداً. يجب أن تكون 6 أحرف على الأقل.";
+                        break;
+                    default:
+                        // إذا كان خطأ غير معروف، نعرض رسالة عامة ورقم الخطأ للمطور
+                        errorMessage = `فشل تسجيل الدخول/التسجيل. الرجاء التحقق من اتصالك بالإنترنت. (Code: ${error.code})`;
+                        break;
+                }
+
+                alert(`فشل المصادقة: ${errorMessage}`);
+            }
+        }
         // ... (بقية الكود الخاص بـ login.html لم يتغير) ...
     </script>
 </body>
