@@ -7,12 +7,18 @@
     <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
+    
+    <video autoplay muted loop id="background-video">
+        <source src="background_void.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
     <header>
         <h1>THRONES OF THE VOID</h1>
         <div>
             <button onclick="window.location='login.html'">LOGIN</button>
-            <button onclick="window.location='register.html'" style="background-color: #2ecc71;">REGISTER</button>
-            <button onclick="window.location='leaderboard.html'" style="background-color: var(--accent-yellow); color: var(--primary-dark);">LEADERBOARD</button> 
+            <button onclick="window.location='register.html'">REGISTER</button>
+            <button onclick="window.location='leaderboard.html'">LEADERBOARD</button> 
         </div>
     </header>
 
