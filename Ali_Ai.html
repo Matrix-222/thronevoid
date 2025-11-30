@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المساعد الذكي الخاص (AI Helper)</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* تنسيقات خاصة بصفحة المساعد الذكي */
+        :root {
+            /* يمكنك تعديل هذه الألوان لتناسب تصميم المساعد */
+            --ai-background: #1e3a8a; /* أزرق داكن للمساعد */
+            --user-bubble: #10b981; /* أخضر للمستخدم */
+            --ai-bubble: #60a5fa;   /* أزرق فاتح للمساعد */
+        }
+        .helper-container {
+            max-width: 700px;
+            height: 90vh; 
+            margin: 20px auto;
+            background-color: var(--primary-dark);
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 2px solid var(--ai-background);
+        }
+
+        .helper-header {
+            padding: 20px;
+            background-color: var(--ai-background);
+            color: white;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .helper-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--secondary-dark);
+        }
+        
+        /* تنسيق فقاعات الرسائل */
+        .message-row {
+            display: flex;
+            margin-bottom: 15px;
+            max-width: 90%;
+        }
+
+        .message-row.user {
+            flex-direction: row-reverse;
+            align-self: flex-end;
+        }
+
+        .message-row.ai {
+            flex-direction: row;
+            align-self: flex-start;
+        }
+
+        .message-bubble {
+            padding: 12px 18px;
+            border-radius: 20px;
+            line-height: 1.6;
+            word-wrap: break-word;
+            text-align: right;
+            direction: rtl;
+            color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .message-row.user .message-bubble {
+            background-color: var(--user-bubble);
+            border-bottom-right-radius: 5px;
+        }
+
+        .message-row.ai .message-bubble {
+            background-color: var(--ai-bubble);
+            border-bottom-left-radius: 5px;
+        }
+
+        .helper-input {
+            padding: 15px;
+            background-color: var(--ai-background);
+            display: flex;
+            align-items: center;
+        }
+
+        #promptInput {
+            flex-grow: 1;
+            margin-left: 10px;
+            direction: rtl; 
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="helper-container">
+            <div class="helper-header">
+                المساعد الذكي (THRONES OF THE VOID AI)
+            </div>
+
+            <div id="helperMessages" class="helper-messages">
+                <div class="message-row ai">
+                    <div class="message-bubble">
+                        مرحباً! أنا مساعدك الذكي السري. يمكنك أن تسألني أي شيء يخطر ببالك، وسأحاول مساعدتك في حلول الاختبارات أو أي سؤال آخر.
+                    </div>
+                </div>
+            </div>
+
+            <div class="helper-input">
+                <button id="sendPromptBtn" class="btn btn-primary" style="background-color: var(--user-bubble);">إرسال</button>
+                <input type="text" id="promptInput" placeholder="اكتب سؤالك أو مشكلتك هنا...">
+            </div>
+        </div>
+    </main>
+    
+    <script type="module">
+        const helperMessagesContainer = document.getElementById('helperMessages');
+        const promptInput = document.getElementById('promptInput');
+        const sendPromptBtn = document.getElementById('sendPromptBtn');
+
+        sendPromptBtn.addEventListener('click', () => sendPrompt());
+        promptInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendPrompt();
+        });
+
+        function displayMessage(content, sender) {
+            const messageRow = document.createElement('div');
+            messageRow.className = `message-row ${sender}`;
+
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            bubble.textContent = content;
+
+            messageRow.appendChild(bubble);
+            helperMessagesContainer.appendChild(messageRow);
+
+            // التمرير إلى الأسفل تلقائياً
+            helperMessagesContainer.scrollTop = helperMessagesContainer.scrollHeight;
+        }
+
+        async function sendPrompt() {
+            const prompt = promptInput.value.trim();
+            if (!prompt) return;
+
+            // 1. عرض رسالة المستخدم
+            displayMessage(prompt, 'user');
+            promptInput.value = '';
+            sendPromptBtn.disabled = true;
+
+            // 2. عرض مؤشر الكتابة من المساعد
+            displayMessage("...", 'ai');
+            const thinkingBubble = helperMessagesContainer.lastElementChild.querySelector('.message-bubble');
+            
+            // 3. (هنا يتم إرسال طلب API للذكاء الاصطناعي)
+            let aiResponse = "أعتذر، وظيفة المساعد الذكي API غير مفعلة حاليًا. يرجى إدخال مفتاح الذكاء الاصطناعي API الخاص بك هنا.";
+            
+            // ملاحظة هامة: يجب عليك دمج كود API الخاص بك هنا لاستدعاء نموذج الذكاء الاصطناعي.
+
+            // (لغرض العرض، سنقوم بمحاكاة تأخير بسيط)
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            // 4. استبدال مؤشر الكتابة بالرد
+            thinkingBubble.textContent = aiResponse;
+            sendPromptBtn.disabled = false;
+        }
+        
+        // رسالة ترحيب إضافية عند التحميل
+        setTimeout(() => {
+             displayMessage("يمكنك الآن البدء في طرح أسئلتك.", 'ai');
+        }, 500);
+
+    </script>
+</body>
+</html>
