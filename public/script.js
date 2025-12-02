@@ -1,25 +1,39 @@
-document.getElementById("send-btn").onclick = async () => {
-  const input = document.getElementById("user-input");
-  const message = input.value.trim();
-  if (!message) return;
+document.getElementById("send-btn").addEventListener("click", sendMessage);
 
-  const chatBox = document.getElementById("chat-box");
-  chatBox.innerHTML += `<div class="user">👤: ${message}</div>`;
+async function sendMessage() {
+    const input = document.getElementById("user-input");
+    const message = input.value.trim();
+    if (!message) return;
 
-  const res = await fetch("/api/index", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message })
-  });
+    addMessage("user", message);
+    input.value = "";
 
-  const data = await res.json();
+    try {
+        const res = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+        });
 
-  if (data?.choices) {
-    const reply = data.choices[0].message.content;
-    chatBox.innerHTML += `<div class="bot">🤖: ${reply}</div>`;
-  } else {
-    chatBox.innerHTML += `<div class="bot error">⚠️ خطأ أثناء الاتصال بالخادم!</div>`;
-  }
+        const data = await res.json();
 
-  input.value = "";
-};
+        if (data.error) {
+            addMessage("bot", "⚠️ خطأ في الاتصال بالخادم!");
+            return;
+        }
+
+        addMessage("bot", data.reply);
+
+    } catch (e) {
+        addMessage("bot", "⚠️ حدث خطأ أثناء الاتصال!");
+    }
+}
+
+function addMessage(sender, text) {
+    const box = document.getElementById("chat-box");
+    const div = document.createElement("div");
+    div.className = sender === "user" ? "user-message" : "bot-message";
+    div.innerText = text;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+}
