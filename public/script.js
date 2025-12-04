@@ -1,8 +1,7 @@
-// =======================================================
 // زر الإرسال
-// =======================================================
 document.getElementById("send-btn").addEventListener("click", sendMessage);
 
+// إرسال عند الضغط Enter
 document.getElementById("user-input").addEventListener("keydown", (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
@@ -10,9 +9,12 @@ document.getElementById("user-input").addEventListener("keydown", (e) => {
     }
 });
 
-// =======================================================
-// دالة إرسال الرسالة
-// =======================================================
+// مؤشر الكتابة
+function showTyping(state) {
+    document.getElementById("typing-indicator").classList.toggle("hidden", !state);
+}
+
+// إرسال الرسالة
 async function sendMessage() {
     const input = document.getElementById("user-input");
     const message = input.value.trim();
@@ -33,31 +35,21 @@ async function sendMessage() {
         const data = await res.json();
         showTyping(false);
 
-        if (data.error) {
-            addMessage("bot", "⚠️ خطأ في الاتصال بالخادم!");
-            return;
-        }
-
         const reply =
             data.choices?.[0]?.message?.content ||
-            "⚠️ لم يتمكن ThroneVoid AI من الرد!";
+            "⚠️ حدث خطأ أثناء معالجة الرد.";
 
         addMessage("bot", reply);
 
-        // تشغيل الرد صوتياً إذا كان الصوت مُفعّل
-        if (voiceEnabled) {
-            speak(reply);
-        }
+        speak(reply);
 
     } catch (e) {
         showTyping(false);
-        addMessage("bot", "⚠️ حدث خطأ أثناء الاتصال!");
+        addMessage("bot", "⚠️ خطأ في الاتصال بالخادم!");
     }
 }
 
-// =======================================================
-// عرض الرسائل
-// =======================================================
+// إضافة الرسائل للصفحة
 function addMessage(sender, text) {
     const box = document.getElementById("chat-box");
     const div = document.createElement("div");
@@ -67,38 +59,35 @@ function addMessage(sender, text) {
     box.scrollTop = box.scrollHeight;
 }
 
-// =======================================================
-// مؤشر "يكتب..."
-// =======================================================
-function showTyping(show) {
-    const indicator = document.getElementById("typing-indicator");
-    indicator.classList.toggle("hidden", !show);
-}
+// ========== الصوت ==========
+let micEnabled = false;
 
-// =======================================================
-// نظام الصوت (تشغيل / إيقاف)
-// =======================================================
-let voiceEnabled = false;
+// تشغيل/إيقاف المايك
+document.getElementById("mic-btn").addEventListener("click", () => {
+    micEnabled = !micEnabled;
+    document.getElementById("mic-btn").classList.toggle("active", micEnabled);
 
-const micBtn = document.getElementById("mic-btn");
-micBtn.addEventListener("click", () => {
-    voiceEnabled = !voiceEnabled;
-    micBtn.classList.toggle("active");
-
-    if (voiceEnabled) {
-        micBtn.innerText = "🔊";
-    } else {
-        micBtn.innerText = "🎙";
-    }
+    if (micEnabled) startListening();
 });
 
-// =======================================================
-// تحويل النص إلى كلام
-// =======================================================
+// تشغيل التحدث
 function speak(text) {
     const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = "ar";
-    utter.pitch = 1;
-    utter.rate = 1;
+    utter.lang = "ar-SA";
     speechSynthesis.speak(utter);
+}
+
+// الاستماع للمايك
+function startListening() {
+    const recognition = new webkitSpeechRecognition();
+    recognition.lang = "ar-SA";
+    recognition.continuous = false;
+
+    recognition.onresult = function (event) {
+        const text = event.results[0][0].transcript;
+        document.getElementById("user-input").value = text;
+        sendMessage();
+    };
+
+    recognition.start();
 }
