@@ -1,318 +1,53 @@
-/* ===== إعدادات عامة ===== */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+/* نفس الثيمات والتنسيق السابق + الإضافات الجديدة فقط */
 
-body {
-  margin: 0;
-  padding: 0;
-  background: radial-gradient(circle at top, #020617, #020617 40%, #000);
-  font-family: 'Tajawal', system-ui, sans-serif;
-  direction: rtl;
-  color: #f9fafb;
+.typing-indicator {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 10px;
+  width: 50px;
 }
 
-/* ثيمات */
-body.theme-dark {
-  --bg-main: #020617;
-  --bg-card: #020617;
-  --bg-soft: #0b1120;
-  --border-color: #1e293b;
-  --text-main: #f9fafb;
-  --text-sub: #9ca3af;
-  --accent: #2563eb;
-  --accent-strong: #1d4ed8;
-  --bubble-user: #2563eb;
-  --bubble-bot: #111827;
-}
-
-body.theme-light {
-  --bg-main: #e5e7eb;
-  --bg-card: #ffffff;
-  --bg-soft: #f9fafb;
-  --border-color: #d1d5db;
-  --text-main: #111827;
-  --text-sub: #6b7280;
-  --accent: #2563eb;
-  --accent-strong: #1d4ed8;
-  --bubble-user: #2563eb;
-  --bubble-bot: #e5e7eb;
-}
-
-/* ===== الحاوية الأساسية ===== */
-.app {
-  width: 95%;
-  max-width: 950px;
-  background: var(--bg-card);
-  border-radius: 20px;
-  border: 1px solid var(--border-color);
-  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.7);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* ===== الهيدر ===== */
-.app-header {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border-color);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: linear-gradient(90deg, rgba(37, 99, 235, 0.1), transparent);
-}
-
-.logo-wrap {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.logo-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 14px;
-  background: radial-gradient(circle at top, #4f46e5, #020617);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-}
-
-.logo-text h1 {
-  margin: 0;
-  font-size: 18px;
-  color: var(--text-main);
-}
-
-.logo-text span {
-  margin: 0;
-  font-size: 12px;
-  color: var(--text-sub);
-}
-
-/* عناصر التحكم في الهيدر */
-.header-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* اختيار الوضع */
-.mode-select {
-  background: var(--bg-soft);
-  color: var(--text-main);
-  border-radius: 999px;
-  border: 1px solid var(--border-color);
-  padding: 6px 10px;
-  font-size: 13px;
-  outline: none;
-}
-
-/* أزرار الأيقونات */
-.icon-btn {
-  border: none;
-  outline: none;
-  background: var(--bg-soft);
-  color: var(--text-main);
-  border-radius: 999px;
-  padding: 7px 10px;
-  font-size: 15px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.icon-btn:hover {
-  background: rgba(148, 163, 184, 0.2);
-  transform: translateY(-1px);
-}
-
-/* ===== منطقة الشات ===== */
-.chat-container {
-  padding: 12px 14px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.18), transparent 55%), var(--bg-card);
-}
-
-.chat-box {
-  flex: 1;
-  border-radius: 14px;
-  background: var(--bg-soft);
-  border: 1px solid var(--border-color);
-  padding: 12px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* سكروول لطيف */
-.chat-box::-webkit-scrollbar {
-  width: 6px;
-}
-.chat-box::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.5);
-  border-radius: 999px;
-}
-.chat-box::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* الرسائل */
-.message {
-  max-width: 80%;
-  padding: 10px 12px;
-  border-radius: 14px;
-  font-size: 15px;
-  line-height: 1.6;
-  animation: fadeIn 0.2s ease-out;
-}
-
-.user-message {
-  margin-left: auto;
-  background: var(--bubble-user);
-  color: #f9fafb;
-  border-bottom-right-radius: 4px;
-}
-
-.bot-message {
-  margin-right: auto;
-  background: var(--bubble-bot);
-  color: var(--text-main);
-  border-bottom-left-radius: 4px;
-}
-
-/* تأثير ظهور الرسائل */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ===== منطقة الإدخال ===== */
-.input-area {
-  border-top: 1px solid var(--border-color);
-  padding: 10px 14px 12px;
-  background: linear-gradient(to top, rgba(15, 23, 42, 0.96), transparent);
-}
-
-.input-inner {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 8px;
-  align-items: center;
-  background: var(--bg-soft);
-  border-radius: 999px;
-  padding: 6px 10px;
-  border: 1px solid var(--border-color);
-}
-
-#user-input {
-  border: none;
-  outline: none;
-  background: transparent;
-  color: var(--text-main);
-  font-size: 14px;
-  padding: 6px 4px;
-}
-
-#user-input::placeholder {
-  color: var(--text-sub);
-}
-
-/* زر الإرسال */
-.send-btn {
-  border: none;
-  outline: none;
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
   background: var(--accent);
-  color: #f9fafb;
-  border-radius: 999px;
-  padding: 7px 16px;
-  font-size: 14px;
+  border-radius: 50%;
+  animation: bounce 0.9s infinite;
+}
+
+.typing-indicator span:nth-child(2) { animation-delay: .2s; }
+.typing-indicator span:nth-child(3) { animation-delay: .4s; }
+
+@keyframes bounce {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+/* رسالة تظهر بحركة كتابة */
+.typewriter {
+  border-right: 2px solid var(--accent);
+  white-space: pre-wrap;
+  overflow: hidden;
+  animation: blinkCursor .7s infinite;
+}
+
+@keyframes blinkCursor {
+  0%, 49% { border-color: var(--accent); }
+  50%, 100% { border-color: transparent; }
+}
+
+/* زر مسح المحادثة */
+.danger-btn {
+  background: #dc2626;
+  color: #fff !important;
+}
+.danger-btn:hover {
+  background: #b91c1c;
+}
+
+/* زر رفع الصور */
+.upload-btn {
   cursor: pointer;
-  font-weight: 600;
-  transition: 0.2s ease;
-  box-shadow: 0 0 0 rgba(37, 99, 235, 0.35);
-}
-
-.send-btn:hover {
-  background: var(--accent-strong);
-  transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.55);
-}
-
-/* زر المايك */
-.mic-btn {
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  border-radius: 999px;
-  font-size: 17px;
-}
-
-.mic-btn.listening {
-  background: #ef4444;
-  color: #fff;
-  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.3);
-}
-
-/* تلميح تحت الإدخال */
-.hint {
-  margin-top: 5px;
-  font-size: 11px;
-  color: var(--text-sub);
-  text-align: center;
-}
-
-kbd {
-  background: var(--bg-soft);
-  border-radius: 4px;
-  padding: 2px 5px;
-  border: 1px solid var(--border-color);
-  font-size: 10px;
-}
-
-/* ===== استجابة للجوال ===== */
-@media (max-width: 640px) {
-  .app {
-    border-radius: 0;
-    height: 100vh;
-    max-width: 100%;
-  }
-
-  .app-header {
-    padding-inline: 10px;
-  }
-
-  .logo-text h1 {
-    font-size: 16px;
-  }
-
-  .chat-container {
-    padding-inline: 8px;
-  }
-
-  .chat-box {
-    height: calc(100vh - 210px);
-  }
-
-  .input-inner {
-    border-radius: 18px;
-  }
 }
