@@ -1,70 +1,87 @@
 body {
-  margin: 0;
-  padding: 0;
-  font-family: "Tajawal", sans-serif;
-  background: #0a0f24;
-  color: white;
+    background: #07101C;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    direction: rtl;
+    text-align: right;
 }
 
-.app {
-  max-width: 700px;
-  margin: auto;
-  padding: 20px;
+.container {
+    width: 60%;
+    margin: 50px auto;
+    background: #0B1623;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 0 20px #0005;
 }
 
-.app-header {
-  text-align: center;
-  margin-bottom: 20px;
+h1 {
+    text-align: center;
+    color: #4ea3ff;
 }
 
-.chat-container {
-  background: #0d132b;
-  border-radius: 10px;
-  padding: 15px;
-  height: 65vh;
-  overflow-y: auto;
+.subtitle {
+    text-align: center;
+    margin-top: -10px;
+    margin-bottom: 20px;
+    color: #bbb;
+}
+
+.chat-box {
+    height: 450px;
+    overflow-y: auto;
+    background: #0F1C2B;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
 }
 
 .message {
-  margin-bottom: 12px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  width: fit-content;
-  max-width: 85%;
-  line-height: 1.6;
+    padding: 10px 15px;
+    border-radius: 10px;
+    margin: 8px 0;
+    max-width: 80%;
+    line-height: 1.6;
 }
 
 .user-message {
-  background: #3c4b72;
-  margin-left: auto;
+    background: #1966FF;
+    color: white;
+    margin-left: auto;
 }
 
 .bot-message {
-  background: #1f273f;
-  margin-right: auto;
+    background: #16222f;
+    border: 1px solid #1f2d3a;
+    color: #e1e1e1;
+    margin-right: auto;
 }
 
 .input-area {
-  display: flex;
-  padding: 10px;
-  gap: 10px;
+    display: flex;
+    gap: 10px;
 }
 
-.input-area input {
-  flex: 1;
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
-  font-size: 16px;
-  outline: none;
+#user-input {
+    flex: 1;
+    height: 50px;
+    resize: none;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
 }
 
-.input-area button {
-  padding: 12px 20px;
-  border: none;
-  border-radius: 8px;
-  background: #3a7eff;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
+#send-btn {
+    background: #1966FF;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    width: 90px;
+}
+
+#send-btn:hover {
+    background: #0b57e3;
 }
