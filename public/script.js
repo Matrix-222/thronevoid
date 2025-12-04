@@ -1,7 +1,5 @@
-// زر الإرسال
+// ========== زر الإرسال ==========
 document.getElementById("send-btn").addEventListener("click", sendMessage);
-
-// إرسال عند الضغط Enter
 document.getElementById("user-input").addEventListener("keydown", (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
@@ -9,12 +7,7 @@ document.getElementById("user-input").addEventListener("keydown", (e) => {
     }
 });
 
-// مؤشر الكتابة
-function showTyping(state) {
-    document.getElementById("typing-indicator").classList.toggle("hidden", !state);
-}
-
-// إرسال الرسالة
+// ========== دالة إرسال الرسالة ==========
 async function sendMessage() {
     const input = document.getElementById("user-input");
     const message = input.value.trim();
@@ -35,21 +28,24 @@ async function sendMessage() {
         const data = await res.json();
         showTyping(false);
 
+        if (data.error) {
+            addMessage("bot", "⚠️ خطأ في الاتصال بالخادم!");
+            return;
+        }
+
         const reply =
             data.choices?.[0]?.message?.content ||
-            "⚠️ حدث خطأ أثناء معالجة الرد.";
+            "⚠️ لم يتمكن ThroneVoid AI من معرفة الرد.";
 
         addMessage("bot", reply);
 
-        speak(reply);
-
     } catch (e) {
         showTyping(false);
-        addMessage("bot", "⚠️ خطأ في الاتصال بالخادم!");
+        addMessage("bot", "⚠️ حدث خطأ أثناء الاتصال بالخادم!");
     }
 }
 
-// إضافة الرسائل للصفحة
+// ========== دالة إضافة الرسالة للصندوق ==========
 function addMessage(sender, text) {
     const box = document.getElementById("chat-box");
     const div = document.createElement("div");
@@ -59,35 +55,8 @@ function addMessage(sender, text) {
     box.scrollTop = box.scrollHeight;
 }
 
-// ========== الصوت ==========
-let micEnabled = false;
-
-// تشغيل/إيقاف المايك
-document.getElementById("mic-btn").addEventListener("click", () => {
-    micEnabled = !micEnabled;
-    document.getElementById("mic-btn").classList.toggle("active", micEnabled);
-
-    if (micEnabled) startListening();
-});
-
-// تشغيل التحدث
-function speak(text) {
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = "ar-SA";
-    speechSynthesis.speak(utter);
-}
-
-// الاستماع للمايك
-function startListening() {
-    const recognition = new webkitSpeechRecognition();
-    recognition.lang = "ar-SA";
-    recognition.continuous = false;
-
-    recognition.onresult = function (event) {
-        const text = event.results[0][0].transcript;
-        document.getElementById("user-input").value = text;
-        sendMessage();
-    };
-
-    recognition.start();
+// ========== مؤشر الكتابة ==========
+function showTyping(state) {
+    const indicator = document.getElementById("typing-indicator");
+    indicator.classList[state ? "remove" : "add"]("hidden");
 }
