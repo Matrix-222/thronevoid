@@ -28,16 +28,13 @@ async function sendMessage() {
 
     const data = await response.json();
 
-    console.log("Worker Response:", data);
-
-    // الرد الصحيح من OpenAI
-    const reply = data?.choices?.[0]?.message?.content ||
+    const reply =
+      data?.choices?.[0]?.message?.content ||
       "⚠️ لم يتمكن ThroneVoid AI من الرد الآن.";
 
     addMessage("bot", reply);
 
   } catch (e) {
-    console.error("Error:", e);
     addMessage("bot", "⚠️ خطأ في الاتصال بالخادم.");
   }
 }
