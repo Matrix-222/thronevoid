@@ -1,31 +1,79 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ThroneVoid AI</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ThroneVoid AI</title>
 
-    <link rel="stylesheet" href="style.css?v=1">
+  <link rel="stylesheet" href="style.css?v=300001" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body class="theme-dark">
 
-    <div class="chat-container">
-        <h2>ThroneVoid AI 🤖</h2>
+  <div class="app">
 
-        <div id="chat-box"></div>
-
-        <div class="input-area">
-            <button id="mic-btn">🎙</button>
-
-            <input type="text" id="user-input" 
-                   placeholder="اكتب رسالتك هنا..." autocomplete="off"/>
-
-            <button id="send-btn">إرسال</button>
+    <header class="app-header">
+      <div class="logo-wrap">
+        <div class="logo-icon">🤖</div>
+        <div class="logo-text">
+          <h1>ThroneVoid AI</h1>
+          <span>مساعدك الذكي الشخصي</span>
         </div>
+      </div>
 
-    </div>
+      <div class="header-controls">
+        <!-- اختيار وضع الذكاء الاصطناعي -->
+        <select id="mode-select" class="mode-select">
+          <option value="default">وضع عادي</option>
+          <option value="science">خبير علمي 🔬</option>
+          <option value="dev">مبرمج 👨‍💻</option>
+          <option value="doctor">طبيب 👨‍⚕️</option>
+          <option value="throne">ThroneVoid Mode ⚡</option>
+        </select>
 
-    <script src="script.js?v=1"></script>
+        <!-- تفعيل/إلغاء النطق الصوتي -->
+        <button id="tts-toggle" class="icon-btn" title="تشغيل / إيقاف النطق">
+          🔈 الصوت: متوقف
+        </button>
+
+        <!-- تبديل الثيم -->
+        <button id="theme-toggle" class="icon-btn" title="وضع ليلي / نهاري">
+          🌙
+        </button>
+      </div>
+    </header>
+
+    <main class="chat-container">
+      <div id="chat-box" class="chat-box"></div>
+    </main>
+
+    <footer class="input-area">
+      <div class="input-inner">
+        <!-- زر المايك -->
+        <button id="mic-btn" class="icon-btn mic-btn" title="إملاء صوتي">
+          🎙
+        </button>
+
+        <!-- مربع الكتابة -->
+        <input
+          type="text"
+          id="user-input"
+          placeholder="اكتب رسالتك هنا..."
+          autocomplete="off"
+        />
+
+        <!-- زر الإرسال -->
+        <button id="send-btn" class="send-btn">إرسال</button>
+      </div>
+
+      <small class="hint">
+        اضغط <kbd>Enter</kbd> للإرسال – <kbd>Shift + Enter</kbd> لسطر جديد
+      </small>
+    </footer>
+
+  </div>
+
+  <script src="script.js?v=300001"></script>
 </body>
 </html>
