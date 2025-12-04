@@ -2,7 +2,7 @@ const chatBox = document.getElementById("chat-box");
 const userInput = document.getElementById("user-input");
 const sendBtn = document.getElementById("send-btn");
 
-// إضافة رسالة داخل الشات
+// إضافة رسالة للدردشة
 function addMessage(sender, text) {
   const div = document.createElement("div");
   div.className = sender === "user" ? "message user-message" : "message bot-message";
@@ -11,7 +11,7 @@ function addMessage(sender, text) {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// إرسال الرسالة إلى Worker
+// إرسال للـ Worker
 async function sendMessage() {
   const message = userInput.value.trim();
   if (!message) return;
@@ -26,7 +26,10 @@ async function sendMessage() {
       body: JSON.stringify({ userMessage: message })
     });
 
+    console.log("Worker Response:", response);
+
     const data = await response.json();
+    console.log("Worker JSON:", data);
 
     const reply =
       data?.choices?.[0]?.message?.content ||
@@ -34,7 +37,8 @@ async function sendMessage() {
 
     addMessage("bot", reply);
 
-  } catch (e) {
+  } catch (error) {
+    console.error("Error:", error);
     addMessage("bot", "⚠️ خطأ في الاتصال بالخادم.");
   }
 }
