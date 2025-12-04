@@ -9,31 +9,7 @@ async function sendMessage() {
     input.value = "";
 
     try {
-        const res = await fetch("/api/chat", {
+        const res = await fetch("https://floral-moon-7d08.i3lawi01.workers.dev/", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message })
-        });
-
-        const data = await res.json();
-
-        if (data.error) {
-            addMessage("bot", "⚠️ خطأ في الاتصال بالخادم!");
-            return;
-        }
-
-        addMessage("bot", data.reply);
-
-    } catch (e) {
-        addMessage("bot", "⚠️ حدث خطأ أثناء الاتصال!");
-    }
-}
-
-function addMessage(sender, text) {
-    const box = document.getElementById("chat-box");
-    const div = document.createElement("div");
-    div.className = sender === "user" ? "user-message" : "bot-message";
-    div.innerText = text;
-    box.appendChild(div);
-    box.scrollTop = box.scrollHeight;
-}
+            body: JSON.st
