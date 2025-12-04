@@ -1,57 +1,44 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ThroneVoid AI</title>
-  <link rel="stylesheet" href="style.css?v=100001">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ThroneVoid AI</title>
+
+    <!-- ملف التنسيق -->
+    <link rel="stylesheet" href="style.css?v=100002" />
 </head>
-<body class="theme-dark">
 
-  <div class="app">
+<body>
 
-    <header class="app-header">
-      <div class="logo-wrap">
-        <div class="logo-icon">🤖</div>
-        <div class="logo-text">
-          <h1>ThroneVoid AI</h1>
-          <span>مساعدك الذكي للإجابة على أسئلتك</span>
+    <div class="chat-container">
+        <h2>ThroneVoid AI 🤖</h2>
+
+        <!-- صندوق المحادثة -->
+        <div id="chat-box"></div>
+
+        <!-- مؤشر الكتابة -->
+        <div id="typing-indicator" class="hidden">
+            ThroneVoid AI يكتب...
         </div>
-      </div>
 
-      <div class="header-actions">
-        <button id="theme-toggle" class="icon-btn">🌙</button>
-      </div>
-    </header>
+        <!-- منطقة الإدخال -->
+        <div class="input-area">
 
-    <main class="chat-container">
-      <div id="chat-box" class="chat-box"></div>
+            <!-- زر المايك 🎙 -->
+            <button id="mic-btn">🎙</button>
 
-      <div id="typing-indicator" class="typing-indicator hidden">
-        <span class="avatar bot-avatar">🤖</span>
-        <span class="dots">
-          ThroneVoid AI يكتب
-          <span class="dot"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
-        </span>
-      </div>
-    </main>
+            <!-- مربع كتابة الرسالة -->
+            <input type="text" id="user-input" placeholder="اكتب رسالتك هنا..." autocomplete="off" />
 
-    <footer class="input-area">
-      <div class="input-inner">
-        <button id="mic-btn" class="icon-btn">🎙</button>
-        <input type="text" id="user-input" placeholder="اكتب رسالتك هنا..." autocomplete="off">
-        <button id="send-btn" class="send-btn">إرسال</button>
-      </div>
+            <!-- زر الإرسال -->
+            <button id="send-btn">إرسال</button>
+        </div>
 
-      <small class="hint">
-        اضغط Enter للإرسال – Shift + Enter لسطر جديد
-      </small>
-    </footer>
+    </div>
 
-  </div>
+    <!-- ملف السكربت -->
+    <script src="script.js?v=100002"></script>
 
-  <script src="script.js?v=100001"></script>
 </body>
 </html>
