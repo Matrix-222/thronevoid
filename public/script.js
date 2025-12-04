@@ -28,12 +28,21 @@ async function sendMessage() {
 
     const data = await response.json();
 
-    const reply = data?.choices?.[0]?.message?.content ||
-      "⚠️ لم يتمكن ThroneVoid AI من الرد الآن.";
+    console.log("Worker Response:", data);
+
+    let reply = "⚠️ لم يتمكن ThroneVoid AI من الرد الآن.";
+
+    if (data?.choices && data.choices.length > 0) {
+      reply = data.choices[0].message.content;
+    } 
+    else if (data?.error) {
+      reply = "⚠️ خطأ: " + data.error;
+    }
 
     addMessage("bot", reply);
 
   } catch (e) {
+    console.error("Error:", e);
     addMessage("bot", "⚠️ خطأ في الاتصال بالخادم.");
   }
 }
