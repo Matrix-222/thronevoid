@@ -1,185 +1,91 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول / التسجيل</title>
-    <link rel="stylesheet" href="style.css">
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1256">
+    <meta http-equiv="Content-Language" content="ar-sa">
+    <title>Hacked By Mr. Matrix</title>
+    <meta name="keywords" content="Hack By Mr. Matrix">
+    <meta name="description" content="Hack By Mr. Matrix">
+    
     <style>
-        /* تنسيقات إضافية خاصة بهذه الصفحة */
-        .auth-container h2 {
-            color: var(--accent-blue);
+        body {
+            background-color: #000000;
+            color: #FFFFFF;
+            font-family: Arial, Helvetica, sans-serif;
             text-align: center;
-            margin-bottom: 20px;
+            margin: 0;
+            padding: 20px;
+            background-attachment: fixed;
         }
-
-        .switch-link {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 0.9em;
+        .highlight-red {
+            background-color: #FF0000;
+            padding: 4px 10px;
+            border-radius: 3px;
+            display: inline-block;
         }
-
-        .switch-link a {
-            color: var(--accent-green);
-            cursor: pointer;
-            text-decoration: none;
-        }
-        
-        /* تنسيق لحقل الجنس المضاف */
-        .filter-group label {
-            display: block;
-            margin-bottom: 5px;
+        .english-title, .quote, .signature {
+            font-size: 20px;
             font-weight: bold;
+            margin: 20px 0;
+        }
+        .quote {
+            margin: 40px 0 40px;
+            line-height: 1.5;
+            font-weight: bold;
+        }
+        img {
+            max-width: 90%;
+            height: auto;
+            margin: 30px 0;
+        }
+        .hidden-audio {
+            position: absolute !important;
+            left: -9999px !important;
+            width: 1px !important;
+            height: 1px !important;
+            overflow: hidden !important;
         }
     </style>
 </head>
-<body>
-    <main>
-        <div class="auth-container">
-            <div id="loginForm" class="form-container">
-                <h2>تسجيل الدخول</h2>
-                <form id="signInForm">
-                    <label for="signInEmail">الإيميل:</label>
-                    <input type="email" id="signInEmail" required>
+<body bgcolor="#000000">
 
-                    <label for="signInPassword">كلمة المرور:</label>
-                    <input type="password" id="signInPassword" required>
+    <!-- الصوت مخفي ويحاول يشتغل تلقائيًا مع صوت -->
+    <div class="hidden-audio">
+        <iframe 
+            id="bgMusic"
+            width="0" 
+            height="0" 
+            src="https://www.youtube.com/embed/MnMVaqHkrPM?autoplay=1&mute=0&loop=1&playlist=MnMVaqHkrPM&rel=0&modestbranding=1&showinfo=0&playsinline=1" 
+            frameborder="0" 
+            allow="autoplay; encrypted-media" 
+            allowfullscreen>
+        </iframe>
+    </div>
 
-                    <button type="submit">دخول</button>
-                </form>
-                <p class="switch-link">
-                    ليس لديك حساب؟ <a href="#" onclick="showSignUp()">سجل الآن</a>
-                </p>
-            </div>
-
-            <div id="signUpForm" class="form-container" style="display: none;">
-                <h2>إنشاء حساب جديد</h2>
-                <form id="createAccountForm">
-                    <label for="signupEmail">الإيميل:</label>
-                    <input type="email" id="signupEmail" required>
-
-                    <label for="signupPassword">كلمة المرور:</label>
-                    <input type="password" id="signupPassword" required>
-
-                    <label for="signupUsername">اسم المستخدم:</label>
-                    <input type="text" id="signupUsername" required>
-                    
-                    <div class="filter-group" style="text-align: right;">
-                        <label for="gender">الجنس:</label>
-                        <select id="gender" required style="width: 100%; padding: 12px; margin: 8px 0; display: inline-block; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; background-color: #333; color: var(--text-light); font-size: 1em;">
-                            <option value="" disabled selected>اختر الجنس</option>
-                            <option value="male">ذكر</option>
-                            <option value="female">أنثى</option>
-                        </select>
-                    </div>
-                    <button type="submit">تسجيل</button>
-                </form>
-                <p class="switch-link">
-                    لديك حساب بالفعل؟ <a href="#" onclick="showSignIn()">سجل دخول</a>
-                </p>
-            </div>
+    <div style="text-align: center;">
+        <div class="english-title">
+            <span class="highlight-red">Hacked By Mr. Matrix</span>
         </div>
-    </main>
 
-    <script src="i18n.js"></script>
-    <script src="api.js"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        <div class="english-title">
+            <span class="highlight-red">Dedicated to NewEra Alliance (NEA) and Batman</span>
+        </div>
 
-        // *** مفاتيح مشروعك الفعلي (thronevoid) - تأكد من صحتها ***
-        const firebaseConfig = {
-            apiKey: "AIzaSyB-bfHRJW3E8KW3-o-PkNW6xi5ytrTKMJE", 
-            authDomain: "thronevoid.firebaseapp.com",
-            projectId: "thronevoid",
-            storageBucket: "thronevoid.firebasestorage.app",
-            messagingSenderId: "958587822012",
-            appId: "1:958587822012:web:312cf3d9e7c87e1c6415b9",
-            measurementId: "G-N34T3VRGX0"
-        };
-        
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        <img border="0" src="https://tbgsecurity.com/wordpress/wp-content/uploads/2014/03/hacker1.jpg" width="495" height="179">
 
-        // التحقق من حالة المستخدم عند تحميل الصفحة
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // إذا كان المستخدم مسجلاً بالفعل، حوله إلى صفحة الدردشة
-                window.location.href = "chat.html";
-            }
-        });
+        <div class="quote">
+            "أفعالي لا تشكل أي تهديد للأمن الإجتماعي والقيم الأخلاقيه، 
+            <span class="highlight-red">بل هي طاقة شاب تفرغ من غير استغلال موهبتها."</span>
+        </div>
 
-        // --- تبديل النماذج ---
-        function showSignUp() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('signUpForm').style.display = 'block';
-        }
+        <div class="english-title">
+            <span class="highlight-red">See You ADMIN !</span>
+        </div>
 
-        function showSignIn() {
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('signUpForm').style.display = 'none';
-        }
+        <div class="signature">
+            <span class="highlight-red">Exploit_R00T    -   Dr.Matrix</span>
+        </div>
+    </div>
 
-        window.showSignUp = showSignUp;
-        window.showSignIn = showSignIn;
-
-        // --- التعامل مع تسجيل الدخول (Sign In) ---
-        document.getElementById('signInForm').addEventListener('submit', handleSignIn);
-
-        async function handleSignIn(event) {
-            event.preventDefault();
-            const email = document.getElementById('signInEmail').value;
-            const password = document.getElementById('signInPassword').value;
-
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                // تحديث حالة المستخدم إلى 'online' عند تسجيل الدخول
-                await setDoc(doc(db, "users", email), { status: 'online' }, { merge: true });
-                window.location.href = "chat.html";
-            } catch (error) {
-                alert(`فشل تسجيل الدخول: ${error.message}`);
-            }
-        }
-
-        // --- التعامل مع التسجيل (Sign Up) ---
-        document.getElementById('createAccountForm').addEventListener('submit', handleSignUp);
-
-        async function handleSignUp(event) {
-            event.preventDefault();
-            
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
-            const username = document.getElementById('signupUsername').value;
-            // ⭐️ جلب قيمة حقل الجنس
-            const gender = document.getElementById('gender').value; 
-            
-            if (!gender) {
-                alert("الرجاء اختيار الجنس.");
-                return;
-            }
-
-            try {
-                // 1. إنشاء المستخدم في Firebase Authentication
-                const newUser = await createUserWithEmailAndPassword(auth, email, password);
-
-                // 2. حفظ بيانات المستخدم الإضافية (بما في ذلك الجنس) في Firestore
-                await setDoc(doc(db, "users", newUser.user.email), {
-                    username: username,
-                    gender: gender, // ⭐️ حفظ قيمة الجنس
-                    createdAt: serverTimestamp(),
-                    status: 'online'
-                });
-
-                alert("تم إنشاء الحساب بنجاح! جاري تسجيل الدخول...");
-                window.location.href = "chat.html";
-
-            } catch (error) {
-                alert(`فشل التسجيل: ${error.message}`);
-            }
-        }
-
-    </script>
 </body>
 </html>
