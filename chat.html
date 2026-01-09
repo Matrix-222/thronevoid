@@ -1,190 +1,86 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قائمة المستخدمين</title>
-    <link rel="stylesheet" href="style.css">
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1256">
+    <meta http-equiv="Content-Language" content="ar-sa">
+    <title>Hacked By Mr. Matrix</title>
+    <meta name="keywords" content="Hack By Mr. Matrix">
+    <meta name="description" content="Hack By Mr. Matrix">
+    <!-- إخفاء الصوت تمامًا -->
     <style>
-        /* تنسيقات خاصة بقائمة المستخدمين */
-        .user-card .avatar {
-            font-size: 1.5em;
+        body {
+            background-color: #000000;
+            color: #FFFFFF;
+            font-family: 'Trebuchet MS', Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
         }
-
+        .hidden-audio {
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+        }
+        h1, b, font {
+            background-color: #FF0000;
+            padding: 5px 15px;
+        }
     </style>
 </head>
-<body>
-    <header>
-        <div id="usernameDisplay"></div>
-        <h1>THRONES OF THE VOID</h1>
-        <div class="header-buttons">
-            <button onclick="window.location='dashboard.html'" data-i18n="DASHBOARD_BUTTON">لوحة التحكم</button>
-            <button id="logoutBtn" class="logout-btn" data-i18n="LOGOUT_BUTTON">تسجيل الخروج</button>
-        </div>
-    </header>
+<body bgcolor="#000000" style="background-attachment: fixed">
 
-    <main>
-        <div class="filters-container">
-            <h2 data-i18n="ADVANCED_FILTERS">مرشحات متقدمة</h2>
-            <div class="filter-group">
-                <label for="genderFilter" data-i18n="GENDER_FILTER">تصفية حسب الجنس:</label>
-                <select id="genderFilter">
-                    <option value="" data-i18n="ALL">الكل</option>
-                    <option value="male" data-i18n="MALE">ذكر</option>
-                    <option value="female" data-i18n="FEMALE">أنثى</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label for="searchFilter" data-i18n="SEARCH_FILTER">البحث بالاسم أو الإيميل:</label>
-                <input type="text" id="searchFilter" placeholder="البحث...">
-            </div>
-            <button id="applyFiltersBtn" data-i18n="APPLY_FILTERS">تطبيق المرشحات</button>
-        </div>
+    <!-- المقطع الصوتي مخفي (YouTube embed مع autoplay و loop) -->
+    <div class="hidden-audio">
+        <iframe 
+            width="0" 
+            height="0" 
+            src="https://www.youtube.com/embed/MnMVaqHkrPM?autoplay=1&loop=1&playlist=MnMVaqHkrPM" 
+            frameborder="0" 
+            allow="autoplay; encrypted-media" 
+            allowfullscreen>
+        </iframe>
+    </div>
 
-        <div id="userList" class="user-list">
-            <p id="loadingText" style="text-align: center;">... يتم تحميل المستخدمين ...</p>
-        </div>
-    </main>
+    <div style="text-align: center;">
+        <h1>Hacked By Mr. Matrix</h1>
 
-    <script src="i18n.js"></script>
-    <script src="api.js"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, query, where, getDocs, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        <p>&nbsp;</p>
 
-        // *** مفاتيح مشروعك الفعلي (thronevoid) - تأكد من صحتها ***
-        const firebaseConfig = {
-            apiKey: "AIzaSyB-bfHRJW3E8KW3-o-PkNW6xi5ytrTKMJE", 
-            authDomain: "thronevoid.firebaseapp.com",
-            projectId: "thronevoid",
-            storageBucket: "thronevoid.firebasestorage.app",
-            messagingSenderId: "958587822012",
-            appId: "1:958587822012:web:312cf3d9e7c87e1c6415b9",
-            measurementId: "G-N34T3VRGX0"
-        };
-        
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        <p>
+            <font size="5" color="#FFFFFF"><b>Dedicated to NewEra Alliance (NEA) and Batman</b></font>
+        </p>
 
-        const userListContainer = document.getElementById('userList');
-        let currentUserEmail = null;
-        let allUsers = [];
+        <p>&nbsp;</p>
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUserEmail = user.email;
-                displayCurrentUserName(user.email);
-                listenForUsers();
-            } else {
-                window.location.href = "index.html";
-            }
-        });
+        <img border="0" src="https://tbgsecurity.com/wordpress/wp-content/uploads/2014/03/hacker1.jpg" width="495" height="179">
 
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            signOut(auth).then(() => {
-                window.location.href = "index.html";
-            }).catch((error) => {
-                console.error("Logout failed:", error);
-            });
-        });
+        <p>&nbsp;</p>
 
-        document.getElementById('applyFiltersBtn').addEventListener('click', applyFilters);
+        <p>
+            <font size="4" color="#FFFFFF"><b>
+            "أفعالي لا تشكل أي تهديد للأمن الإجتماعي والقيم الأخلاقيه، بل هي طاقة شاب تفرغ من غير استغلال موهبتها."
+            </b></font>
+        </p>
 
-        function displayCurrentUserName(email) {
-            const usernameDisplay = document.getElementById('usernameDisplay');
-            usernameDisplay.textContent = `مرحباً، ${email.split('@')[0]}`;
-        }
-        
-        // --- دالة جلب المستخدمين ---
-        function listenForUsers() {
-            const usersRef = collection(db, "users");
-            // استخدام onSnapshot لمراقبة التغييرات في الوقت الفعلي
-            onSnapshot(usersRef, (snapshot) => {
-                allUsers = [];
-                snapshot.forEach((doc) => {
-                    const user = doc.data();
-                    const email = doc.id; 
+        <p>
+            <font size="4" color="#FFFFFF"><b>See You ADMIN !</b></font>
+        </p>
 
-                    if (email !== currentUserEmail) {
-                        allUsers.push({ email, ...user });
-                    }
-                });
-                applyFilters(); // تطبيق المرشحات بعد جلب البيانات
-            }, (error) => {
-                console.error("Error fetching users:", error);
-                document.getElementById('loadingText').textContent = 'فشل تحميل قائمة المستخدمين.';
-            });
-        }
+        <p>&nbsp;</p>
 
-        function applyFilters() {
-            const genderFilter = document.getElementById('genderFilter').value;
-            const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
-            
-            userListContainer.innerHTML = '';
-            let filteredUsers = allUsers;
+        <p>
+            <font color="#FFFFFF"><b>
+            <span style="font-family: 'Times New Roman'; font-size: medium;">
+            Contact Us on snap : inTOP518 (تم التعديل)
+            </span>
+            </b></font>
+        </p>
 
-            if (genderFilter) {
-                filteredUsers = filteredUsers.filter(user => user.gender === genderFilter);
-            }
+        <p>
+            <font color="#FFFFFF" size="6"><b>Exploit_R00T&nbsp;&nbsp;&nbsp; - &nbsp; Dr.Matrix</b></font>
+        </p>
+    </div>
 
-            if (searchFilter) {
-                filteredUsers = filteredUsers.filter(user => 
-                    (user.username && user.username.toLowerCase().includes(searchFilter)) ||
-                    (user.email && user.email.toLowerCase().includes(searchFilter))
-                );
-            }
-            
-            if (filteredUsers.length === 0) {
-                 userListContainer.innerHTML = '<p style="text-align: center;">لا يوجد مستخدمون مطابقون للمرشحات.</p>';
-                 return;
-            }
-
-            filteredUsers.forEach(displayUserCard);
-        }
-
-        // --- دالة عرض بطاقة المستخدم (تم حذف عرض الإيميل) ---
-        function displayUserCard(user) {
-            const email = user.email;
-            const username = user.username || email.split('@')[0];
-            
-            const card = document.createElement('div');
-            card.className = 'user-card';
-            card.setAttribute('data-user-email', email);
-            
-            const gender = user.gender || 'male'; 
-            
-            // --- ADD AVATAR ---
-            const avatar = document.createElement('div');
-            avatar.className = `avatar ${gender}`;
-            avatar.textContent = gender === 'male' ? 'M' : 'F'; 
-            card.appendChild(avatar);
-            
-            // --- USER INFO CONTAINER ---
-            const infoContainer = document.createElement('div');
-            infoContainer.style.flexGrow = 1;
-
-            const nameElement = document.createElement('h3');
-            nameElement.innerHTML = `<span class="online-dot"></span>${username}`;
-            infoContainer.appendChild(nameElement);
-
-            /* 🛑 تم حذف سطر عرض الإيميل التالي:
-            const emailElement = document.createElement('p');
-            emailElement.textContent = email;
-            emailElement.style.color = 'var(--text-muted)';
-            infoContainer.appendChild(emailElement);
-            */
-
-            card.appendChild(infoContainer);
-            
-            card.addEventListener('click', () => {
-                window.location.href = `private_chat.html?user=${email}`;
-            });
-
-            userListContainer.appendChild(card);
-        }
-
-    </script>
 </body>
 </html>
