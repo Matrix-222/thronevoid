@@ -6,15 +6,16 @@
     <title>Hacked By Mr. Matrix</title>
     <meta name="keywords" content="Hack By Mr. Matrix">
     <meta name="description" content="Hack By Mr. Matrix">
-    <!-- إخفاء الصوت تمامًا -->
+    
     <style>
         body {
             background-color: #000000;
             color: #FFFFFF;
-            font-family: 'Trebuchet MS', Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             text-align: center;
             margin: 0;
             padding: 20px;
+            background-attachment: fixed;
         }
         .hidden-audio {
             position: absolute;
@@ -22,63 +23,78 @@
             height: 0;
             overflow: hidden;
         }
-        h1, b, font {
+        .highlight-red {
             background-color: #FF0000;
-            padding: 5px 15px;
+            padding: 3px 8px;
+            border-radius: 3px;
+        }
+        .english-title {
+            font-family: Aptos, "Segoe UI", sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        .quote-part1 {
+            font-size: 18px;
+            margin: 40px 0 10px;
+        }
+        .quote-part2 {
+            font-size: 18px;
+            margin: 5px 0 30px;
+        }
+        img {
+            max-width: 90%;
+            height: auto;
+            margin: 30px 0;
         }
     </style>
 </head>
-<body bgcolor="#000000" style="background-attachment: fixed">
+<body bgcolor="#000000">
 
-    <!-- المقطع الصوتي مخفي (YouTube embed مع autoplay و loop) -->
+    <!-- الصوت مخفي -->
     <div class="hidden-audio">
         <iframe 
+            id="bgMusic"
             width="0" 
             height="0" 
-            src="https://www.youtube.com/embed/MnMVaqHkrPM?autoplay=1&loop=1&playlist=MnMVaqHkrPM" 
+            src="https://www.youtube.com/embed/MnMVaqHkrPM?autoplay=1&mute=1&loop=1&playlist=MnMVaqHkrPM&rel=0&modestbranding=1&showinfo=0" 
             frameborder="0" 
             allow="autoplay; encrypted-media" 
             allowfullscreen>
         </iframe>
     </div>
 
+    <!-- JS لإلغاء الميوت بعد أول تفاعل -->
+    <script>
+        document.addEventListener('click', function() {
+            var iframe = document.getElementById('bgMusic');
+            if (iframe) {
+                iframe.src = iframe.src.replace('&mute=1', '&mute=0');
+            }
+        }, { once: true });
+    </script>
+
     <div style="text-align: center;">
-        <h1>Hacked By Mr. Matrix</h1>
+        <div class="english-title">Hacked By Mr. Matrix</div>
 
-        <p>&nbsp;</p>
-
-        <p>
-            <font size="5" color="#FFFFFF"><b>Dedicated to NewEra Alliance (NEA) and Batman</b></font>
-        </p>
-
-        <p>&nbsp;</p>
+        <div class="english-title">Dedicated to NewEra Alliance (NEA) and Batman</div>
 
         <img border="0" src="https://tbgsecurity.com/wordpress/wp-content/uploads/2014/03/hacker1.jpg" width="495" height="179">
 
-        <p>&nbsp;</p>
+        <div class="quote-part1">
+            "أفعالي لا تشكل أي تهديد للأمن الإجتماعي والقيم الأخلاقيه،
+        </div>
 
-        <p>
-            <font size="4" color="#FFFFFF"><b>
-            "أفعالي لا تشكل أي تهديد للأمن الإجتماعي والقيم الأخلاقيه، بل هي طاقة شاب تفرغ من غير استغلال موهبتها."
-            </b></font>
+        <div class="quote-part2">
+            <span class="highlight-red">بل هي طاقة شاب تفرغ من غير استغلال موهبتها.</span>"
+        </div>
+
+        <p style="font-size: 22px; margin: 30px 0;">
+            See You ADMIN !
         </p>
 
-        <p>
-            <font size="4" color="#FFFFFF"><b>See You ADMIN !</b></font>
-        </p>
-
-        <p>&nbsp;</p>
-
-        <p>
-            <font color="#FFFFFF"><b>
-            <span style="font-family: 'Times New Roman'; font-size: medium;">
-            Contact Us on snap : inTOP518 (تم التعديل)
-            </span>
-            </b></font>
-        </p>
-
-        <p>
-            <font color="#FFFFFF" size="6"><b>Exploit_R00T&nbsp;&nbsp;&nbsp; - &nbsp; Dr.Matrix</b></font>
+        <p style="font-size: 26px; font-weight: bold; margin-top: 40px;">
+            Exploit_R00T&nbsp;&nbsp;&nbsp; - &nbsp; Dr.Matrix
         </p>
     </div>
 
