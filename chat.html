@@ -8,95 +8,86 @@
         body {
             background-color: #000000;
             color: #FFFFFF;
-            font-family: 'Trebuchet MS', Arial, sans-serif;
-            text-align: center;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace; /* خط مشابه للقديم */
+            text-align: center;
             background-attachment: fixed;
         }
-        .highlight {
+        .red-highlight {
             background-color: #FF0000;
-            padding: 4px 12px;
-            border-radius: 4px;
-            display: inline;
-        }
-        h1 {
-            font-size: 36pt;
-            margin: 20px 0;
-        }
-        .big-text {
-            font-size: 24pt;
+            color: #FFFFFF;
+            padding: 2px 6px;
             font-weight: bold;
         }
-        .medium-text {
-            font-size: 18pt;
+        .title {
+            font-size: 48px;
             font-weight: bold;
+            margin: 20px 0 10px;
+        }
+        .subtitle {
+            font-size: 28px;
+            margin: 10px 0;
+        }
+        .quote {
+            font-size: 20px;
+            margin: 40px 0 20px;
+        }
+        .small-text {
+            font-size: 18px;
+            margin: 15px 0;
+        }
+        .image-container {
+            margin: 30px 0;
         }
         img {
-            max-width: 100%;
+            max-width: 80%;
             height: auto;
+            border: none;
         }
-        /* صوت مخفي */
+        /* الصوت مخفي تماماً */
         .hidden-audio {
-            position: absolute !important;
-            width: 0 !important;
-            height: 0 !important;
-            overflow: hidden !important;
-            pointer-events: none !important;
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden;
         }
     </style>
 </head>
-<body bgcolor="#000000">
+<body>
 
-    <!-- الصوت رجع: مخفي، autoplay مع mute أولي، loop كامل -->
+    <!-- المقطع الصوتي مخفي (YouTube embed مع autoplay + loop) -->
     <div class="hidden-audio">
         <iframe 
-            id="bgMusic"
-            src="https://www.youtube.com/embed/MnMVaqHkrPM?autoplay=1&mute=1&loop=1&playlist=MnMVaqHkrPM&rel=0&modestbranding=1&controls=0&showinfo=0" 
+            src="https://www.youtube.com/embed/MnMVaqHkrPM?autoplay=1&mute=1&loop=1&playlist=MnMVaqHkrPM&rel=0&controls=0&showinfo=0&modestbranding=1" 
             width="0" 
             height="0" 
             frameborder="0" 
-            allow="autoplay; encrypted-media; picture-in-picture" 
+            allow="autoplay; encrypted-media" 
             allowfullscreen>
         </iframe>
     </div>
 
-    <!-- JS بسيط عشان يشغل الصوت بعد تفاعل (اختياري، لو تبي الصوت يرجع بعد كليك) -->
-    <script>
-        document.addEventListener('click', function() {
-            var iframe = document.getElementById('bgMusic');
-            if (iframe) {
-                iframe.src = iframe.src.replace('&mute=1', '&mute=0'); // إلغاء الميوت بعد أول كليك
-            }
-        }, { once: true }); // يشتغل مرة واحدة فقط
-    </script>
+    <div style="padding: 20px;">
 
-    <div style="text-align: center;">
-        <h1><span class="highlight">Hacked By Mr. Matrix</span></h1>
+        <div class="title"><span class="red-highlight">Hacked By Mr. Matrix</span></div>
 
-        <p class="big-text">
-            <span class="highlight">Dedicated to NewEra Alliance (NEA) and Batman</span>
-        </p>
+        <div class="subtitle"><span class="red-highlight">Dedicated to NewEra Alliance (NEA) and Batman</span></div>
 
-        <p>&nbsp;</p>
+        <div class="image-container">
+            <img src="https://tbgsecurity.com/wordpress/wp-content/uploads/2014/03/hacker1.jpg" alt="Hacked Image">
+        </div>
 
-        <img border="0" src="https://tbgsecurity.com/wordpress/wp-content/uploads/2014/03/hacker1.jpg" width="495" height="179">
+        <div class="quote">
+            <span class="red-highlight">"أفعالي لا تشكل أي تهديد للأمن الإجتماعي والقيم الأخلاقيه، بل هي طاقة شاب تفرغ من غير استغلال موهبتها."</span>
+        </div>
 
-        <p>&nbsp;</p>
+        <div class="subtitle"><span class="red-highlight">See You ADMIN !</span></div>
 
-        <p class="medium-text">
-            <span class="highlight">"أفعالي لا تشكل أي تهديد للأمن الإجتماعي والقيم الأخلاقيه، بل هي طاقة شاب تفرغ من غير استغلال موهبتها."</span>
-        </p>
+        <div class="small-text">
+            <span class="red-highlight">Exploit_R00T - Dr.Matrix</span>
+        </div>
 
-        <p class="big-text">
-            <span class="highlight">See You ADMIN !</span>
-        </p>
-
-        <p>&nbsp;</p>
-
-        <p class="big-text">
-            <span class="highlight">Exploit_R00T - Dr.Matrix</span>
-        </p>
     </div>
 
 </body>
