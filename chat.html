@@ -18,7 +18,7 @@
             background-color: #FF0000;
             padding: 4px 12px;
             border-radius: 4px;
-            display: inline; /* الخلفية تتبع النص فقط */
+            display: inline;
         }
         h1 {
             font-size: 36pt;
@@ -36,25 +36,40 @@
             max-width: 100%;
             height: auto;
         }
-        /* موسيقى خلفية مخفية */
+        /* صوت مخفي */
         .hidden-audio {
-            position: absolute;
-            width: 0;
-            height: 0;
-            overflow: hidden;
-            pointer-events: none;
+            position: absolute !important;
+            width: 0 !important;
+            height: 0 !important;
+            overflow: hidden !important;
+            pointer-events: none !important;
         }
     </style>
 </head>
 <body bgcolor="#000000">
 
-    <!-- المقطع الصوتي مخفي تمامًا (رجعناه) -->
+    <!-- الصوت رجع: مخفي، autoplay مع mute أولي، loop كامل -->
     <div class="hidden-audio">
         <iframe 
-            src="https://www.youtube.com/embed/MnMVaqHkrPM?autoplay=1&mute=1&loop=1&playlist=MnMVaqHkrPM&rel=0&modestbranding=1&showinfo=0" 
-            width="0" height="0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+            id="bgMusic"
+            src="https://www.youtube.com/embed/MnMVaqHkrPM?autoplay=1&mute=1&loop=1&playlist=MnMVaqHkrPM&rel=0&modestbranding=1&controls=0&showinfo=0" 
+            width="0" 
+            height="0" 
+            frameborder="0" 
+            allow="autoplay; encrypted-media; picture-in-picture" 
+            allowfullscreen>
         </iframe>
     </div>
+
+    <!-- JS بسيط عشان يشغل الصوت بعد تفاعل (اختياري، لو تبي الصوت يرجع بعد كليك) -->
+    <script>
+        document.addEventListener('click', function() {
+            var iframe = document.getElementById('bgMusic');
+            if (iframe) {
+                iframe.src = iframe.src.replace('&mute=1', '&mute=0'); // إلغاء الميوت بعد أول كليك
+            }
+        }, { once: true }); // يشتغل مرة واحدة فقط
+    </script>
 
     <div style="text-align: center;">
         <h1><span class="highlight">Hacked By Mr. Matrix</span></h1>
